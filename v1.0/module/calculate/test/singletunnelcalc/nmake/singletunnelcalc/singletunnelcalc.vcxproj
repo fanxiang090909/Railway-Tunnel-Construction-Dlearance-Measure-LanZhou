@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\include\compress.h" />
+    <ClInclude Include="..\..\..\..\..\..\include\datastructure.h" />
+    <ClInclude Include="..\..\..\..\..\..\include\filemanagers.h" />
+    <ClInclude Include="..\..\..\..\..\compress\include\lzoconf.h" />
+    <ClInclude Include="..\..\..\..\..\compress\include\lzodefs.h" />
+    <ClInclude Include="..\..\..\..\..\compress\include\minilzo.h" />
+    <ClInclude Include="..\..\..\..\..\datastructure\include\headdefine.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageAcqui.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageBase.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageCalc.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageMat.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageRT.h" />
+    <ClInclude Include="..\..\..\..\include\LzCalc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\compress\include\minilzo.c" />
+    <ClCompile Include="..\..\..\..\..\compress\src\testmini.c" />
+    <ClCompile Include="..\..\..\..\..\filemanagers\src\LzSerialStorageBase.cpp" />
+    <ClCompile Include="..\..\..\..\src\LzCalc.cpp" />
+    <ClCompile Include="..\..\main.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtXml;C:\Qt\include\QtTest;D:\svn-lanzhou2013\v1.0\module\calculate\include;D:\svn-lanzhou2013\v1.0\module\datastructure\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencv-vc11-x64\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>D:\opencv-vc11-x64\include;D:\Boost\include\boost-1_55;C:\Qt\include;C:\Qt\include\Qt;C:\Qt\include\QtSql;C:\Qt\include\ActiveQt;C:\Qt\include\QtGui;C:\Qt\include\QtCore;..\..\..\..\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\lz_exception\include;..\..\..\..\..\..\include;..\..\..\..\..\compress\include;..\..\..\..\..\backup\include;..\..\..\..\..\acquisition\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>D:\opencv-vc11-x64\include;D:\Boost\include\boost-1_55;C:\Qt\include;C:\Qt\include\Qt;C:\Qt\include\QtSql;C:\Qt\include\ActiveQt;C:\Qt\include\QtGui;C:\Qt\include\QtCore;..\..\..\..\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\lz_exception\include;..\..\..\..\..\..\include;..\..\..\..\..\compress\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencv-vc11-x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);..\..\..\..\..\filemanagers\include;..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>qtmaind.lib;QtCored4.lib;QtGuid4.lib;QtNetworkd4.lib;QtSqld4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);..\..\..\..\..\filemanagers\include;..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>qtmaind.lib;QtCore4.lib;QtCored4.lib;QtGui4.lib;QtGuid4.lib;QtNetwork4.lib;QtNetworkd4.lib;QtSql4.lib;QtSqld4.lib;opencv_calib3d246.lib;opencv_calib3d246d.lib;opencv_contrib246.lib;opencv_contrib246d.lib;opencv_core246.lib;opencv_core246d.lib;opencv_features2d246.lib;opencv_features2d246d.lib;opencv_flann246.lib;opencv_flann246d.lib;opencv_gpu246.lib;opencv_gpu246d.lib;opencv_haartraining_engine.lib;opencv_haartraining_engined.lib;opencv_highgui246.lib;opencv_highgui246d.lib;opencv_imgproc246.lib;opencv_imgproc246d.lib;opencv_legacy246.lib;opencv_legacy246d.lib;opencv_ml246.lib;opencv_ml246d.lib;opencv_nonfree246.lib;opencv_nonfree246d.lib;opencv_objdetect246.lib;opencv_objdetect246d.lib;opencv_ocl246.lib;opencv_ocl246d.lib;opencv_photo246.lib;opencv_photo246d.lib;opencv_stitching246.lib;opencv_stitching246d.lib;opencv_superres246.lib;opencv_superres246d.lib;opencv_ts246.lib;opencv_ts246d.lib;opencv_video246.lib;opencv_video246d.lib;opencv_videostab246.lib;opencv_videostab246d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);..\..\..\..\..\filemanagers\include;..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>qtmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);..\..\..\..\..\filemanagers\include;..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;D:\Boost\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>qtmain.lib;QtCore4.lib;QtCored4.lib;QtGui4.lib;QtGuid4.lib;QtNetwork4.lib;QtNetworkd4.lib;QtSql4.lib;QtSqld4.lib;opencv_calib3d246.lib;opencv_calib3d246d.lib;opencv_contrib246.lib;opencv_contrib246d.lib;opencv_core246.lib;opencv_core246d.lib;opencv_features2d246.lib;opencv_features2d246d.lib;opencv_flann246.lib;opencv_flann246d.lib;opencv_gpu246.lib;opencv_gpu246d.lib;opencv_haartraining_engine.lib;opencv_haartraining_engined.lib;opencv_highgui246.lib;opencv_highgui246d.lib;opencv_imgproc246.lib;opencv_imgproc246d.lib;opencv_legacy246.lib;opencv_legacy246d.lib;opencv_ml246.lib;opencv_ml246d.lib;opencv_nonfree246.lib;opencv_nonfree246d.lib;opencv_objdetect246.lib;opencv_objdetect246d.lib;opencv_ocl246.lib;opencv_ocl246d.lib;opencv_photo246.lib;opencv_photo246d.lib;opencv_stitching246.lib;opencv_stitching246d.lib;opencv_superres246.lib;opencv_superres246d.lib;opencv_ts246.lib;opencv_ts246d.lib;opencv_video246.lib;opencv_video246d.lib;opencv_videostab246.lib;opencv_videostab246d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" Qt5Version_x0020_Win32="Qt4.8" Qt5Version_x0020_x64="Qt4.8" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

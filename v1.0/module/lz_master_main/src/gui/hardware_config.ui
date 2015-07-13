@@ -1,0 +1,763 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HardwareConfigWidget</class>
+ <widget class="QWidget" name="HardwareConfigWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>810</width>
+    <height>635</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>微软雅黑</family>
+    <pointsize>11</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>硬件配置</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okConfigButton">
+       <property name="text">
+        <string>确认参数</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resource/gui/icons.qrc">
+         <normaloff>:/image/filesave.png</normaloff>:/image/filesave.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="ID">
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <row>
+      <property name="text">
+       <string>A</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>C</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>D</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>E</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>H</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>I</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>J</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>K</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>L</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>M</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>N</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>O</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>P</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Q</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </row>
+     <column>
+      <property name="text">
+       <string>从机号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>IP地址</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>相机(1)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>相机(1)序列号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>相机(2)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>相机(2)序列号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>双目标定参数文件</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>轨平面分中坐标系标定参数文件</string>
+      </property>
+     </column>
+     <item row="0" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="0" column="2">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="0" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="0" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="1" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="1" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="1" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="1" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="2" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="2" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="2" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="2" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="3" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="3" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="3" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="3" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="4" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="4" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="4" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="4" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="5" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="5" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="5" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="5" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="6" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="6" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="6" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="6" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="7" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="7" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="7" column="4">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="7" column="6">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <family>微软雅黑</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+     </item>
+     <item row="8" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="8" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="8" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="8" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="9" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="9" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="9" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="9" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="10" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="10" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="10" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="10" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="11" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="11" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="11" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="11" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="12" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="12" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="12" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="12" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="13" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="13" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="13" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="13" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="14" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="14" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="14" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="14" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="15" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="15" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="15" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="15" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="16" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="16" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="16" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="16" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="17" column="1">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="17" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="17" column="4">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="17" column="6">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="selectSendFileButton">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>选择要发送的文件</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resource/gui/icons.qrc">
+         <normaloff>:/image/open-file.png</normaloff>:/image/open-file.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="filelineEdit">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="sendConfigFilesButton">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>发送至所有从控机</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="sendOneConfigFileButton">
+       <property name="text">
+        <string>发送至某个从控机</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="clientStatusLabel">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>状态提示：</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="status">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>20</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="hostLineEdit">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="portLineEdit">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../resource/gui/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

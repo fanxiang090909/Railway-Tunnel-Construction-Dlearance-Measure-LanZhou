@@ -1,0 +1,50 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/addstu&amp;tea.png</file>
+        <file>image/export.png</file>
+        <file>image/import.png</file>
+        <file>image/modify.png</file>
+        <file>image/ok_3644.png</file>
+        <file>image/m-delete.gif</file>
+        <file>image/refresh.png</file>
+        <file>image/add.png</file>
+        <file>image/alert.png</file>
+        <file>image/cross.png</file>
+        <file>image/down_alt.png</file>
+        <file>image/exit.png</file>
+        <file>image/help.png</file>
+        <file>image/icons_04.png</file>
+        <file>image/icons_05.png</file>
+        <file>image/icons_12.png</file>
+        <file>image/icons_13.png</file>
+        <file>image/info.png</file>
+        <file>image/minus (2).png</file>
+        <file>image/minus white.png</file>
+        <file>image/minus.png</file>
+        <file>image/new archive.png</file>
+        <file>image/notepad.png</file>
+        <file>image/pencil.png</file>
+        <file>image/refresh (2).png</file>
+        <file>image/search (2).png</file>
+        <file>image/search.png</file>
+        <file>image/tick.png</file>
+        <file>image/up_alt.png</file>
+        <file>image/user.png</file>
+        <file>image/zoom in.png</file>
+        <file>image/zoom out.png</file>
+        <file>image/icon.png</file>
+        <file>image/lightblue.png</file>
+        <file>image/lightgreen.png</file>
+        <file>image/lightred.png</file>
+        <file>image/lightyellow.png</file>
+        <file>image/arrow.png</file>
+        <file>image/tabbutton1.png</file>
+        <file>image/tabbutton1_up.png</file>
+        <file>image/tabbutton2.png</file>
+        <file>image/tabbutton2_up.png</file>
+        <file>image/Ok.ico</file>
+        <file>image/cancel.png</file>
+        <file>image/filesave.png</file>
+        <file>image/showdoc.png</file>
+    </qresource>
+</RCC>
