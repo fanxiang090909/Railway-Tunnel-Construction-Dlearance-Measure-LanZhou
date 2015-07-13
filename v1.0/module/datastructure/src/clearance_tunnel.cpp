@@ -81,3 +81,36 @@ QString ClearanceSingleTunnel::getTaskTunnelInfo()
     TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tasktunnelid, tunnelid, tunnelname, date);
     return tunnelname + "_" + date;
 }
+
+/**
+ * 最小曲线半径
+ */
+int ClearanceSingleTunnel::getMinRadius()
+{
+    return 0;
+}
+
+/**
+ * 最低中心净高
+ */
+int ClearanceSingleTunnel::getMinHeight()
+{
+    int minheight = -1;
+    if (hasstraight)
+    {
+        if (minheight < 0 || (straightdata.getMinCenterHeight() > 0 && straightdata.getMinCenterHeight() < minheight ))
+            minheight = straightdata.getMinCenterHeight();
+    }
+    if (hasleft)
+    {
+        if (minheight < 0 || (leftdata.getMinCenterHeight() > 0 && leftdata.getMinCenterHeight() < minheight ))
+            minheight = leftdata.getMinCenterHeight();
+    }
+    if (hasright)
+    {
+        if (minheight < 0 || (rightdata.getMinCenterHeight() > 0 && rightdata.getMinCenterHeight() < minheight ))
+            minheight = rightdata.getMinCenterHeight();
+    }
+
+    return minheight;
+}

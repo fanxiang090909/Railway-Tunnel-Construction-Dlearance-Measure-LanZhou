@@ -47,6 +47,7 @@
     <ClCompile Include="..\..\..\..\..\datastructure\src\realtask_list.cpp" />
     <ClCompile Include="..\..\..\..\..\datastructure\src\slavemodel.cpp" />
     <ClCompile Include="..\..\..\..\..\filemanagers\src\LzSerialStorageBase.cpp" />
+    <ClCompile Include="..\..\..\..\..\lz_logger\src\lz_logger.cpp" />
     <ClCompile Include="..\..\..\..\..\lz_slave_main\src\lz_calc_queue.cpp" />
     <ClCompile Include="..\..\..\..\..\lz_slave_main\src\lz_slavemsg_queue.cpp" />
     <ClCompile Include="..\..\..\..\..\lz_slave_main\src\setting_slave.cpp" />
@@ -424,6 +425,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\..\..\..\lz_logger\include\lz_logger.h" />
     <ClInclude Include="..\..\..\..\..\pulsehandle\include\bdaq\bdaqctrl.h" />
     <ClInclude Include="..\..\..\..\..\pulsehandle\include\bdaq\compatibility.h" />
     <ClInclude Include="..\..\..\..\..\pulsehandle\include\ReadHardware.h" />
@@ -1105,8 +1107,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\include\gui\test;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;..\..\..\..\..\lz_slave_main\include;C:\Boost\include\boost-1_55;C:\opencvx64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Boost\lib\x64;C:\opencvx64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\include\gui\test;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;..\..\..\..\..\lz_slave_main\include;D:\Boost\include\boost-1_55;D:\opencvx64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencvx64\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -1114,8 +1116,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\include\gui\test;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\..\include;..\..\..\..\..\lz_slave_main\include;C:\Boost\include\boost-1_55;C:\opencvx64\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Boost\lib\x64;C:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\include\gui\test;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\..\include;..\..\..\..\..\lz_slave_main\include;D:\Boost\include\boost-1_55;D:\opencvx64\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

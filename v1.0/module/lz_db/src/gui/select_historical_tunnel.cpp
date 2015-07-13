@@ -701,7 +701,7 @@ void SelectHistoricalTunnelDataWidget::loadClearanceDataToOutput()
             tasktunnelids.push_back(itemlong);
         }
         // 如果多隧道数量不够，提示
-        if (tasktunnelids.size() < 2)
+        if (tasktunnelids.size() < 1)
         {
             QMessageBox::warning(this, tr("提示"), tr("当前未选择待综合的多条隧道，请先选择！"));
             return;

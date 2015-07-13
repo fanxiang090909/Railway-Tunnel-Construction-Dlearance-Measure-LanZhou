@@ -79,6 +79,16 @@ public:
 
     QString getJieChuWangGaoDu() { return jiechuwanggaodu; }
 
+    /**
+     * 最小曲线半径
+     */
+    int getMinRadius();
+
+    /**
+     * 最低中心净高
+     */
+    int getMinHeight();
+
 private:
 
     _int64 tasktunnelid;

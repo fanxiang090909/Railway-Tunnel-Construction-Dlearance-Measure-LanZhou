@@ -42,8 +42,8 @@ OutputClearanceWidget::OutputClearanceWidget(QWidget *parent) :
 
     templatepath = ClientSetting::getSettingInstance()->getOutExcelTemplatePath();
 
-    // 界面上默认的底板是基础隧道限界--内燃牵引
-    outImageType = OutType_B_NeiRan;
+    // 界面上默认的底板是基础隧道限界--电力牵引
+    outImageType = OutType_B_DianLi;
     datatype= AllType;
 
     // 单隧道基本信息模型设置为NULL，界面切换过来时再从ClientSetting中加载
@@ -88,7 +88,7 @@ OutputClearanceWidget::OutputClearanceWidget(QWidget *parent) :
     // 选择输出图标类型信号槽
     connect(ui->comboBox_OutImageType, SIGNAL(currentIndexChanged(int)), SLOT(selectOutputClearanceImageType(int)));
     // 告知画图界面输出图标类型信号槽
-    connect(this, SIGNAL(sendOutputType(OutputClearanceImageType)), syntunnelcorrect, SLOT(getfloornumber(OutputClearanceImageType)));
+    connect(this, SIGNAL(sendOutputType(OutputClearanceImageType)), syntunnelcorrect, SLOT(setfloornumber(OutputClearanceImageType)));
     //选择显示的数据类型
     connect(ui->comboBox_outCurveType,SIGNAL(currentIndexChanged(int)),this,SLOT(selectOutputClearanceDataType(int)));
     //告知画图界面输出数据类型信号槽
@@ -334,6 +334,8 @@ void OutputClearanceWidget::clearanceImagePreview()
         datar = multiTunnelsModel.getClearanceRightData();
     }
     
+    syntunnelcorrect->clearPointsArrayAll();
+
     if (!hass && !hasl && !hasr)
         return;
 
@@ -376,20 +378,22 @@ void OutputClearanceWidget::selectOutputClearanceImageType(int index)
     }
     else // 若是多隧道综合结果输出
     {
-    
+        outImageType = OutType_B_DianLi;
+        emit sendOutputType(outImageType);
     }
 }
+
 void OutputClearanceWidget::selectOutputClearanceDataType(int index)
 {
     index = ui->comboBox_outCurveType->currentIndex();
-    if(index==0)
-        datatype=AllType;
-    else if(index==1)
-        datatype=StraightType;
-    else if(index==2)
-         datatype=LeftType;
+    if(index == 0)
+        datatype = AllType;
+    else if(index == 1)
+        datatype = StraightType;
+    else if(index == 2)
+        datatype = LeftType;
     else
-        datatype=RightType;
+        datatype = RightType;
     syntunnelcorrect->setImageType(datatype);
 }
 
@@ -453,9 +457,15 @@ void OutputClearanceWidget::updateClearanceTableModel(SingleOrMultiSelectionMode
                 ui->lineEdit_isNew->setText(tr(""));
 
             if (lineType == 1) // 内燃牵引
+            {
                 ui->lineEdit_lineType->setText(tr("内燃牵引"));
+                syntunnelcorrect->setfloornumber(OutType_B_NeiRan);
+            }
             else if (lineType == 0) // 电力牵引
+            {
                 ui->lineEdit_lineType->setText(tr("电力牵引"));
+                syntunnelcorrect->setfloornumber(OutType_B_DianLi);
+            }
             else
                 ui->lineEdit_lineType->setText(tr(""));
 

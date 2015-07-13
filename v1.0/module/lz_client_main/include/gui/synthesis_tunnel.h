@@ -101,6 +101,11 @@ private:
     Ui::SynthesisTunnelWidget *ui;   
 
     /**
+     * 里程折算系数，相邻帧间隔里程
+     */
+    double interframe_mile;
+
+    /**
      * 当前正在编辑用户
      */
     QString username;

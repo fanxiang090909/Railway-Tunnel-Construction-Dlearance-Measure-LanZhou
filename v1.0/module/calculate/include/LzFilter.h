@@ -37,19 +37,30 @@ static bool Filter_TunnelMileage_InterToActual(bool is_normal, bool is_double_li
 	qDebug() << "is_normal=" << is_normal << ", is_double_line=" << is_double_line << ", is_down_link=" << is_down_link << ", mileage=" << filteredmileage;
     qDebug() << "this tunnel startpoint=" << tunnelStartPoint << ", endpoint=" << tunnelEndPoint;
     // 若单线正常（正序），双线下行正常、双线上行非正常，mileage+隧道起始里程为当前里程
-	//if ((!is_double_line && is_normal) || (is_double_line && is_down_link && is_normal) || (is_double_line && !is_down_link && !is_normal))
+	if ((!is_double_line && is_normal) || (is_double_line && is_down_link && is_normal) || (is_double_line && !is_down_link && !is_normal))
     {
+        // 里程表示
         filteredmileage = tunnelStartPoint + filteredmileage;
+
+        // 隧道距小里程隧道口表示
+        //filteredmileage = filteredmileage;
     }
-    //else // 若单线非正常（逆序），双线下行非正常、双线上行正常，隧道终止里程-mileage为当前里程
-    //{
-	//	filteredmileage = tunnelEndPoint - filteredmileage;
-    //}
+    else // 若单线非正常（逆序），双线下行非正常、双线上行正常，隧道终止里程-mileage为当前里程
+    {
+        // 里程表示
+		filteredmileage = tunnelEndPoint - filteredmileage;
+
+        // 隧道距小里程隧道口表示
+        //filteredmileage = tunnelEndPoint - tunnelStartPoint - filteredmileage;
+    }
+
     qDebug() << "the filtered mileage=" << filteredmileage;
+    // 里程表示
     if (filteredmileage <= tunnelEndPoint && tunnelStartPoint <= filteredmileage)
         return true;
     else
         return false;
+    //return true;
 }
 
 // 【注意！】相对于车厢正向的相机组左侧右侧开启模式

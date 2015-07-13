@@ -58,13 +58,17 @@ static bool clearanceReduction(SectionData & data, bool carriagedirection)
     // 如果车厢为正，又是左曲线，则data左侧为内侧，data右侧为外侧
     CurveType type = data.getType();
     int radius = data.getRadius();
-    if ((type == Curve_Left && carriagedirection) || (type == Curve_Right && !carriagedirection))
+    /*if ((type == Curve_Left && carriagedirection) || (type == Curve_Right && !carriagedirection))
         leftisinside = true;
     // 如果车厢为反，又是左转曲线，则data左侧为外侧，data右侧为内侧
     else if ((type == Curve_Left && !carriagedirection) || (type == Curve_Right && carriagedirection)) 
         leftisinside = false;
     else
-        return false;
+        return false;*/
+    if (type == Curve_Left)
+        leftisinside = true;
+    else
+        leftisinside = false;
 
     std::map<int,item>::iterator it = data.getMaps().begin();
     int tempkey;
@@ -72,7 +76,58 @@ static bool clearanceReduction(SectionData & data, bool carriagedirection)
     {
         std::pair<int,item> pair = (*it);
         reduction(type, (*it).second.left, radius, leftisinside);
-        reduction(type, (*it).second.left, radius, !leftisinside);
+        reduction(type, (*it).second.right, radius, !leftisinside);
+        it++;
+    }
+    return true;
+}
+
+/**
+ * 隧道断面折减
+ * @param curvetype 曲线类型，直线0，左转曲线-1，右转曲线+1
+ * @param data 输入的隧道断面数据
+ * @param radius 曲线半径
+ * @param carriagedirection 车厢正反
+ * @return true 折减成功
+ * @author 范翔
+ * @date 2014-6-12
+ */
+static bool clearanceReduction(ClearanceData & data, bool carriagedirection)
+{
+    bool leftisinside;
+    // 如果车厢为正，又是左曲线，则data左侧为内侧，data右侧为外侧
+    ClearanceType type0 = data.getClearanceType();
+    CurveType type;
+    switch (type0)
+    {
+        case ClearanceType::LeftCurve_Smallest:
+        case ClearanceType::LeftCurve_2ndSmallest:
+            type = Curve_Left; break;
+        case ClearanceType::RightCurve_Smallest:
+        case ClearanceType::RightCurve_2ndSmallest:
+            type = Curve_Right; break;
+        default:
+            break;
+    }
+    /*if ((type == Curve_Left && carriagedirection) || (type == Curve_Right && !carriagedirection))
+        leftisinside = true;
+    // 如果车厢为反，又是左转曲线，则data左侧为外侧，data右侧为内侧
+    else if ((type == Curve_Left && !carriagedirection) || (type == Curve_Right && carriagedirection)) 
+        leftisinside = false;
+    else
+        return false;*/
+    if (type == Curve_Left)
+        leftisinside = true;
+    else
+        leftisinside = false;
+
+    std::map<int, ClearanceItem>::iterator it = data.getMaps().begin();
+    int tempkey;
+    while (it != data.getMaps().end())
+    {
+        std::pair<int,ClearanceItem> pair = (*it);
+        reduction(type, (*it).second.leftval, (*it).second.leftradius, leftisinside);
+        reduction(type, (*it).second.rightval, (*it).second.rightradius, !leftisinside);
         it++;
     }
     return true;

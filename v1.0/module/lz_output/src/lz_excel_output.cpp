@@ -67,7 +67,7 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
     excel.SetCellData(102,3,tunnellength); 
 
     // 计算中心里程 隧道中心点的里程数
-    float centerlength = 1.0 * (inputbasicdata->getEndPoint() + inputbasicdata->getStartPoint()) / 2000; 
+    float centerlength = 1.0 * (inputbasicdata->getEndPoint() + inputbasicdata->getStartPoint()) / 2; 
     excel.SetCellData(4,10,centerlength);
     excel.SetCellData(101,3,centerlength); 
 
@@ -90,6 +90,7 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
         CurveType type = inputdata.getType();
         long long pos = inputdata.getMile();
         int radius = inputdata.getRadius();
+        float minHeight = inputdata.getCenterHeight();
 
         switch(type)
         {
@@ -112,6 +113,10 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
         while (it != data.getMaps().rend())
         {
             std::pair<int, item> pair = (*it);
+
+            if (pair.first > minHeight)
+                continue;
+
             // 此处写要插入的内容
             if (pair.second.left >= 0)
                 excel.SetCellData(k + startrownum, startcolumnnum, (int)pair.second.left); 
@@ -213,6 +218,10 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
     excel.SetCellData(4,4,QObject::tr(inputbasicdata->getName().c_str()));
     excel.SetCellData(54,5,QObject::tr(inputbasicdata->getName().c_str()));
 
+    // 隧道编号
+    excel.SetCellData(54, 8, QObject::tr(inputbasicdata->getIdStd().c_str()));
+
+
     // 时间
     QStringList strList = inputdata->getTaskTunnelInfo().split("_");
     QByteArray ba = strList.at(1).toLocal8Bit();
@@ -220,7 +229,8 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
 
     // 起讫里程
     _int64 startdistance = inputbasicdata->getStartPoint();
-    excel.SetCellData(4,16,startdistance); 
+    QString startenddistance = QString("%1-%2").arg(inputbasicdata->getStartPoint()).arg(inputbasicdata->getEndPoint());
+    excel.SetCellData(4,16,startenddistance); 
 
     // 计算隧道长度
     _int64 tunnellength = inputbasicdata->getEndPoint() - inputbasicdata->getStartPoint();
@@ -229,16 +239,19 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
     excel.SetCellData(102,3,tunnellength); 
 
     // 计算中心里程 隧道中心点的里程数
-    float centerlength = 1.0 * (inputbasicdata->getEndPoint() + inputbasicdata->getStartPoint()) / 2000; 
+    float centerlength = (inputbasicdata->getEndPoint() + inputbasicdata->getStartPoint()) / 2; 
     excel.SetCellData(4,10,centerlength);
     excel.SetCellData(101,3,centerlength); 
 
-    // 最小曲线半径///TODO
-    excel.SetCellData(5,5,startdistance); 
+    // 最小曲线半径
+    excel.SetCellData(5, 4, inputdata->getMinRadius()); 
+    excel.SetCellData(54, 10, inputdata->getMinRadius()); 
+
     // 最大外轨超高
     excel.SetCellData(5,10,inputdata->getWaiGuiChaoGao()); 
     // 最低接触网高度
     excel.SetCellData(5,16,inputdata->getJieChuWangGaoDu()); 
+
 
     ClearanceData * data = &inputdata->getClearanceStraightData();
     int rowcount = data->getMaps().size();
@@ -252,6 +265,7 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
     float tmpval;
     _int64 tmppos;
     int tmpradius;
+    float minHeight;
     
     for (int i = 0; i < 3; i++)
     {
@@ -290,12 +304,22 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
                 break;
         }
 
+        minHeight = data->getMinCenterHeight();
+
         // map反向遍历，正向为高度从小到大，插入图表是需要高度从大到小
         std::map<int, ClearanceItem>::reverse_iterator it = data->getMaps().rbegin();
         int k = 0; // 相对行数
         while (it != data->getMaps().rend())
         {
             std::pair<int, ClearanceItem> pair = (*it);
+
+            if (pair.first > minHeight)
+            {
+                it++;
+                k++;
+                continue;
+            }
+
             // 此处写要插入的内容
             if (pair.second.leftval >= 0)
                 excel.SetCellData(k + startrownum, startcolumnnum, pair.second.leftval); 
@@ -329,9 +353,8 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
 
     // <150高度手动输入？ ///TODO
 
-    // 线路中心线上方最低净高mm///TODO
-    int newdata = 0;
-    excel.SetCellData(rowcount+startrownum+1,10,newdata);
+    // 线路中心线上方最低净高mm
+    excel.SetCellData(rowcount+startrownum+1,9, inputdata->getMinHeight());
     
     excel.setProperty("DisplayAlerts", 0);
     
@@ -391,10 +414,11 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
     ExcelEngine excel;
 
     excel.Open(outputfile, 1, false);
-    QString linename = ""; ////TODO
+    
+    QString linename = ""; 
     // 限界表名称
-    excel.SetCellData(1,1,QObject::tr("%1桥隧综合最小建筑限界尺寸表").arg(linename));
-    excel.SetCellData(52,1,QObject::tr("%1桥隧综合最小建筑限界尺寸图").arg(linename));
+    excel.SetCellData(1,1,QObject::tr("%1区段桥隧综合最小建筑限界尺寸表").arg(linename));
+    excel.SetCellData(52,1,QObject::tr("%1区段桥隧综合最小建筑限界尺寸图").arg(linename));
 
     // 线路名称
     excel.SetCellData(3,3,linename);
@@ -448,7 +472,8 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
     float tmpval;
     _int64 tmppos;
     int tmpradius;
-    
+    float minHeight;
+
     for (int i = 0; i < 3; i++)
     {
         startcolumnnum = startcolumnnumdef;
@@ -486,12 +511,22 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
                 break;
         }
 
+        minHeight = data->getMinCenterHeight();
+
         // map反向遍历，正向为高度从小到大，插入图表是需要高度从大到小
         std::map<int, ClearanceItem>::reverse_iterator it = data->getMaps().rbegin();
         int k = 0; // 相对行数
         while (it != data->getMaps().rend())
         {
             std::pair<int, ClearanceItem> pair = (*it);
+
+            if (pair.first > minHeight)
+            {
+                it++;
+                k++;
+                continue;
+            }
+
             // 此处写要插入的内容
             if (pair.second.leftval >= 0)
                 excel.SetCellData(k + startrownum, startcolumnnum, pair.second.leftval); 
@@ -500,21 +535,29 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
             if (i == Curve_Straight) // 直线
             {
                 if (pair.second.leftval >= 0)
-                    excel.SetCellData(k + startrownum, startcolumnnum + 2, toTunnelPosString(pair.second.leftpos, pair.second.lefttunnelid, "0").c_str()); 
+                {
+                    excel.SetCellData(k + startrownum, startcolumnnum + 2, toTunnelPosString2(pair.second.leftpos, pair.second.lefttunnelid, "0"));
+                    qDebug() << toTunnelPosString2(pair.second.leftpos, pair.second.lefttunnelid, "0");
+                }
                 if (pair.second.rightval >= 0)
-                    excel.SetCellData(k + startrownum, startcolumnnum + 3, toTunnelPosString(pair.second.rightpos, pair.second.righttunnelid, "0").c_str());
+                {
+                    excel.SetCellData(k + startrownum, startcolumnnum + 3, toTunnelPosString2(pair.second.rightpos, pair.second.righttunnelid, "0"));
+                    qDebug() << toTunnelPosString2(pair.second.rightpos, pair.second.righttunnelid, "0");
+                }
             }
             else
             {
                 if (pair.second.leftval >= 0)
                 {
                     excel.SetCellData(k + startrownum, startcolumnnum + 2, pair.second.leftradius); 
-                    excel.SetCellData(k + startrownum, startcolumnnum + 4, toTunnelPosString(pair.second.leftpos, pair.second.lefttunnelid, "0").c_str()); 
+                    excel.SetCellData(k + startrownum, startcolumnnum + 4, toTunnelPosString2(pair.second.leftpos, pair.second.lefttunnelid, "0"));
+                    qDebug() << toTunnelPosString2(pair.second.leftpos, pair.second.lefttunnelid, "0");
                 }
                 if (pair.second.rightval >= 0)
                 {
                     excel.SetCellData(k + startrownum, startcolumnnum + 3, pair.second.rightradius);
-                    excel.SetCellData(k + startrownum, startcolumnnum + 5, toTunnelPosString(pair.second.rightpos, pair.second.righttunnelid, "0").c_str());
+                    excel.SetCellData(k + startrownum, startcolumnnum + 5, toTunnelPosString2(pair.second.rightpos, pair.second.righttunnelid, "0"));
+                    qDebug() << toTunnelPosString2(pair.second.rightpos, pair.second.righttunnelid, "0");
                 }
             }
             it++;
@@ -524,9 +567,8 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
 
     // <150高度手动输入？ ///TODO
 
-    // 线路中心线上方最低净高mm///TODO
-    int newdata = 0;
-    excel.SetCellData(rowcount+startrownum+1,10,newdata);
+    // 线路中心线上方最低净高mm
+    excel.SetCellData(rowcount+startrownum+1,9, inputdata->getMinHeight());
     
     excel.setProperty("DisplayAlerts", 0);
     

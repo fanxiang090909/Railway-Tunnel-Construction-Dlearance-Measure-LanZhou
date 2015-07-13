@@ -1,6 +1,7 @@
 ﻿#include "LzSynth_n.h"
 #include "output_heights_list.h"
 #include "daoclearanceoutput.h"
+#include "daotasktunnel.h"
 #include <QDebug>
 
 /**
@@ -80,12 +81,19 @@ void LzNTunnelsSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& 
 
             // 临时变量findInterMile()函数引用
             tmptype = tempdata.getClearanceType();
+            //tempdata.setMinCenterHeightTunnelID(-1)
+            int tmptunnelid = -1;
+            QString tmptunnelname;
+            QString tmpdate;
+            // 根据采集隧道ID得到隧道基本ID
+            TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate);
+            tempdata.setTunnelID(tmptunnelid);
 
             if (ret)
             {
                 switch (tmptype)
                 {
-                    case Straight_Smallest:	tempdata.updateToClearanceData(straightdata); straightnum++; break;
+                    case Straight_Smallest:	    tempdata.updateToClearanceData(straightdata); straightnum++; break;
                     case LeftCurve_Smallest:    tempdata.updateToClearanceData(leftdata); leftnum++; break;
                     case RightCurve_Smallest:   tempdata.updateToClearanceData(rightdata); rightnum++; break;
                     default:qDebug() << "can not find TYPE in task_tunnel_id" << (*it); break;

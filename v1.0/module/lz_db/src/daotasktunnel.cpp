@@ -273,12 +273,18 @@ bool TaskTunnelDAO::hasTaskTunnelID(_int64 taskTunnelid)
 
 /**
  * 创建隧道任务，没有taskTunnelid参数，因为加入数据库时采取主键自增策略
+ * @param taskid
+ * @param tunnelid 隧道ID
+ * @param interframe_mile 帧间隔里程数，一般0.5m，0.75m，1m，1.25m一帧
+ * @param carriageDirection 车厢正反
+ * @param isNormal 正常拍摄、非正常拍摄
+ * @param state 状态
  * @return 0 创建成功
  *         1 创建不成功 已经存在该隧道任务
  *         2 创建不成功 taskid不存在
  *         3 创建不成功 tunnelid不存在
  */
-int TaskTunnelDAO::addTaskTunnel(_int64 taskid, int tunnelid, bool isNormal, int state)
+int TaskTunnelDAO::addTaskTunnel(_int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state)
 {
     int ret = 0;
     QString date = TaskDAO::getTaskDAOInstance()->getTaskDate(taskid);
@@ -297,18 +303,24 @@ int TaskTunnelDAO::addTaskTunnel(_int64 taskid, int tunnelid, bool isNormal, int
         ret = 1;
         return ret;
     }
-    createTaskTunnel_P(taskid, tunnelid, isNormal, state);
+    createTaskTunnel_P(taskid, tunnelid, interframe_mile, carriageDirection, isNormal, state);
     return ret;
 }
 
 /**
  * 更新隧道任务
+ * @param taskid
+ * @param tunnelid 隧道ID
+ * @param interframe_mile 帧间隔里程数，一般0.5m，0.75m，1m，1.25m一帧
+ * @param carriageDirection 车厢正反
+ * @param isNormal 正常拍摄、非正常拍摄
+ * @param state 状态
  * @return 0 更新成功
  *         1 更新不成功，当前taskTunnelid不存在
  *         2 更新不成功，taskid不存在
  *         3 更新不成功，tunnelid不存在
  */
-int TaskTunnelDAO::updateTaskTunnel(_int64 taskTunnelid, _int64 taskid, int tunnelid, bool isNormal, int state)
+int TaskTunnelDAO::updateTaskTunnel(_int64 taskTunnelid, _int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state)
 {
     int ret = 0;
     if (!hasTaskTunnelID(taskTunnelid))
@@ -327,7 +339,7 @@ int TaskTunnelDAO::updateTaskTunnel(_int64 taskTunnelid, _int64 taskid, int tunn
         ret = 3;
         return ret;
     }
-    updateTaskTunnel_P(taskTunnelid, taskid, tunnelid, isNormal, state);
+    updateTaskTunnel_P(taskTunnelid, taskid, tunnelid, interframe_mile, carriageDirection, isNormal, state);
     return ret;
 }
 
@@ -350,24 +362,25 @@ _int64 TaskTunnelDAO::getTaskTunnel_P(int tunnelid, QString date)
 }
 
 // 数据库中创建新隧道任务，没有taskTunnelid参数，因为加入数据库时采取主键自增策略
-void TaskTunnelDAO::createTaskTunnel_P(_int64 taskid, int tunnelid, bool isNormal, int state)
+void TaskTunnelDAO::createTaskTunnel_P(_int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state)
 {
     QSqlQuery query;
-    query.exec(QString("INSERT INTO task_tunnel (task_id, tunnel_id, is_normal, state) "
-                       "VALUES (%1, %2, %3, %4) "
-               ).arg(taskid).arg(tunnelid).arg(isNormal).arg(state));
-    qDebug() << "createTaskTunnel_P, task_id" << taskid << ", tunnelid: " << tunnelid << ", isnormal: " << isNormal << ", state: " << state;
+    query.exec(QString("INSERT INTO task_tunnel (task_id, tunnel_id, interframe_mile, carriage_direction, is_normal, state) "
+                       "VALUES (%1, %2, %3, %4, %5, %6) "
+                       ).arg(taskid).arg(tunnelid).arg(interframe_mile).arg(carriageDirection).arg(isNormal).arg(state));
+    qDebug() << "createTaskTunnel_P, task_id" << taskid << ", tunnelid: " << tunnelid <<  ", interframe_mile" << interframe_mile
+        << ", carriageDirection" << carriageDirection << ", isnormal: " << isNormal << ", state: " << state;
 
 }
 
 // 数据库中修改task_tunnel
-void TaskTunnelDAO::updateTaskTunnel_P(_int64 taskTunnelid, _int64 taskid, int tunnelid, bool isNormal, int state)
+void TaskTunnelDAO::updateTaskTunnel_P(_int64 taskTunnelid, _int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state)
 {
     QSqlQuery query;
-    query.exec(QString("UPDATE task_tunnel SET task_id = %1, tunnel_id = %2, "
-                       "is_normal = %3, state = %4 "
-                       "WHERE task_tunnel_id = %5")
-               .arg(taskTunnelid).arg(taskid).arg(tunnelid).arg(isNormal).arg(state));
+    query.exec(QString("UPDATE task_tunnel SET task_id = %1, tunnel_id = %2, interframe_mile = %3, carriage_direction = %4, "
+                       "is_normal = %5, state = %6 "
+                       "WHERE task_tunnel_id = %7")
+                       .arg(taskid).arg(tunnelid).arg(interframe_mile).arg(carriageDirection).arg(isNormal).arg(state).arg(taskTunnelid));
     qDebug() << "updateTaskTunnel_P" << taskTunnelid;
 
 }

@@ -95,16 +95,16 @@ public:
 		//horizontal
 		for (int i=0; i<ORIGINAL_WIDTH; i++)
 		{
-			left.push_back( Point2f(ORIGINAL_WIDTH+i, 0) );
-			left.push_back( Point2f(ORIGINAL_WIDTH+i, 1280) );
+			left.push_back( Point2f(i, 0) );
+			left.push_back( Point2f(i, 1280) );
 			right.push_back( Point2f(i, 0) );
 			right.push_back( Point2f(i, 1280) );
 		}
 		//vertical
 		for (int i=0; i<ORIGINAL_HEIGHT; i++)
 		{
+			left.push_back( Point2f(0, i) );
 			left.push_back( Point2f(ORIGINAL_WIDTH, i) );
-			left.push_back( Point2f(ORIGINAL_WIDTH + ORIGINAL_WIDTH, i) );
 			right.push_back( Point2f(0, i) );
 			right.push_back( Point2f(ORIGINAL_WIDTH, i) );
 		}
@@ -132,9 +132,9 @@ public:
 	}
 	inline void rctfimgs(Mat &_left, Mat &_right, Mat &img_L, Mat &img_R){
 
-		Mat full_left = Mat::zeros(1280, 1024, _left.type());
-		Mat full_right = Mat::zeros(1280, 1024, _right.type());
-		_left.copyTo(full_left.colRange(512,1024));
+		Mat full_left = Mat::zeros(1280, 512, _left.type());
+		Mat full_right = Mat::zeros(1280, 512, _right.type());
+		_left.copyTo(full_left.colRange(0,512));
 		_right.copyTo(full_right.colRange(0,512));
 
 		// remap
@@ -145,14 +145,14 @@ public:
 		cvtColor(rctf_full_left , img_L ,CV_GRAY2BGR);
 	    cvtColor(rctf_full_right, img_R ,CV_GRAY2BGR);
 		
-	    _left = rctf_full_left.colRange(lxlt, lxrb).rowRange(lylt, lyrb).clone();
-		_right = rctf_full_right.colRange(rxlt, rxrb).rowRange(rylt, ryrb).clone();
-//		_left = rctf_full_left;
-//		_right = rctf_full_right;
+//		_left = rctf_full_left.colRange(lxlt, lxrb).rowRange(lylt, lyrb).clone();
+//		_right = rctf_full_right.colRange(rxlt, rxrb).rowRange(rylt, ryrb).clone();
+		_left = rctf_full_left;
+		_right = rctf_full_right;
 
 	};
-	inline Size lsize() { return Size(lxrb-lxlt,lyrb-lylt); }
-	inline Size rsize() { return Size(rxrb-rxlt,ryrb-rylt); }
+	inline Size lsize() { return Size(800,1600); }
+	inline Size rsize() { return Size(800,1600); }
 private:
 	//load 
 	Mat Distort1,Distort2;
@@ -291,10 +291,10 @@ private:
 	   {
 		   if(L_opt_ps[i]!=-1&&R_opt_ps[i]!=-1)        //判断条件L_op_ps时加入地面三维点，rail_pnts时判断铁轨三维点
 		  {
-			  pts_L.x = L_opt_ps[i]+_calibparas.lxlt;
-			  pts_L.y = float(i)+_calibparas.lylt;
-			  pts_R.x = R_opt_ps[i]+_calibparas.rxlt;
-			  pts_R.y = float(i)+_calibparas.lylt;
+			  pts_L.x = L_opt_ps[i];
+			  pts_L.y = float(i);
+			  pts_R.x = R_opt_ps[i];
+			  pts_R.y = float(i);
 			  lft_pts.push_back(pts_L);
 			  rgt_pts.push_back(pts_R);
 			  /*if(L_rail_ps[i]!=-1&&R_rail_ps[i]!=-1)

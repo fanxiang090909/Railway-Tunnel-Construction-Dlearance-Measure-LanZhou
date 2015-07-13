@@ -74,6 +74,20 @@ public:
 
     QString getJieChuWangGaoDu() { return jiechuwanggaodu; }
 
+    QString getLineName();
+
+    QString getEndStationName();
+
+    /**
+     * 最小曲线半径
+     */
+    int getMinRadius();
+
+    /**
+     * 最低中心净高
+     */
+    int getMinHeight();
+
 public:
 
     std::list<_int64> tasktunnelids;

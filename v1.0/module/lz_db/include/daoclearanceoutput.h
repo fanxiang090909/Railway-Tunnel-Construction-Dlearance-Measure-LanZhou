@@ -74,7 +74,7 @@ public:
      * @return 0 找到
      *         1 未找到outputid
      */
-    int ClearanceOutputDAO::getOutputMinHeight(_int64 outputid, float & minHeight, double & minHeightPos, int & minHeightTunnelID);
+    int getOutputMinHeight(_int64 outputid, int & tunnelid, float & minHeight, double & minHeightPos, int & minHeightTunnelID);
 
     /**
      * 是否有该outputid对应的线路数据库记录

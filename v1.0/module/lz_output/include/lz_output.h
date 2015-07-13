@@ -128,6 +128,20 @@ public:
          return string_To_UTF8(tmpba.constData());
     };
 
+    QString toTunnelPosString2(int pos, int tunnelid, string valstr)
+    {
+         // 如果值为-1，说明无数据，控制点字段不输出任何内容
+         if (valstr.compare("") == 0)
+             return "";
+
+         QString tmpstr = TunnelDAO::getTunnelDAOInstance()->getOneTunnelName(tunnelid);
+         if (tmpstr.compare("") == 0)
+             tmpstr = QString("%1,%2").arg(tunnelid).arg(pos);
+         else
+             tmpstr = tmpstr + QString(",%1").arg(pos);
+         return tmpstr;
+    };
+
     /**
      * 将正斜杠路径转换为反斜杠路径 主要针对AxObject操作EXCEL输出，Excel的SaveAs和AddPicture函数
      * 例如 "D:/data.xls" -> "D:\\data.xls"

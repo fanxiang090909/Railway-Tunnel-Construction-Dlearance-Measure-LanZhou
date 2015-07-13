@@ -116,21 +116,33 @@ public:
 
     /**
      * 创建隧道任务，没有tasktunnelid参数，因为加入数据库时采取主键自增策略
+     * @param taskid
+     * @param tunnelid 隧道ID
+     * @param interframe_mile 帧间隔里程数，一般0.5m，0.75m，1m，1.25m一帧
+     * @param carriageDirection 车厢正反
+     * @param isNormal 正常拍摄、非正常拍摄
+     * @param state 状态
      * @return 0 创建成功
      *         1 创建不成功 已经存在该隧道任务
      *         2 创建不成功 taskid不存在
      *         3 创建不成功 tunnelid不存在
      */
-    int addTaskTunnel(_int64 taskid, int tunnelid, bool isNormal, int state);
+    int addTaskTunnel(_int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state);
 
     /**
      * 更新隧道任务
+     * @param taskid
+     * @param tunnelid 隧道ID
+     * @param interframe_mile 帧间隔里程数，一般0.5m，0.75m，1m，1.25m一帧
+     * @param carriageDirection 车厢正反
+     * @param isNormal 正常拍摄、非正常拍摄
+     * @param state 状态
      * @return 0 更新成功
      *         1 更新不成功，当前taskTunnelid不存在
      *         2 更新不成功，taskid不存在
      *         3 更新不成功，tunnelid不存在
      */
-    int updateTaskTunnel(_int64 taskTunnelid, _int64 taskid, int tunnelid, bool isNormal, int state);
+    int updateTaskTunnel(_int64 taskTunnelid, _int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state);
 
 private:
 
@@ -141,10 +153,10 @@ private:
     _int64 getTaskTunnel_P(int tunnelid, QString date);
 
     // 数据库中创建隧道任务，没有taskTunnelid参数，因为加入数据库时采取主键自增策略
-    void createTaskTunnel_P(_int64 taskid, int tunnelid, bool isNormal, int state);
+    void createTaskTunnel_P(_int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state);
 
     // 数据库中修改task_tunnel
-    void updateTaskTunnel_P(_int64 taskTunnelid, _int64 taskid, int tunnelid, bool isNormal, int state);
+    void updateTaskTunnel_P(_int64 taskTunnelid, _int64 taskid, int tunnelid, double interframe_mile, bool carriageDirection, bool isNormal, int state);
 
     // 数据库中删除task_tunnel
     void deleteTaskTunnel_P(_int64 taskTunnelid);

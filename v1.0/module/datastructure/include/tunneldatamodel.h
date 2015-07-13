@@ -80,12 +80,13 @@ public:
     /**
      * 得到该里程在此隧道的曲线，及曲线curveid，及曲线半径
      * @param mileage 【折算后，非采集时】注明内部里程，隧道口为0
+     * @param carriagedirection 车厢正反
      * @param curvetype （ref）找到了该里程，在曲线类型上，曲线类型，直线，左转曲线，右转曲线
      * @param curveid （ref）如果是曲线，给出数据库中的该曲线段id（暂时版本直线段没有）
      * @param curveradius （ref）如果是曲线，给出数据库中的该曲线段半径（暂时版本直线段没有）
      * @return true 如果找到里程，false没找到
      */
-    bool findInterMile(int filteredmileage, CurveType & curvetype, int & curveid, int &curveradius);
+    bool findInterMile(int filteredmileage, bool carriagedirection,  CurveType & curvetype, int & curveid, int &curveradius);
 
     /****************get 方法********************/
     // 隧道名称、编号及其他

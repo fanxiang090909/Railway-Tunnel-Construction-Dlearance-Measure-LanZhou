@@ -155,7 +155,7 @@ public:
      * 获得该断面所在曲线半径（if 曲线类型为type）
      */
     float getRadius();
-    
+        
     /**
      * 设置中心线净高
      */
@@ -263,6 +263,11 @@ public:
     ClearanceData & operator=(const ClearanceData &real);
 
     /**
+     * 左右数据对调，方便限界图形预览（符合人眼感觉）
+     */
+    void swapLeftAndRight();
+
+    /**
      * 插入map单侧限界值
      * @param height 高度map中的键
      * @param val 限界值
@@ -307,6 +312,16 @@ public:
     void updateToMinCenterHeight(float val, double pos, int tunnelid);
 
     /**
+     * 设置最小半径
+     */ 
+    void setMinRadius(int newradius);
+
+    /**
+     * 得到最小半径
+     */
+    int getMinRadius();
+         
+    /**
      * 线路中心线上方最低净高
      */
     float getMinCenterHeight();
@@ -349,7 +364,16 @@ public:
      */
     void setType(ClearanceType curvetype);
 
+    int getTunnelID();
+
+    void setTunnelID(int newtunnelid);
+
 private:
+
+    /**
+     * 最小曲线半径
+     */
+    int minRadius;
 
     /**
      * 线路中心线上方最低净高

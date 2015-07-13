@@ -32,6 +32,9 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // 帧间隔里程系数
+    interframe_mile = 0.5103;
+
     // 文件名赋初值
     filename = "";
     // 隧道编号初始为-1
@@ -283,11 +286,20 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
             ui->lineEdit_isNew->setText(tr(""));
 
         if (lineType == 1) // 内燃牵引
+        {
             ui->lineEdit_lineType->setText(tr("内燃牵引"));
+            syntunnelcorrect->setfloornumber(OutType_B_NeiRan);
+        }
         else if (lineType == 0) // 电力牵引
+        {
             ui->lineEdit_lineType->setText(tr("电力牵引"));
+            syntunnelcorrect->setfloornumber(OutType_B_DianLi);
+        }
         else
+        {
             ui->lineEdit_lineType->setText(tr(""));
+            syntunnelcorrect->setfloornumber(OutType_B_DianLi);
+        }
 
         if (isDoubleLine == true) // 双线
             ui->lineEdit_isDoubleLine->setText(tr("双线"));
@@ -312,6 +324,8 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
 void SynthesisTunnelWidget::loadSynthesisData()
 {
     __int64 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
+
+    syntunnelcorrect->clearPointsArrayAll();
 
     if (tasktunnelid < 0)
     {
@@ -381,14 +395,14 @@ void SynthesisTunnelWidget::calculateSynthesisData()
         string tunnelheightssynname = filename;
         
         __int64 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
+        __int64 taskid = TaskDAO::getTaskDAOInstance()->getTaskID(tunnelid, currentcollectdate);
 
         if (tasktunnelid < 0)
         {
-            __int64 taskid = TaskDAO::getTaskDAOInstance()->getTaskID(tunnelid, currentcollectdate);
 
             // 没有这个任务组
             if (taskid < 0)
-                taskid = TaskDAO::getTaskDAOInstance()->addTask(tmp.planTask.pulsepermeter, currentcollectdate, tmp.planTask.traindirection, QObject::tr(tmp.planTask.tunnelname.c_str()));
+                taskid = TaskDAO::getTaskDAOInstance()->addTask(tmp.planTask.pulsepermeter, currentcollectdate, currentcarriagedirection, QObject::tr(tmp.planTask.tunnelname.c_str()));
 
             if (taskid < 0)
             {
@@ -397,7 +411,7 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             }
 
             // 有当天采集的任务组，但没有这个隧道任务
-            if (TaskTunnelDAO::getTaskTunnelDAOInstance()->addTaskTunnel(taskid, tunnelid, tmp.planTask.isnormal, 0) == 0)
+            if (TaskTunnelDAO::getTaskTunnelDAOInstance()->addTaskTunnel(taskid, tunnelid, interframe_mile, currentcarriagedirection, tmp.planTask.isnormal, 0) == 0)
             {
                 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
             }
@@ -410,6 +424,8 @@ void SynthesisTunnelWidget::calculateSynthesisData()
         
         if (tasktunnelid >= 0)
         {
+            int ret0 = TaskTunnelDAO::getTaskTunnelDAOInstance()->updateTaskTunnel(tasktunnelid, taskid, tunnelid, interframe_mile, currentcarriagedirection, tmp.planTask.isnormal, 0);
+
             //straightdata.showMaps();
             ClearanceData & straightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceStraightData();
             ClearanceData & leftdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceLeftData();
@@ -421,7 +437,8 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             connect(&lzsyn, SIGNAL(initfc(long long, long long)), this, SLOT(initProgressBar(long long, long long)));
             connect(&lzsyn, SIGNAL(currentfc(long long)), this, SLOT(updateProgressBar(long long)));
             
-            lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, 0.75);
+            // @TODO 系数0.5103应改为外部配置文件输入
+            lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection);
             bool hasstraight = false, hasleft = false, hasright = false;
             lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
 
@@ -447,7 +464,12 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 
 void SynthesisTunnelWidget::loadGaugeImage(ClearanceData& data, CurveType newtype)
 {
+    // 如果车厢反向，左右对调重新写会
+    //if (!currentcarriagedirection)
+    //    data.swapLeftAndRight();
+
     bool ret1= syntunnelcorrect->ClearanceDataToPointsArray(data, newtype);
+
     if(ret1)
         syntunnelcorrect->update();//即更新绘图
   

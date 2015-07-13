@@ -44,17 +44,17 @@ void Lz_RT_Clac::calc(Mat &_LEFT, Mat &_RIGHT, Mat &_Ledge, Mat &_Redge,int flag
 		coordProject(flag);                                                //相机坐标到世界坐标的转换
 		rail_pnts_detect(flag);
         //get_rail(_rect_Pnts3d);                                        //获得当前相机的铁轨轨高和轨距。
-	    ofstream SaveFile("C:\\Users\\Administrator\\Desktop\\Output.txt");
+/*	    ofstream SaveFile("C:\\Users\\Administrator\\Desktop\\Output.txt");
 		for(int i=0; i<_rect_Pnts3d.cols; i++)
 	    {
-//			SaveFile<<"第"<<i<<"点坐标："<<endl;
-			SaveFile<<*_Pnts3d.ptr<float>(0,i)<<","<<*_Pnts3d.ptr<float>(1,i)<<","<<*_Pnts3d.ptr<float>(2,i)<<endl;
-//			SaveFile<<"水平： "<<*_rect_Pnts3d.ptr<float>(1,i)<<" 原点:"<<*_Pnts3d.ptr<float>(1,i)<<endl;
-//			SaveFile<<"Z坐标："<<*_rect_Pnts3d.ptr<float>(2,i)<<" 原点:"<<*_Pnts3d.ptr<float>(2,i)<<endl;
-//			SaveFile<<endl;
+			SaveFile<<"第"<<i<<"点坐标："<<endl;
+			SaveFile<<"高度： "<<*_rect_Pnts3d.ptr<float>(0,i)<<" 原点:"<<*_Pnts3d.ptr<float>(0,i)<<endl;
+			SaveFile<<"水平： "<<*_rect_Pnts3d.ptr<float>(1,i)<<" 原点:"<<*_Pnts3d.ptr<float>(1,i)<<endl;
+			SaveFile<<"Z坐标："<<*_rect_Pnts3d.ptr<float>(2,i)<<" 原点:"<<*_Pnts3d.ptr<float>(2,i)<<endl;
+			SaveFile<<endl;
 
 		}
-		SaveFile.close();
+		SaveFile.close();*/
 		for(int i=0;i<lft_pts.size();i++)
 		{
 			if(lft_pts[i].x!=-1)

@@ -16,11 +16,15 @@ BaseImage::BaseImage(QWidget *parent) :
     ui(new Ui::BaseImage)
 {
     ui->setupUi(this);
+
+    // 默认底板
+    floornumber = OutType_B_DianLi;
+
     // 初始不保存图片
     cansaveimg = false;
     saveimgpathfilename = "";
 
-    // 初始不显示高度辅助线
+    // 初始不显示高度辅助线底板
     isshowheightline = false;
     // 初始显示底板
     ifshowfloor = true;
@@ -47,7 +51,7 @@ void BaseImage::saveImage(QString outputimgfilename)
     bool tmpisDrawRect = isDrawRect;
     
     // 图片更新
-    scale = 40;
+    scale = 34;
     isDrawRect = false;
     isshowheightline = false;
     repaint();
@@ -70,25 +74,25 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
     h=0;//暂时默认接触网高度为0
     originy=((80+(6860+h)/scale))/pixeltomm;
     // 画水平的基准线
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
     QPointF pointsthree[3]={QPointF(100.0,originy),QPointF(widthpixel/2,originy),QPointF((widthpixel-100),originy)};
     pp.drawPolyline(pointsthree,3);
 
     // 画一个小三角形，即多边形
-    pp.setPen(QPen(Qt::gray,1.5));
+    pp.setPen(QPen(Qt::gray,1));
     QPolygonF polygon;
     polygon<<QPointF((widthpixel-110),(originy-7))<<QPointF((widthpixel-105),originy)<<QPointF((widthpixel-100),(originy-7));
     bruch.setStyle(Qt::CrossPattern);
     bruch.setStyle(Qt::NoBrush);
     pp.setBrush(bruch);
     pp.drawPolygon(polygon,Qt::WindingFill);
-    pp.setPen(QPen(Qt::black,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::black,1));//两个参数为画笔的颜色和粗细
     pp.drawText((widthpixel-100),originy,tr("轨面"));
 
     // 画垂直的基准线
-    pp.setPen(QPen(Qt::gray,1.5));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
@@ -96,7 +100,7 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
         return;
 
     // 标准限界实线部分
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointsthree1[3]={QPointF((widthpixel/2)-((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4220/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
     QPointF pointsthree2[3]={QPointF((widthpixel/2)+((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4220/scale)/pixeltomm))};
@@ -106,7 +110,7 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
     pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),((80/pixeltomm)+(200/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
-    pp.setPen(QPen(Qt::gray,1.5,Qt::DashDotDotLine,Qt::RoundCap));
+    pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
     QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,8);
     QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
@@ -128,7 +132,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
     originy=((80+(6700)/scale))/pixeltomm;
     // 画水平的基准线
            
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QBrush bruch(Qt::FDiagPattern);//画刷
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
@@ -136,7 +140,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
     pp.drawPolyline(pointsthree,3);
 
     // 画一个小三角形，即多边形
-    pp.setPen(QPen(Qt::gray,1.5));
+    pp.setPen(QPen(Qt::gray,1));
     QPolygonF polygon;
     polygon<<QPointF((widthpixel-110),(originy-7))<<QPointF((widthpixel-105),originy)<<QPointF((widthpixel-100),(originy-7));
     bruch.setStyle(Qt::CrossPattern);
@@ -147,7 +151,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
     pp.drawText((widthpixel-100),originy,tr("轨面"));
 
     // 画垂直的基准线
-    pp.setPen(QPen(Qt::gray,1.5));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
@@ -155,7 +159,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
         return;
 
     //标准限界实线部分
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointsthree1[3]={QPointF((widthpixel/2)-((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4500/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
     QPointF pointsthree2[3]={QPointF((widthpixel/2)+((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4500/scale)/pixeltomm))};
@@ -165,7 +169,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
     pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
-    pp.setPen(QPen(Qt::gray,1.5,Qt::DashDotDotLine,Qt::RoundCap));
+    pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
     QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,8);
     QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
@@ -180,7 +184,7 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
 {
     originy=((80+(6550)/scale))/pixeltomm;
     // 画水平的基准线
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QBrush bruch(Qt::FDiagPattern);//画刷
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
@@ -188,7 +192,7 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
     pp.drawPolyline(pointsthree,3);
 
     // 画一个小三角形，即多边形
-    pp.setPen(QPen(Qt::gray,1.5));
+    pp.setPen(QPen(Qt::gray,1));
     QPolygonF polygon;
     polygon<<QPointF((widthpixel-110),(originy-7))<<QPointF((widthpixel-105),originy)<<QPointF((widthpixel-100),(originy-7));
     bruch.setStyle(Qt::CrossPattern);
@@ -199,7 +203,7 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
     pp.drawText((widthpixel-100),originy,tr("轨面"));
 
     // 画垂直的基准线
-    pp.setPen(QPen(Qt::gray,1.5));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
@@ -207,17 +211,18 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
         return;
 
     //标准限界实线部分
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointsthree1[5]={QPointF((widthpixel/2)-((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2400/scale)/pixeltomm),originy-((4550/scale)/pixeltomm)),QPointF((widthpixel/2)-((1700/scale)/pixeltomm),originy-((5800/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,5);
     QPointF pointsthree2[5]={QPointF((widthpixel/2)+((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2400/scale)/pixeltomm),originy-((4550/scale)/pixeltomm)),QPointF((widthpixel/2)+((1700/scale)/pixeltomm),originy-((5800/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree2,5);
     //绘制圆弧
-    // pp.drawEllipse((widthpixel/2)-((2300/scale)/pixeltomm),(80/pixeltomm),(((2300*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm));
+    //pp.drawEllipse((widthpixel/2)-((2300/scale)/pixeltomm),(80/pixeltomm),(((2300*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm));
     pp.drawArc((widthpixel/2)-((2300/scale)/pixeltomm),(80/pixeltomm),(((2300*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm),42.3*16,95.2*16);
 
+
     //标准限界虚线部分
-    pp.setPen(QPen(Qt::gray,1.5,Qt::DashDotDotLine,Qt::RoundCap));
+    pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
     QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,9);
     QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
@@ -232,7 +237,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
 {
     originy=((80+(6000)/scale))/pixeltomm;
     // 画水平的基准线
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QBrush bruch(Qt::FDiagPattern);//画刷
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
@@ -240,7 +245,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
     pp.drawPolyline(pointsthree,3);
 
     // 画一个小三角形，即多边形
-    pp.setPen(QPen(Qt::gray,1.5));
+    pp.setPen(QPen(Qt::gray,1));
     QPolygonF polygon;
     polygon<<QPointF((widthpixel-110),(originy-7))<<QPointF((widthpixel-105),originy)<<QPointF((widthpixel-100),(originy-7));
     bruch.setStyle(Qt::CrossPattern);
@@ -251,7 +256,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
     pp.drawText((widthpixel-100),originy,tr("轨面"));
        
     // 画垂直的基准线
-    pp.setPen(QPen(Qt::gray,1.5));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
@@ -259,7 +264,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
         return;
 
     //标准限界实线部分
-    pp.setPen(QPen(Qt::gray,2));//两个参数为画笔的颜色和粗细
+    pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QPointF pointsthree1[3]={QPointF((widthpixel/2)-((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3900/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
     QPointF pointsthree2[3]={QPointF((widthpixel/2)+((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3900/scale)/pixeltomm))};
@@ -269,7 +274,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
     pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
-    pp.setPen(QPen(Qt::gray,1.5,Qt::DashDotDotLine,Qt::RoundCap));
+    pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
     QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,9);
     QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
@@ -465,9 +470,10 @@ void BaseImage::UpdateScaleRelativeParameter(int newscale)
     this->update();
 }
 
-void BaseImage::getfloornumber(OutputClearanceImageType newfloornumber)
+void BaseImage::setfloornumber(OutputClearanceImageType newfloornumber)
 {
-	this->floornumber=newfloornumber;
+	this->floornumber = newfloornumber;
+    update();
 }
 
 ClearanceImage::ClearanceImage(QWidget *parent):
@@ -481,7 +487,6 @@ ClearanceImage::ClearanceImage(QWidget *parent):
     row1count=0;
     row2count=0;
     isoutputcorrect=true;//是否保存图片
-    floornumber=OutType_D_DianLi;//表示底板类型
     imagetype=AllType;//默认所有图像数据全部显示,1表示直线，2表示左曲线，3表示右曲线
     lineimage=true;
     leftimage=true;
@@ -601,8 +606,17 @@ bool ClearanceImage::ClearanceDataToPointsArray(ClearanceData& data, CurveType t
                 hasMinHeight_straight = false; 
                 return false;
             }
-            minHeight_straight = -1;//data.getMinCenterHeight();
-            if (minHeight_straight <= 0)
+            // @author 范翔注释 20150629
+            //minHeight_straight = -1;
+            minHeight_straight = data.getMinCenterHeight();
+            if (minHeight_straight < 0)
+            {
+                hasstraightinit = false;
+                hasMinHeight_straight = false;
+                return false;
+            }
+
+            if (minHeight_straight < 0)
                 hasMinHeight_straight = false;
             else
                 hasMinHeight_straight = true;
@@ -615,7 +629,16 @@ bool ClearanceImage::ClearanceDataToPointsArray(ClearanceData& data, CurveType t
                 hasMinHeight_left = false; 
                 return false;
             }
-            minHeight_left = -1;//data.getMinCenterHeight();
+            // @author 范翔注释 20150629
+            //minHeight_left = -1;
+            minHeight_left = data.getMinCenterHeight();
+            if (minHeight_left < 0)
+            {
+                hasleftinit = false;
+                hasMinHeight_left = false;
+                return false;
+            }
+
             if (minHeight_left <= 0)
                 hasMinHeight_left = false;
             else
@@ -629,7 +652,15 @@ bool ClearanceImage::ClearanceDataToPointsArray(ClearanceData& data, CurveType t
                 hasMinHeight_right = false; 
                 return false;
             }
-            minHeight_right = -1;//data.getMinCenterHeight();
+            // @author 范翔注释 20150629
+            //minHeight_right = -1;
+            minHeight_right = data.getMinCenterHeight();
+            if (minHeight_right < 0)
+            {
+                hasrightinit = false;
+                hasMinHeight_right = false;
+                return false;
+            }
             if (minHeight_right < 0)
                 hasMinHeight_right = false;
             else
@@ -692,6 +723,22 @@ bool ClearanceImage::ClearanceDataToPointsArray(ClearanceData& data, CurveType t
    return true;
 }
 
+
+/**
+ * 初始化所有左右直线数据
+ */
+void ClearanceImage::clearPointsArrayAll()
+{
+    hasMinHeight_left = false;
+    hasMinHeight_right = false;
+    hasMinHeight_straight = false;
+
+    hasleftinit = false;
+    hasrightinit = false;
+    hasstraightinit = false;
+
+}
+
 void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
 {
     QPointF * tmpArray1;
@@ -699,7 +746,7 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
     int tmprowcount;
     bool tmpHasMinHeight;
     float tmpMinHeightVal;
-    QPen tmppen = QPen(Qt::red,3); // 画笔颜色
+    QPen tmppen = QPen(Qt::red,1); // 画笔颜色
     switch (type)
     {
         case Curve_Straight:
@@ -722,7 +769,7 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
             }
             tmpHasMinHeight = hasMinHeight_straight;
             tmpMinHeightVal = minHeight_straight;
-            tmppen = QPen(Qt::red,3);
+            tmppen = QPen(Qt::red,1);
             break;
         case Curve_Left:
             tmpArray1 = pointintstwo_rowcount3;
@@ -744,7 +791,7 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
             }
             tmpHasMinHeight = hasMinHeight_left;
             tmpMinHeightVal = minHeight_left;
-            tmppen = QPen(Qt::black,3);
+            tmppen = QPen(Qt::blue,1,Qt::DashLine,Qt::RoundCap);
             break;
         case Curve_Right:
             tmpArray1 = pointintstwo_rowcount5;
@@ -766,7 +813,8 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
             }
             tmpHasMinHeight = hasMinHeight_right;
             tmpMinHeightVal = minHeight_right;
-            tmppen = QPen(Qt::blue,3);
+            tmppen = QPen(Qt::black,1,Qt::DashDotDotLine,Qt::RoundCap);
+
             break;
         default:return;// 都不是直接退出
     }
@@ -857,23 +905,27 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
         pp.drawLine(pointtop, pointtmp2);
     }
 
-    //标记那些点,以便于修正
-    pp.setPen(QPen(Qt::green,3));
-    bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
-    pp.setBrush(bruch);
-    QPoint *point =new  QPoint[tmprowcount];
-    QPoint *pointr =new QPoint[tmprowcount];
-    for(int i=0;i<tmprowcount;i++)
+    // 不画图时界面显示左右限界半宽点，否则出表时防止彩色打印成断线，于是输入半宽值
+    if (!cansaveimg)
     {
-        point[i].setX(((widthpixel/2)-((tmpArray1[i].ry()/scale)/pixeltomm)));
-        point[i].setY((originy-((tmpArray1[i].rx()/scale)/pixeltomm)));
-        pointr[i].setX(((widthpixel/2)+((tmpArray2[i].ry()/scale)/pixeltomm)));
-        pointr[i].setY((originy-((tmpArray2[i].rx()/scale)/pixeltomm)));
+        //标记那些点,以便于修正
+        pp.setPen(QPen(Qt::green, 3));
+        bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
+        pp.setBrush(bruch);
+        QPoint *point =new  QPoint[tmprowcount];
+        QPoint *pointr =new QPoint[tmprowcount];
+        for(int i=0;i<tmprowcount;i++)
+        {
+            point[i].setX(((widthpixel/2)-((tmpArray1[i].ry()/scale)/pixeltomm)));
+            point[i].setY((originy-((tmpArray1[i].rx()/scale)/pixeltomm)));
+            pointr[i].setX(((widthpixel/2)+((tmpArray2[i].ry()/scale)/pixeltomm)));
+            pointr[i].setY((originy-((tmpArray2[i].rx()/scale)/pixeltomm)));
+        }
+        pp.drawPoints(point,tmprowcount);
+        pp.drawPoints(pointr,tmprowcount);
+        delete []point;
+        delete []pointr;
     }
-    pp.drawPoints(point,tmprowcount);
-    pp.drawPoints(pointr,tmprowcount);
-    delete []point;
-    delete []pointr;
 
     if (tmpHasMinHeight)
     {
@@ -1010,9 +1062,10 @@ SectionImage::SectionImage(QWidget *parent):
 
     isoutputcorrect = true;//是否保存图片
     ishaveRect = false;
-    // 界面上默认的是1(基本限界内燃牵引）
-    floornumber = OutputClearanceImageType::OutType_D_DianLi;
-    multilframe=NULL;
+
+    // 界面上默认的是1(基本限界电力牵引）
+    floornumber = OutputClearanceImageType::OutType_B_DianLi;
+    multilframe = NULL;
     
     // 实际点集合数组
     pointsFuseResult = vector<QPointF*>();
@@ -1315,9 +1368,9 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
 
     // 开始画实际的隧道数据,左侧直线
     if (iscompared)
-        pp.setPen(QPen(Qt::gray, 3));
+        pp.setPen(QPen(Qt::gray, 1));
     else
-        pp.setPen(QPen(Qt::red,3));
+        pp.setPen(QPen(Qt::red,1));
     QBrush bruch(Qt::FDiagPattern);//画刷
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
@@ -1349,9 +1402,9 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
     delete []linef;
     //画右侧的那条直线
     if (iscompared)
-        pp.setPen(QPen(Qt::gray, 3));
+        pp.setPen(QPen(Qt::gray, 1));
     else
-        pp.setPen(QPen(Qt::red,3));
+        pp.setPen(QPen(Qt::red,1));
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
     pp.setBrush(bruch);
     for(int j=0;j<drawrowcount-1;j++)
@@ -1393,7 +1446,7 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
     //标记那些点,以便于修正
     if (!iscompared)
     {
-        pp.setPen(QPen(Qt::green,3));
+        pp.setPen(QPen(Qt::green,1));
         bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
         pp.setBrush(bruch);
         QPointF *point = new  QPointF[drawrowcount];

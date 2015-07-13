@@ -182,6 +182,7 @@ bool SectionData::initMaps()
         }
         qDebug() << "sectiondata heights init ok";
         hasinit = true;
+        setCenterHeight(-1);
     }
     else // 如果已被初始化，全部重置-1
         resetMaps();
@@ -209,6 +210,7 @@ bool SectionData::resetMaps()
         vals[tempkey].right = -1;
         it++;
     }
+    setCenterHeight(-1);
     return true;
 }
 
@@ -255,22 +257,26 @@ bool SectionData::updateToClearanceData(ClearanceData & clearancedata)
         // qDebug() << "height:" << tempkey << ", val:" << pair.second.left << pair.second.right;
         // qDebug() << "\t clearanceval:" << clearancevals[tempkey].leftval << clearancevals[tempkey].rightval;
         // 更新左右限界值
-        if (clearancevals[tempkey].leftval <= 0 || (pair.second.left > 0 && pair.second.left < clearancevals[tempkey].leftval))
+        if (clearancevals[tempkey].leftval <= 0 || (pair.second.left - 30 > 0 && (pair.second.left - 30) < clearancevals[tempkey].leftval))
         {
             //if (pair.second.left < 0)
             //    pair.second.left = 0;
-            clearancevals[tempkey].leftval = pair.second.left;
+            clearancevals[tempkey].leftval = pair.second.left - 30; // 人为缩减30
             clearancevals[tempkey].leftpos = mileCount;
 			clearancevals[tempkey].leftradius = curveRadius;
         }
-        if (clearancevals[tempkey].rightval <= 0 || (pair.second.right > 0 && pair.second.right < clearancevals[tempkey].rightval))
+        if (clearancevals[tempkey].rightval <= 0 || (pair.second.right - 30 > 0 && pair.second.right - 30 < clearancevals[tempkey].rightval))
         {
             //if (pair.second.right < 0)
             //    pair.second.right = 0;
-            clearancevals[tempkey].rightval = pair.second.right;
+            clearancevals[tempkey].rightval = pair.second.right - 30; // 人为缩减30
             clearancevals[tempkey].rightpos = mileCount;
             clearancevals[tempkey].rightradius = curveRadius;
         }
+
+        // 最小曲线半径
+        //if (clearancevals.getMinRadius() < 0 || clearancevals.getMinRadius() > curveRadius)
+        //    clearancevals.setMinRadius(curveRadius);
         it++;
     }
     if (clearancedata.getMinCenterHeight() <= 0 || (centerHeight > 0 && centerHeight < clearancedata.getMinCenterHeight()))
@@ -310,6 +316,7 @@ ClearanceData::ClearanceData(const ClearanceData & real)
     this->hasinit = real.hasinit;
     this->clearanceType = real.clearanceType;
 
+    this->minRadius = real.minRadius;
     this->minCenterHeight = real.minCenterHeight;
     this->minCenterHeightPos = real.minCenterHeightPos;
     this->minCenterHeightTunnelID = real.minCenterHeightTunnelID;
@@ -325,10 +332,50 @@ ClearanceData & ClearanceData::operator=(const ClearanceData &real)
     this->hasinit = real.hasinit;
     this->clearanceType = real.clearanceType;
 
+    this->minRadius = real.minRadius;
     this->minCenterHeight = real.minCenterHeight;
     this->minCenterHeightPos = real.minCenterHeightPos;
     this->minCenterHeightTunnelID = real.minCenterHeightTunnelID;
     return *this;
+}
+
+/**
+ * 左右数据对调，方便限界图形预览（符合人眼感觉）
+ */
+void ClearanceData::swapLeftAndRight()
+{
+    std::map<int,ClearanceItem>::iterator it = vals.begin();
+    int tempkey;
+    float tmpvalf;
+    int tmpvali;
+	while (it != vals.end())
+    {
+        /*
+        vs2012下不行，出错“初始化”: 无法从“std::pair<_Ty1,_Ty2>”转换为“std::pair<_Ty1,_Ty2>”
+        std::pair<int,item&> pair = (*it);
+        pair.second.left = -1;
+        pair.second.right = -1;
+        */
+        std::pair<int,ClearanceItem> pair = (*it);
+        tempkey = pair.first;
+        tmpvalf = vals[tempkey].leftval;
+        vals[tempkey].leftval = vals[tempkey].rightval;
+        vals[tempkey].rightval = tmpvalf;
+
+        tmpvali = vals[tempkey].leftradius;
+        vals[tempkey].leftradius = vals[tempkey].rightradius;
+        vals[tempkey].rightradius = tmpvali;
+
+        tmpvalf = vals[tempkey].leftpos;
+        vals[tempkey].leftpos = vals[tempkey].rightpos;
+        vals[tempkey].rightpos = tmpvalf;
+
+        tmpvali = vals[tempkey].lefttunnelid;
+        vals[tempkey].lefttunnelid = vals[tempkey].righttunnelid;
+        vals[tempkey].righttunnelid = tmpvali;
+
+        it++;
+    }
 }
 
 /**
@@ -415,12 +462,22 @@ bool ClearanceData::initMaps()
             vals.insert(std::pair<int,ClearanceItem>((*it),i));
             it++;
         }
+        setMinRadius(-1);
+        setMinCenterHeight(-1);
+        setMinCenterHeightPos(-1);
+        setMinCenterHeightTunnelID(-1);
+        setTunnelID(-1);
+
         qDebug() << "clearancedata heights init ok";
         hasinit = true;
     }
     else // 如果已被初始化过，全部赋值-1
     {
         resetMaps();
+        setMinCenterHeight(-1);
+        setMinCenterHeightPos(-1);
+        setMinCenterHeightTunnelID(-1);
+        setTunnelID(-1);
     }
     return true;
 }
@@ -452,6 +509,12 @@ bool ClearanceData::resetMaps()
         vals[tempkey].rightradius = -1;
         it++;
     }
+    setMinRadius(-1);
+    setMinCenterHeight(-1);
+    setMinCenterHeightPos(-1);
+    setMinCenterHeightTunnelID(-1);
+    setTunnelID(-1);
+
     return true;
 }
 
@@ -496,6 +559,23 @@ void ClearanceData::updateToMinCenterHeight(float val, double pos, int tunnelid)
     minCenterHeightPos = pos;
     minCenterHeightTunnelID = tunnelid;
 }
+
+/**
+ * 设置最小半径
+ */ 
+void ClearanceData::setMinRadius(int newradius)
+{
+    this->minRadius = newradius;
+}
+
+/**
+ *  得到最小半径
+ */
+int ClearanceData::getMinRadius()
+{
+    return this->minRadius;
+}
+
 
 /**
  * 线路中心线上方最低净高
@@ -545,6 +625,16 @@ void ClearanceData::setMinCenterHeightTunnelID(int newtunnelid)
     minCenterHeightTunnelID = newtunnelid;
 }
 
+int ClearanceData::getTunnelID()
+{
+    return tunnelid;
+}
+
+void ClearanceData::setTunnelID(int newtunnelid)
+{
+    this->tunnelid = newtunnelid;
+}
+
 /**
  * 更新限界值
  * @param clearancedata 当前限界ClearanceData数据指针
@@ -566,13 +656,14 @@ bool ClearanceData::updateToClearanceData(ClearanceData & clearancedata)
         {
             clearancevals[tempkey].leftval = pair.second.leftval;
             clearancevals[tempkey].leftpos = pair.second.leftpos;
+            clearancevals[tempkey].leftradius = pair.second.leftradius;
             clearancevals[tempkey].lefttunnelid = tunnelid;
-
         }
         if (clearancevals[tempkey].rightval < 0 || (pair.second.rightval >= 0 && pair.second.rightval < clearancevals[tempkey].rightval))
         {
             clearancevals[tempkey].rightval = pair.second.rightval;
             clearancevals[tempkey].rightpos = pair.second.rightpos;
+            clearancevals[tempkey].rightradius = pair.second.rightradius;
             clearancevals[tempkey].righttunnelid = tunnelid;
         }
         it++;

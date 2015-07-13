@@ -18,6 +18,7 @@ LzSynthesis::LzSynthesis(QObject *parent) : QObject(parent)
 {
     currentTunnelData = NULL;
     currentCheckedTunnelModel = NULL;
+    carriageDireciton = false;
     hasinit = false;
 }
 
@@ -34,11 +35,12 @@ LzSynthesis::~LzSynthesis()
  * @return true 检查输出高度配置文件（output_heights.xml）是否加载
  */
 bool LzSynthesis::initSynthesis(string initialTunnelheight_syn_name, TunnelDataModel * initialTunnelData, 
-								CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance)
+								CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection)
 {
     tunnelheight_syn_name = initialTunnelheight_syn_name;
     currentTunnelData = initialTunnelData;
     currentCheckedTunnelModel = initialCheckedTunnelModel;
+    carriageDireciton = newCarriageDirection;
     currentFrameDistance = framedistance;
 
     if (OutputHeightsList::getOutputHeightsListInstance()->getCurrentHeightsVersion() == 0)
@@ -78,17 +80,17 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
     //{
     hasstraight = true;
     straightdata.initMaps();	// 初始化高度，不可缺少
+    leftdata.initMaps();	// 初始化高度，不可缺少
+    rightdata.initMaps();	// 初始化高度，不可缺少
     //}
     if (currentTunnelData->getNumberOfLeftCurves() > 0)
     {
         hasleft = true;
-        leftdata.initMaps();	// 初始化高度，不可缺少
     }
     if (currentTunnelData->getNumberOfRightCurves() > 0)
     {
         hasright = true;
-        rightdata.initMaps();	// 初始化高度，不可缺少
-    }
+    }    
 
     // 临时存储当前帧的高度数据
     SectionData tempdata;
@@ -141,7 +143,6 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
 
     __int64 framecounter;
     double mile;
-    double tempmile;
     float centerheight;
 
     // 文件取出帧数
@@ -162,7 +163,7 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
     __int64 framecount = endfc - startfc;
 
     // 临时变量findInterMile()函数引用
-    CurveType curvetype;
+    CurveType curvetype = CurveType::Curve_Straight;
     int curveid;
     int curveradius;
     bool intermileret;
@@ -174,6 +175,11 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
         ret = syn->readMap(framecounter, mile, centerheight, tempdata);
         if (ret == false)
              continue;
+
+        // 如果车厢反向，左右对调重新写会
+        if (!carriage_direction)
+            tempdata.swapLeftAndRight();
+
         qDebug() << "read " << i << "times. return:" << ret;
         qDebug() << "mile:" << mile << ", framecounter:" << framecounter << ", centerheight:" << centerheight;
         //tempdata.showMaps();
@@ -182,47 +188,45 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
 
         // 里程折算
         //@author范翔20150423注释
-        tempmile = (framecounter - startfc) * currentFrameDistance;
+        mile = (framecounter - startfc) * currentFrameDistance;
 ;
-        if (!Filter_TunnelMileage_InterToActual(is_normal, is_doubleline, is_down_link, startPoint, endPoint, mile))
+        if (Filter_TunnelMileage_InterToActual(is_normal, is_doubleline, is_down_link, startPoint, endPoint, mile))
         {
-            mile = tempmile;
-            intermileret = false;
-        }
-        mile = tempmile;
-        //else
-        {
+            
             // 判断更新直，左，右的限界
-            intermileret = currentTunnelData->findInterMile(mile, curvetype, curveid, curveradius);
+            intermileret = currentTunnelData->findInterMile(mile, dataread.carriage_direction, curvetype, curveid, curveradius);
+        }
+        else
+        {
+            intermileret = false;
         }
         
 		//straightdata.showMaps();
 
         //@author范翔20150423注释
-        //if (intermileret)
+        if (intermileret)
             switch (curvetype)
             {
-                case 0:	tempdata.setMile(mile);
+                case CurveType::Curve_Straight:
+                        tempdata.setMile(mile);
                         tempdata.setCenterHeight(centerheight);
                         tempdata.setType(CurveType::Curve_Straight);
                         tempdata.updateToClearanceData(straightdata);
                         hasstraight = true;
                         break;
-                case -1:tempdata.setMile(mile);
+                case CurveType::Curve_Left:
+                        tempdata.setMile(mile);
                         tempdata.setCenterHeight(centerheight);
                         tempdata.setRadius(curveradius);
                         tempdata.setType(CurveType::Curve_Left);
-                        //  曲线折减
-                        clearanceReduction(tempdata, carriage_direction);
                         hasleft = true;
                         tempdata.updateToClearanceData(leftdata);
                         break;
-                case 1: tempdata.setMile(mile);
+                case CurveType::Curve_Right:
+                        tempdata.setMile(mile);
                         tempdata.setCenterHeight(centerheight);
                         tempdata.setRadius(curveradius);
                         tempdata.setType(CurveType::Curve_Right);
-                        //  曲线折减
-                        clearanceReduction(tempdata, carriage_direction);
                         hasright = true;
                         tempdata.updateToClearanceData(rightdata);
                         break;
@@ -245,5 +249,12 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
     qDebug() << "close file:" << QString::fromLocal8Bit(filename.c_str());
     /*********************************/
 
+    //  曲线折减
+    if (hasleft)
+        clearanceReduction(leftdata, carriage_direction);
+
+    if (hasright)
+        clearanceReduction(rightdata, carriage_direction);
+        
     delete syn;
 }

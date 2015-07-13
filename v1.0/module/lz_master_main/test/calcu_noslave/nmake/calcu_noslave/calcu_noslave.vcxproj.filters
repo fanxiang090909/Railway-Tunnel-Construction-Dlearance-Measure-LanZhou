@@ -373,6 +373,9 @@
     <ClCompile Include="..\..\..\..\..\pulsehandle\src\WriteHardware.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\lz_logger\src\lz_logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\xmlloader\include\tinyxml\tinystr.h">
@@ -502,6 +505,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\pulsehandle\include\WriteHardware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\lz_logger\include\lz_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

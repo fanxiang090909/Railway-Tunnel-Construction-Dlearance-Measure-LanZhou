@@ -120,10 +120,12 @@ bool ClearanceOutputDAO::DBDataToClearanceData(ClearanceData & clearancedata, _i
     float minHeight;
     double minHeightPos;
     int minHeightTunnelid;
-    getOutputMinHeight(outputid, minHeight, minHeightPos, minHeightTunnelid);
+    int tmptunnelid;
+    getOutputMinHeight(outputid, tmptunnelid, minHeight, minHeightPos, minHeightTunnelid);
     clearancedata.setMinCenterHeight(minHeight);
     clearancedata.setMinCenterHeightPos(minHeightPos);
-    clearancedata.setMinCenterHeightTunnelID(minHeightTunnelid);
+    clearancedata.setMinCenterHeightTunnelID(tmptunnelid);
+    clearancedata.setTunnelID(tmptunnelid);
 
     QSqlTableModel * outputTable = new QSqlTableModel();
     // 查找数据库，将结果赋给outputTable
@@ -311,16 +313,20 @@ QStringListModel * ClearanceOutputDAO::getTaskTunnelOutputList(_int64 taskTunnel
  * @return 0 找到
  *         1 未找到outputid
  */
-int ClearanceOutputDAO::getOutputMinHeight(_int64 outputid, float & minHeight, double & minHeightPos, int & minHeightTunnelID)
+int ClearanceOutputDAO::getOutputMinHeight(_int64 outputid, int & tunnelid, float & minHeight, double & minHeightPos, int & minHeightTunnelID)
 {
     QSqlQuery query;
-    query.exec(QString("SELECT co.min_height, co.min_height_pos, co.min_height_tunnelid FROM clearance_output co WHERE co.output_id = %1 "
-               ).arg(outputid));
+    query.exec(QString("SELECT t.tunnel_id, co.min_height, co.min_height_pos, co.min_height_tunnelid "
+                        "FROM clearance_output co " 
+                        "JOIN task_tunnel tt ON co.task_tunnel_id = tt.task_tunnel_id "
+                        "JOIN tunnel t ON t.tunnel_id = tt.tunnel_id "
+                        "WHERE co.output_id = %1").arg(outputid));
 
     while (query.next()) {
-        minHeight = query.value(0).toFloat();
-        minHeightPos = query.value(1).toDouble();
-        minHeightTunnelID = query.value(2).toInt();
+        tunnelid = query.value(0).toInt();
+        minHeight = query.value(1).toFloat();
+        minHeightPos = query.value(2).toDouble();
+        minHeightTunnelID = query.value(3).toInt();
         return 0;
     }
     return 1;
@@ -358,9 +364,9 @@ bool ClearanceOutputDAO::updateOutput_P(_int64 outputid, _int64 taskTunnelid, Cl
 {
     QSqlQuery query;
     bool ret = query.exec(QString("UPDATE clearance_output SET task_tunnel_id = %1, "
-               "ouput_type = %2, min_height = %3, min_height_pos = %4, min_height_tunnelid = %5, description = '%6' "
-               "WHERE ouput_id = %7").arg(taskTunnelid).arg(type).arg(description).arg(minHeight).arg(minHeightPos).arg(minHeightTunnelID).arg(outputid));
-    qDebug() << "updateOutput_P" << outputid << ret;
+               "output_type = %2, min_height = %3, min_height_pos = %4, min_height_tunnelid = %5, description = '%6' "
+               "WHERE output_id = %7").arg(taskTunnelid).arg(type).arg(minHeight).arg(minHeightPos).arg(minHeightTunnelID).arg(description).arg(outputid));
+    qDebug() << "updateOutput_P" << outputid << taskTunnelid << type << minHeight << ret;
     return ret;
 }
 

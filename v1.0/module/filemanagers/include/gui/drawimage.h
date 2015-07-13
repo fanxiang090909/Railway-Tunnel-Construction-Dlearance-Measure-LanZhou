@@ -128,7 +128,7 @@ public slots:
     /**
      * 获得底板的值
      */
-    virtual void getfloornumber(OutputClearanceImageType);
+    virtual void setfloornumber(OutputClearanceImageType);
     /**
      * 得到显示图像类型
      * @param 参数为 0, 全部显示 1, 只显示直线 2, 只显示左转曲线 3, 只显示右转曲线
@@ -230,6 +230,12 @@ public:
      * @param type 曲线类型（直线，左转曲线，右转曲线）
      */
     void initPointsArray(int arraysize, CurveType type);
+
+    
+    /**
+     * 初始化所有左右直线数据
+     */
+    void clearPointsArrayAll();
 
 protected:
     

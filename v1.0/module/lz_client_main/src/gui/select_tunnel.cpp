@@ -423,7 +423,7 @@ void SelectAvaliableTunnelWidget::opensetvalidframes()
     openvalidframes->setShowWidgetDisVisible(false);
     connect(openvalidframes, SIGNAL(sendframestocheck_task(long long ,long long)), this, SLOT(getframesfromsetvalidframes(long long ,long long)));
 
-    initLogger(, ClientSetting::getSettingInstance()->getCurrentUser().toLocal8Bit().constData());
+    //initLogger(, ClientSetting::getSettingInstance()->getCurrentUser().toLocal8Bit().constData());
 }
 
 void SelectAvaliableTunnelWidget::getframesfromsetvalidframes(long long  newstartframes, long long newendframes)

@@ -1,6 +1,8 @@
 ﻿#include "clearance_tunnels.h"
 
 #include "LzSynth_n.h"
+#include "daoline.h"
+#include "daotunnel.h"
 #include "daotasktunnel.h"
 
 /**
@@ -91,4 +93,74 @@ QStringListModel * ClearanceMultiTunnels::getTunnelsNames()
     tunnelsModel->setStringList(tmplist);
     hasloadnames = true;
     return tunnelsModel;
+}
+
+QString ClearanceMultiTunnels::getLineName()
+{
+    // 如果已经加载
+    int lasttunnelid = -1;
+    QString linename = "";
+    if (hasloadnames)
+    {
+        if (tunnelsModel->rowCount() > 0)
+        {
+            QString tunnelname = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_name_std).toString();
+            int lineid = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_line_ID).toInt();
+            if (lasttunnelid != lineid)
+            {
+                lasttunnelid = lineid;
+            
+                //QString linename = LineDAO::getLineDAOInstance()->getLineName(lineid);
+            }
+            //qDebug() << tunnelname << TunnelDAO::getTunnelDAOInstance()->get
+        }
+    }
+    return "";
+}
+
+QString ClearanceMultiTunnels::getEndStationName()
+{
+    // 如果已经加载
+    if (tunnelsModel->rowCount() > 0)
+    {
+        QString tunnelname = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_name_std).toString();
+        int lineid = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_line_ID).toInt();
+
+    }
+    return "";
+}
+
+
+/**
+ * 最小曲线半径
+ */
+int ClearanceMultiTunnels::getMinRadius()
+{
+    return 0;
+}
+
+/**
+ * 最低中心净高
+ */
+int ClearanceMultiTunnels::getMinHeight()
+{
+    int minheight = -1;
+    if (numofstraight)
+    {
+        if (minheight < 0 || (straightdata.getMinCenterHeight() > 0 && straightdata.getMinCenterHeight() < minheight ))
+            minheight = straightdata.getMinCenterHeight();
+    }
+    if (numofleft)
+    {
+        if (minheight < 0 || (leftdata.getMinCenterHeight() > 0 && leftdata.getMinCenterHeight() < minheight ))
+            minheight = leftdata.getMinCenterHeight();
+    }
+    if (numofright)
+    {
+        if (minheight < 0 || (rightdata.getMinCenterHeight() > 0 && rightdata.getMinCenterHeight() < minheight ))
+            minheight = rightdata.getMinCenterHeight();
+    }
+
+
+    return minheight;
 }

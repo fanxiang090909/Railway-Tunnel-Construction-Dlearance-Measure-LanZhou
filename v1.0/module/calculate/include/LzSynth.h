@@ -37,7 +37,7 @@ public:
      * @return true 检查输出高度配置文件（output_heights.xml）是否加载
      */
     bool initSynthesis(string initialTunnelheight_syn_name, TunnelDataModel * initialTunnelData,
-                       CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance);
+                       CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection);
     /**
      * 综合函数
      * @param straightdata 返回值：直线段断面数据
@@ -59,9 +59,17 @@ private:
     /**
      * 是否初始化成功
      */
+
     bool hasinit;
 
-    // 帧间隔
+    /**
+     * 车厢正反
+     */
+    bool carriageDireciton;
+
+    /**
+     * 帧间隔
+     */
     float currentFrameDistance;
 
     /**
