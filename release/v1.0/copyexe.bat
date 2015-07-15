@@ -23,22 +23,3 @@ copy ..\..\v1.0\module\lz_master_main\test\monitor\nmake\x64\Release\lz_master_m
 
 @echo 从控程序
 copy ..\..\v1.0\module\lz_slave_main\test\nmake\x64\Release\lz_slave.exe Release\lz_slave.exe
-
-
-Sub bat 
-echo off & cls 
-echo create_shortcut 
-start wscript -e:vbs "%~f0" 
-Exit Sub 
-End Sub 
-
-Set WshShell = WScript.CreateObject("WScript.Shell") 
-strDesktop = WshShell.SpecialFolders("Desktop") 
-set oShellLink = WshShell.CreateShortcut(strDesktop & "\客户端.lnk") 
-oShellLink.TargetPath = "Debug\lanzhouclient2013.exe" 
-oShellLink.WindowStyle = 3 
-oShellLink.Hotkey = "Ctrl+Alt+e" 
-oShellLink.IconLocation = "icon\cali_icon.ico, 0" 
-oShellLink.Description = "快捷方式" 
-oShellLink.WorkingDirectory = "" 
-oShellLink.Save
