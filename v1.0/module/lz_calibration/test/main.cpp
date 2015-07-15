@@ -6,10 +6,12 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	QTextCodec *codec = QTextCodec::codecForName("system");
-	QTextCodec::setCodecForTr(codec);
-	QTextCodec::setCodecForCStrings(codec);
-	QTextCodec::setCodecForLocale(codec);
+    QApplication::addLibraryPath("./plugins");
+
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
+
 	LZ_Calibration w;
 	w.show();
 	return a.exec();

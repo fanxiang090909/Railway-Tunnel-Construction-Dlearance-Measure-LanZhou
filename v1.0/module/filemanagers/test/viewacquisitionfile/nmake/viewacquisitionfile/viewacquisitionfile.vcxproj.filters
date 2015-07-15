@@ -150,4 +150,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="slave_datastore_path.txt" />
+  </ItemGroup>
 </Project>

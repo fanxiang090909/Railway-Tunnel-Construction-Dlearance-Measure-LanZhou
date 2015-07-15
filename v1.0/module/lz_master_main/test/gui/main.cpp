@@ -26,13 +26,16 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
+    QApplication::addLibraryPath("./plugins");
+
     QTextCodec::setCodecForTr(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GB2312"));//让显示的文字不乱码
 
     Q_INIT_RESOURCE(icons);
 
-    QApplication a(argc, argv);
     // 系统图标
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(0, QObject::tr("Systray"),

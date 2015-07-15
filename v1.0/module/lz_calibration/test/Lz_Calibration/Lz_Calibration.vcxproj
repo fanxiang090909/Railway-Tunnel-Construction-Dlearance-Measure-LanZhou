@@ -180,8 +180,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\opencvx64\include;C:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;C:\Boost\lib\x64;C:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <IncludePath>D:\opencvx64\include;D:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;D:\Boost\lib\x64;D:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

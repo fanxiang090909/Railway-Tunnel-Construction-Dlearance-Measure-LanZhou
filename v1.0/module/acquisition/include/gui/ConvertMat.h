@@ -1,4 +1,4 @@
-#ifndef __CONVERT_MAT_H
+﻿#ifndef __CONVERT_MAT_H
 #define __CONVERT_MAT_H
 
 #include <opencv2/opencv.hpp>

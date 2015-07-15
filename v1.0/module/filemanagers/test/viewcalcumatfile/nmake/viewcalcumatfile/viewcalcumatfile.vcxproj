@@ -371,6 +371,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="slave_datastore_path.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
@@ -416,8 +419,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\opencvx64\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;C:\Boost\include\boost-1_55;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\opencvx64\lib;C:\Qt\lib;C:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\opencvx64\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;D:\Boost\include\boost-1_55;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencvx64\lib;C:\Qt\lib;D:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>

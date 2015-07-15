@@ -702,4 +702,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="master_datastore_path.txt" />
+  </ItemGroup>
 </Project>

@@ -153,6 +153,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="slave_datastore_path.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{109A8564-03C7-4411-A128-616C037DC8AF}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
@@ -206,8 +209,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Program Files\Basler\pylon 4\pylon\include;C:\Program Files\Basler\pylon 4\genicam\library\cpp\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;..\..\..\..\include\gui;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\datastructure\include;C:\Boost\include\boost-1_55;C:\opencvx64\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Basler\pylon 4\pylon\lib\x64;C:\Program Files\Basler\pylon 4\genicam\library\cpp\lib\win64_x64;C:\Qt\lib;C:\opencvx64\lib;C:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>C:\Program Files\Basler\pylon 4\pylon\include;C:\Program Files\Basler\pylon 4\genicam\library\cpp\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;..\..\..\..\include\gui;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\datastructure\include;D:\Boost\include\boost-1_55;D:\opencvx64\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\Basler\pylon 4\pylon\lib\x64;C:\Program Files\Basler\pylon 4\genicam\library\cpp\lib\win64_x64;C:\Qt\lib;D:\opencvx64\lib;D:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
