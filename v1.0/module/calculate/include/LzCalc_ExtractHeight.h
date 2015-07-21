@@ -15,6 +15,10 @@ class LzCalculate_ExtractHeight
 
 public:
 
+    LzCalculate_ExtractHeight();
+
+    ~LzCalculate_ExtractHeight();
+
     /**
      * 提高度计算初始化
      * @param initHeights 待提取指定高度

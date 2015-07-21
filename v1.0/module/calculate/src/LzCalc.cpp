@@ -375,6 +375,15 @@ bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinte
 }
 
 /**
+ * 开始提取高度+RT校正计算
+ */
+bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc)
+{
+    return false;
+}
+
+
+/**
  * 当前所有线程暂停计算
  */
 bool LzSlaveCalculate::suspendAllThreads()

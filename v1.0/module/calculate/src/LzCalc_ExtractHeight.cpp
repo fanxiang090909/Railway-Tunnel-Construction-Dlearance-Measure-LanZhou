@@ -317,8 +317,13 @@ int LzCalculate_ExtractHeight::run()
         return 5;
     }
 
+    std::vector<BLOCK_KEY> inputkeys = lzMatFuse->readKeys();
+
+    BLOCK_KEY startfr = inputkeys.at(0);
+    BLOCK_KEY endfr = inputkeys.at(inputkeys.size() - 1);
+
     BlockInfo Info;
-    Info.key = start_num;
+    Info.key = startfr;
 
     // @author 范翔改
     // 记录18组文件是否有数据
@@ -339,11 +344,11 @@ int LzCalculate_ExtractHeight::run()
 
     
 
-    lzMatFuse->retrieveBlock(start_num);
+    lzMatFuse->retrieveBlock(startfr);
 
     // TODO TODELETE
     double mile_count = 0;
-	for(int frame_num = start_num; frame_num < start_num+frame_cunt; frame_num++, mile_count+=1)  // mile_count++ TODO TODELETE
+	for(int frame_num = startfr; frame_num < endfr; frame_num++, mile_count+=1)  // mile_count++ TODO TODELETE
     {
                                                   //将17组从机vector放入一个vector中
         if(hasinit_has_RTfile)
