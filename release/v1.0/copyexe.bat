@@ -23,3 +23,11 @@ copy ..\..\v1.0\module\lz_master_main\test\monitor\nmake\x64\Release\lz_master_m
 
 @echo ´Ó¿Ø³ÌÐò
 copy ..\..\v1.0\module\lz_slave_main\test\nmake\x64\Release\lz_slave.exe Release\lz_slave.exe
+
+@echo ½âÑ¹ËõDLL
+set path=%path%;C:\Program Files\WinRAR
+cd Debug
+Rar.exe x -ibck -y -o+ ..\Debug_dll.rar
+cd ..
+cd Release
+Rar.exe x -ibck -y -o+ ..\Release_dll.rar

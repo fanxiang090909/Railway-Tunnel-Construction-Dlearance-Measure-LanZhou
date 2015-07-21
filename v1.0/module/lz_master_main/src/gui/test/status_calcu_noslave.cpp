@@ -12,6 +12,8 @@
 
 CalcuStatusNoSlaveWidget::CalcuStatusNoSlaveWidget(QWidget *parent) : CalcuWidget(parent)
 {
+	// 范翔定义新按钮，从融合fuse结果计算syn提取高度结果
+	ui->startExtractHeightButton->setVisible(true);
 }
 
 CalcuStatusNoSlaveWidget::~CalcuStatusNoSlaveWidget()
@@ -27,7 +29,6 @@ void CalcuStatusNoSlaveWidget::on_stopCalcuButton_clicked()
 void CalcuStatusNoSlaveWidget::on_stopFuseButton_clicked()
 {
     CalcuWidget::on_stopFuseButton_clicked();
-
 }
 
 void CalcuStatusNoSlaveWidget::calculate_beginStartAll()
@@ -47,5 +48,15 @@ void CalcuStatusNoSlaveWidget::fuse_beginStartAll()
 
 void CalcuStatusNoSlaveWidget::fuse_beginStartOneTunnel(int tunnelid)
 {
-   emit startcalcu(3, tunnelid);
+    emit startcalcu(3, tunnelid);
+}
+
+void CalcuStatusNoSlaveWidget::extract_beginStartAll()
+{
+	emit startcalcu(4, 0);
+}
+
+void CalcuStatusNoSlaveWidget::extract_beginStartOneTunnel(int tunnelid)
+{
+	emit startcalcu(5, tunnelid);
 }

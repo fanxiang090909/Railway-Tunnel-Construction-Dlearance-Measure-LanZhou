@@ -2288,6 +2288,22 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="startExtractHeightButton">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>独立提高度计算</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../resource/player.qrc">
+            <normaloff>:/player/player_play.png</normaloff>:/player/player_play.png</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>

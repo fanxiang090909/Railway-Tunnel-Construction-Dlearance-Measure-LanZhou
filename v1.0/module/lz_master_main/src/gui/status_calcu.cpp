@@ -31,6 +31,9 @@ CalcuWidget::CalcuWidget(QWidget *parent) :
     hasinintproject = false;
 
     setOptButtonEnable(false);
+	
+	// 范翔定义新按钮，从融合fuse结果计算syn提取高度结果
+	ui->startExtractHeightButton->setVisible(false);
 
     QObject::connect(ui->resetButton, SIGNAL(clicked()), this, SLOT(resetCalcuConfigFile()));
 }
@@ -75,12 +78,12 @@ void CalcuWidget::resetCalcuConfigFile()
 
 void CalcuWidget::on_startCalcuButton_clicked()
 {
-    SelectCalcuMode(false);
+    SelectCalcuMode(0);
 }
 
 void CalcuWidget::on_startFuseButton_clicked()
 {
-    SelectCalcuMode(true);
+    SelectCalcuMode(1);
 }
 
 void CalcuWidget::on_stopCalcuButton_clicked()
@@ -91,6 +94,11 @@ void CalcuWidget::on_stopCalcuButton_clicked()
 void CalcuWidget::on_stopFuseButton_clicked()
 {
     ui->stopFuseButton->setEnabled(false);
+}
+
+void CalcuWidget::on_startExtractHeightButton_clicked()
+{
+	SelectCalcuMode(2);
 }
 
 void CalcuWidget::changeSlaveTask(WorkingStatus status, QString index, int threadid, QString msgtask, QString remark)
@@ -471,7 +479,7 @@ void CalcuWidget::setOptButtonEnable(bool initstatus)
     }
 }
 
-void CalcuWidget::SelectCalcuMode(bool iffuse)
+void CalcuWidget::SelectCalcuMode(int calcutype)
 {
     bool line = ui->line_radioButton->isChecked();
     bool tunnel = ui->tunnel_radioButton->isChecked();
@@ -484,18 +492,23 @@ void CalcuWidget::SelectCalcuMode(bool iffuse)
     {
         if (line == true) // 按线路
         {
-            if (!iffuse)
+            if (calcutype == 0)
             {
                 calculate_beginStartAll();
                 ui->startCalcuButton->setEnabled(false);
                 ui->stopCalcuButton->setEnabled(true);
             }
-            else
+            else if (calcutype == 1)
             {
                 fuse_beginStartAll();
                 ui->startFuseButton->setEnabled(false);
                 ui->stopFuseButton->setEnabled(true);
             }
+			else if (calcutype == 2)
+			{
+			    extract_beginStartAll();
+                //ui->startFuseButton->setEnabled(false);
+			}
         }
         else // 按某条隧道
         {
@@ -508,20 +521,25 @@ void CalcuWidget::SelectCalcuMode(bool iffuse)
             int i = ui->actualTasksWidget->currentRow();//获得当前行的索引
             // 下面发送至丛控的代码得改，发送到9个丛控应该先计算哪一条隧道
             int tunnelid = ui->actualTasksWidget->item(i, CHECKEDTASK_TUNNELID)->data(Qt::DisplayRole).toInt();
-            if (!iffuse)
+            if (calcutype == 0)
             {
                 qDebug() << (QString(tr("要求从控计算第%1条隧道，隧道ID为%2")).arg(i).arg(tunnelid));
                 calculate_beginStartOneTunnel(tunnelid);
                 ui->startCalcuButton->setEnabled(false);
                 ui->stopCalcuButton->setEnabled(true);
             }
-            else
+            else if (calcutype == 1)
             {
                 qDebug() << (QString(tr("要求主控融合计算第%1条隧道，隧道ID为%2")).arg(i).arg(tunnelid));
                 fuse_beginStartOneTunnel(tunnelid);
                 ui->startFuseButton->setEnabled(false);
                 ui->stopFuseButton->setEnabled(true);
             }
+			else if (calcutype == 2)
+			{
+				qDebug() << (QString(tr("要求主控提高度计算第%1条隧道，隧道ID为%2")).arg(i).arg(tunnelid));
+                extract_beginStartOneTunnel(tunnelid);
+			}
         }
     }
 }

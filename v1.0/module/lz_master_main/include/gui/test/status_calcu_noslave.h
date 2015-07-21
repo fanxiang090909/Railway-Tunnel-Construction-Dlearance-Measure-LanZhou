@@ -35,7 +35,11 @@ protected slots:
     virtual void fuse_beginStartAll();
 
     virtual void fuse_beginStartOneTunnel(int tunnelid);
+	
+	virtual void extract_beginStartAll();
 
+	virtual void extract_beginStartOneTunnel(int tunnelid);
+	
 signals:
     /**
      * @param int 类型，0双目全部算，1双目按隧道算 2 fuse全部算，4 fuse按隧道算 

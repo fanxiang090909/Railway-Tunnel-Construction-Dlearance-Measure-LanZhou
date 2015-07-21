@@ -206,6 +206,10 @@ void CalcuNoSlaveWidget::startcalcu2(int type, int tunnelid)
         calculate_Fuse_beginAll();
     else if (type == 3)
         calculate_Fuse_beginOneTunnel(tunnelid);
+	else if (type == 4)
+		;//calculate_ExtractHeight_betinAll();
+	else if (type == 5)
+		calculate_ExtractHeight_beginOneTunnel(tunnelid);
 }
 
 
@@ -710,6 +714,49 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginOneTunnel(int tunnelid)
         it++;
     }
     emit calcubackupProgressingBar(WorkingStatus::Calculating, QString("%1").arg(0), 1, totalhasbackupnum, tmphasbackupnum, false);
+}
+
+void CalcuNoSlaveWidget::calculate_ExtractHeight_beginOneTunnel(int tunnelid)
+{
+    QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Calculate);
+    QString date = projectname.right(13).left(8);
+    ToDoMsg todomsg;
+
+    int tmphasbackup;
+    __int64 tmpinterruptfc;
+    int tmphasbackupnum = 0;
+    int totalhasbackupnum = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).list()->size();
+
+    bool ret2 = false;
+    QList<CheckedTunnelTaskModel>::iterator it = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).begin();
+    while (it != LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).end())
+    {
+
+        ret2 = (*it).calcuItem.getHasBackupCalc("fuse", tmphasbackup, tmpinterruptfc);
+        if (ret2)
+        {
+
+            if (tunnelid == (*it).planTask.tunnelnum)
+            {
+                QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+                //if (tmphasbackup == 1)
+                    todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+                //else
+                    todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0);
+                    QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
+
+                    qDebug() << projectpath + "/fuse_calcu/" + filename + ".fdat";
+
+                    qDebug() << projectpath + "/syn_calcu/" + filename + ".syn";
+
+
+                //lzFuseCalcQueue->pushBack(todomsg);
+                break;
+            }
+        }
+        it++;
+    }
+
 }
 
 void CalcuNoSlaveWidget::calculate_Fuse_stop()

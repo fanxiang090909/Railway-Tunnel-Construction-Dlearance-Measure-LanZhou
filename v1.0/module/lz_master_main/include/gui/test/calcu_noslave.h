@@ -168,6 +168,7 @@ public slots:
     void calculate_beginStartAll();
     void calculate_beginStartOneTunnel(int tunnelid);
     void calculate_Fuse_beginOneTunnel(int tunnelid);
+    void calculate_ExtractHeight_beginOneTunnel(int tunnelid);
     void calculate_StartOneFile(int slaveid, QString cameragroupindex, QString filename, int tunnelid, bool isinterrupted, qint64 interruptfc);
 
     /**
@@ -186,6 +187,7 @@ public slots:
      * 暂停融合
      */
     void calculate_Fuse_stop();
+	
     ////////////////////////////////////////////////
     ////////////////////////////////////////////////
     /////////////////从控函数复制//////////////////

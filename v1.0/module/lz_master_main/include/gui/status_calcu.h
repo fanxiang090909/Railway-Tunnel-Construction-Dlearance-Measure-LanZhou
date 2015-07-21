@@ -36,10 +36,11 @@ public:
 
     /**
      * 设置计算模式选择
-     * @param iffuse true 对融合计算选择计算模式
-     *               false 对双目计算选择计算模式
+     * @param calcutype 2 对提高度计算 
+	 *                  1 对融合计算选择计算模式
+     *                  0 对双目计算选择计算模式
      */
-    void SelectCalcuMode(bool iffuse);
+    void SelectCalcuMode(int calcutype);
 
 protected slots:
     /**
@@ -56,6 +57,8 @@ protected slots:
     virtual void on_stopCalcuButton_clicked();
 
     virtual void on_stopFuseButton_clicked();
+	
+	virtual void on_startExtractHeightButton_clicked();	
 
     virtual void calculate_beginStartAll() = 0;
 
@@ -64,6 +67,10 @@ protected slots:
     virtual void fuse_beginStartAll() = 0;
 
     virtual void fuse_beginStartOneTunnel(int tunnelid) = 0;
+	
+	virtual void extract_beginStartAll() = 0;
+
+	virtual void extract_beginStartOneTunnel(int tunnelid) = 0;
 
 public slots:
 

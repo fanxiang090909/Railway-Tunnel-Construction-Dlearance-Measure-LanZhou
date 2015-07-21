@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\..\..\..\calculate\src\kdtree.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalculator.cpp" />
+    <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_ExtractHeight.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_thread.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzEdgeMarker.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzImgArgument.cpp" />
@@ -296,6 +297,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
     </CustomBuild>
     <ClInclude Include="..\..\..\..\..\calculate\include\LzCalculator.h" />
+    <ClInclude Include="..\..\..\..\..\calculate\include\LzCalc_ExtractHeight.h" />
     <ClInclude Include="..\..\..\..\..\calculate\include\LZ_Calculation.h" />
     <ClInclude Include="..\..\..\..\..\calculate\include\Lz_RT_Calc.h" />
     <ClInclude Include="..\..\..\..\..\calculate\include\opencvhead.h" />
