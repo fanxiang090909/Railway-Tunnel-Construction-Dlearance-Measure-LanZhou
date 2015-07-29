@@ -1,4 +1,5 @@
 ﻿#include "LzCalc_ExtractHeight.h"
+#include <QFile>
 
 LzCalculate_ExtractHeight::LzCalculate_ExtractHeight()
 {
@@ -91,7 +92,27 @@ bool LzCalculate_ExtractHeight::init(list<int> initHeights, string initfusefile_
     if (syn_rectify_input_file.compare("") == 0)
         hasinit_syn_rectify_input_file = false;
     else
+    {
+        vals.clear();
+        std::list<int>::iterator it = Item.begin();
+        while (it != Item.end())
+        {
+            RectifyFactor i;
+            i.l_a = 0;
+            i.l_b = 0;
+            i.l_c = 0;
+            i.l_d = 0;
+            i.r_a = 0;
+            i.r_b = 0;
+            i.r_c = 0;
+            i.r_d = 0;
+            vals.insert(std::pair<int,RectifyFactor>((*it),i));
+            it++;
+        }
+
+        loadRectifyData(syn_rectify_input_file);
         hasinit_syn_rectify_input_file = true;
+    }
 
     this->syn_output_file = initsyn_output_file;
 
@@ -100,6 +121,118 @@ bool LzCalculate_ExtractHeight::init(list<int> initHeights, string initfusefile_
     else
         hasinit_can_calc = false;
     return hasinit_can_calc;
+}
+
+bool LzCalculate_ExtractHeight::loadRectifyData(string filename)
+{
+    QFile file;
+    QString in;
+
+    file.setFileName(QString::fromLocal8Bit(filename.c_str()));
+
+    // Currently here for debugging purposes
+    qDebug() << "Reading file: " << QString::fromLocal8Bit(filename.c_str()) << endl;
+
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream inStream(&file);
+        
+        // readfile
+        in = inStream.readLine();
+        in = inStream.readLine();
+
+        int height;
+        float l_a;
+        float l_b;
+        float l_c;
+        float l_d;
+        float r_a;
+        float r_b;
+        float r_c;
+        float r_d;
+
+        while(!(in.isNull()))
+        {
+            height = in.section("\t",0,0).toInt();
+            l_a = in.section("\t",1,1).toFloat();
+            l_b = in.section("\t",2,2).toFloat();
+            l_c = in.section("\t",3,3).toFloat();
+            l_d = in.section("\t",4,4).toFloat();
+
+            r_a = in.section("\t",5,5).toFloat();
+            r_b = in.section("\t",6,6).toFloat();
+            r_c = in.section("\t",7,7).toFloat();
+            r_d = in.section("\t",8,8).toFloat();
+
+            vals.at(height).l_a = l_a;
+            vals.at(height).l_b = l_b;
+            vals.at(height).l_c = l_c;
+            vals.at(height).l_d = l_d;
+            vals.at(height).r_a = r_a;
+            vals.at(height).r_b = r_b;
+            vals.at(height).r_c = r_c;
+            vals.at(height).r_d = r_d;
+
+
+            in = inStream.readLine();
+        }
+
+        file.close();
+
+        qDebug() << "read_end" << endl;
+    }
+
+    // Debug
+    std::map<int,RectifyFactor>::iterator it = vals.begin();
+    while (it != vals.end())
+    {
+        std::pair<int,RectifyFactor> pair = (*it);
+
+        qDebug() << pair.first << pair.second.l_a << pair.second.l_b << pair.second.l_c << pair.second.l_d << 
+                                  pair.second.r_a << pair.second.r_b << pair.second.r_c << pair.second.r_d;
+        it++;
+    }
+    return true;
+}
+
+/**
+ * 加校正系数校正提高度结果
+ */
+void LzCalculate_ExtractHeight::rectifyHeight(SectionData & data, bool safetyfactor)
+{
+    std::map<int,item>::iterator it = data.getMaps().begin();
+    int tempkey;
+    float leftVal;
+    float rightVal;
+    RectifyFactor rectifyFactor;
+    while (it != data.getMaps().end())
+    {
+        std::pair<int,item> pair = (*it);
+        tempkey = (*it).first;
+        leftVal = (*it).second.left;
+        rightVal = (*it).second.right;
+        rectifyFactor = vals.at(tempkey);
+
+        // 公式计算
+        // 如果不加安全缩减因子
+        if (leftVal > 0)
+            leftVal += rectifyFactor.l_a * leftVal + rectifyFactor.l_b;
+        if (rightVal > 0)
+            rightVal += rectifyFactor.r_a * rightVal + rectifyFactor.r_b;
+
+        // 如果加安全缩减因子
+        if (safetyfactor)
+        {
+            if (leftVal > 0)
+                leftVal += rectifyFactor.l_c * leftVal + rectifyFactor.l_d;
+            if (rightVal > 0)
+                rightVal += rectifyFactor.r_c * rightVal + rectifyFactor.r_d;
+        }
+        data.updateToMapVals(tempkey, leftVal, rightVal);
+        
+        it++;
+    }
 }
 
 void LzCalculate_ExtractHeight::rectify_RT()                                                 //对三维点向量进行RT矫正
@@ -136,6 +269,25 @@ void LzCalculate_ExtractHeight::Vector2Mat(Vector<Point3d> & input, Mat & output
     }
 }
 
+void LzCalculate_ExtractHeight::get_vector(Mat& mat_point, Vector<Point3d> & fus_vector, int cameragroupid, bool carriagedirection)
+{
+    Point3d point;
+    // @author 范翔 车厢正反对x值的影响，使得结果浏览时符合火车真实前行时人的直观左右认知
+    int a = 1;
+    if (!carriagedirection)
+        a = -1;
+    if(4 != mat_point.cols)
+        for(int i=0; i<mat_point.cols; i++)                          
+        {
+            point.x = (*mat_point.ptr<double>(0,i));
+            //////////TODO TO DELETE////////
+            // (-1) 是因为外标定的坐标系与车厢正厢正向坐标系相反，建议下次外标定点测量时采用所规定的车厢正向坐标系
+            point.y = a*(-1)*(*mat_point.ptr<double>(1,i));
+            point.z = cameragroupid;//*mat_point.ptr<float>(2,i);
+            fus_vector.push_back(point);
+        }
+}
+
 void LzCalculate_ExtractHeight::Mat2Vector(Mat & input, Vector<Point3d> & output)
 {
     Point3d point;
@@ -148,20 +300,12 @@ void LzCalculate_ExtractHeight::Mat2Vector(Mat & input, Vector<Point3d> & output
     }
 }
 
-int LzCalculate_ExtractHeight::extract_height(list<int> Item,LzSerialStorageSynthesis* extr_high, __int64 frame_num, double mile_count)
+int LzCalculate_ExtractHeight::extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height)
 {
 	int blank_step = 75;
 
-	BlockInfo tmpblockinfo;
-    tmpblockinfo.isvalid = true;
-    tmpblockinfo.key = frame_num;
-
-	SectionData Data;
-	bool ret = Data.initMaps();
-    if (!ret)
-        return 1;
-
-    float center_height = -1, center_height_HI = -1, minx = 10000;
+    center_height = -1;
+    float center_height_HI = -1, minx = 10000;
 	for(list<int>::iterator it = Item.begin(); it != Item.end() ;it++)                      //对List进行遍历获取点
 	{
 		bool flag = false;
@@ -286,7 +430,6 @@ int LzCalculate_ExtractHeight::extract_height(list<int> Item,LzSerialStorageSynt
         }
         it++;
     }*/
-    extr_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！
     return 0;
 }
 
@@ -294,7 +437,7 @@ int LzCalculate_ExtractHeight::run()
 {
     if (!hasinit_can_calc)
     {
-        return -1;
+        return 6; // 没有任何数据
     }
 
     lzMatFuse = new LzSerialStorageMat();
@@ -327,38 +470,66 @@ int LzCalculate_ExtractHeight::run()
 
     // @author 范翔改
     // 记录18组文件是否有数据
-    bool hasdata = false;
     DataHead towritedatahead;
     // @author 范翔添加
     carriagedirect = true;
     
     // 如果首次创建文件（非暂停后继续），则写入文件头
-    if (!isinterruptfile && hasdata) // TODO +RT
+    if (!isinterruptfile) // TODO +RT
     {
         strcpy(towritedatahead.camera_index, "SYN\0");
         towritedatahead.seqno = 0;
         extra_high->writeHead(&towritedatahead);
     }
-    else
-        return 6; // 没有任何数据
-
-    
 
     lzMatFuse->retrieveBlock(startfr);
+    bool ifread = false;
 
     // TODO TODELETE
     double mile_count = 0;
 	for(int frame_num = startfr; frame_num < endfr; frame_num++, mile_count+=1)  // mile_count++ TODO TODELETE
     {
-                                                  //将17组从机vector放入一个vector中
-        if(hasinit_has_RTfile)
+        // 【Step1】 Mat转Vector
+        Mat fuseMat;
+        ifread = lzMatFuse->readMat(fuseMat);
+        //Mat2Vector(fuseMat, fuse_vector);
+        get_vector(fuseMat, fuse_vector, 0, false);
+
+        // 【Step2】对vector进行rt矫正
+        // 将17组从机vector放入一个vector中
+        if (hasinit_has_RTfile)
         {
-		    rectify_RT();                                                  //对vector进行rt矫正
+		    rectify_RT();                                                  
         }
 
-		ret = extract_height(Item,extra_high,frame_num, mile_count);
-        fus_vector.clear();
-        ret = 0;
+      	BlockInfo tmpblockinfo;
+        tmpblockinfo.isvalid = true;
+        tmpblockinfo.key = frame_num;
+
+	    SectionData Data;
+	    bool retb = Data.initMaps();
+        if (!retb)
+        {
+            // 终止计算
+            lzMatFuse->closeFile();
+            extra_high->closeFile();
+            return -8;
+        }
+        float center_height = -1;
+
+        // 【Step3】提取高度
+		ret = extract_height(fuse_vector, Data, center_height);
+        
+        // 【Step4】系数校正
+        if (hasinit_syn_rectify_input_file)
+        {
+            rectifyHeight(Data, false);
+        }
+
+        extra_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！
+
+
+        fuse_vector.clear();
         if (ret != 0)
         {
             // 终止计算
@@ -381,7 +552,7 @@ int LzCalculate_ExtractHeight::run()
         }
 
         Info.key++;
-        fus_vector.clear();
+        fuse_vector.clear();
 	}
 
     lzMatFuse->closeFile();

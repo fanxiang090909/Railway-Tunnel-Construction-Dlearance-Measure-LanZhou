@@ -10,8 +10,9 @@ using namespace cv;
 using namespace std;
 ///@todo 添加标定文件路径
 
-class LzCalculate_ExtractHeight
+class LzCalculate_ExtractHeight : public QObject 
 {
+    Q_OBJECT
 
 public:
 
@@ -36,6 +37,21 @@ public:
 
     void Mat2Vector(Mat & input, Vector<Point3d> & output);
 
+    /**
+     * fuseMat转Vector
+     */
+    void get_vector(Mat& mat_point, Vector<Point3d> & fus_vector, int cameragroupid, bool carriagedirection);
+
+    /**
+     * 加载校正系数配置文件.rectify配置文件
+     */
+    bool loadRectifyData(string rectifyname);
+    
+    /**
+     * 加校正系数校正提高度结果
+     */
+    void rectifyHeight(SectionData & data, bool safetyfactor);
+
 signals:
     // @author 范翔改 继承自QObject 可以通过消息槽反馈计算进度
     /**
@@ -55,7 +71,7 @@ private:
     /**
      * 提取高度
      */
-    int extract_height(list<int> Item,LzSerialStorageSynthesis* extr_high, __int64 frame_num, double mile_count);
+    int extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height);
     
     // 初始化参数
     bool hasinit_can_calc;
@@ -87,7 +103,7 @@ private:
     LzSerialStorageSynthesis* extra_high;
 
     // 用于记录融合后的三维点
-    Vector<Point3d> fus_vector;                          
+    Vector<Point3d> fuse_vector;                          
 
     // 指定高度
     list<int> Item;
@@ -98,6 +114,27 @@ private:
     bool carriagedirect;
 
     bool isinterruptfile;
+
+    
+    struct RectifyFactor
+    {
+        float l_a;
+        float l_b;
+        float l_c;
+        float l_d;
+        float r_a;
+        float r_b;
+        float r_c;
+        float r_d;
+    };
+
+    /**
+     * 右边点  左边点 （包含高度信息）
+     * 【注意！】左边右边都以标准输出表格的左右为准
+     *          即单线下行，与双线非正常方向
+     *          面向终点的左边数据点和右边数据点
+     */
+    std::map<int, RectifyFactor> vals;
 };
 
 #endif // LZCALCULATE_EXTRACTHEIGHT_H

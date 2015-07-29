@@ -739,11 +739,12 @@ void CalcuNoSlaveWidget::calculate_ExtractHeight_beginOneTunnel(int tunnelid)
             if (tunnelid == (*it).planTask.tunnelnum)
             {
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+                QString parentpath = SlaveSetting::getSettingInstance()->getParentPath();
                 if (tmphasbackup == 1)
-                    todomsg.msg = QString("-32,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath);
                 else
                 {
-                    todomsg.msg = QString("-32,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath);
                     QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
 
                     qDebug() << projectpath + "/fuse_calcu/" + filename + ".fdat";

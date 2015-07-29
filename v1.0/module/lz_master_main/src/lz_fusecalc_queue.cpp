@@ -111,9 +111,9 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
                 emit signalParsedMsgToSlave(tr("[主控] 命令:暂停融合计算"));
                 break;
             }
-            case -32: // 开始提高度计算-32,"tunnelid","filename","hascalcu","calcuinterruptfc"
+            case -32: // 开始提高度计算-32,"tunnelid","filename","hascalcu","calcuinterruptfc","parentpath"
             {
-                if (strList.length() < 5)
+                if (strList.length() < 6)
                 {
                     qDebug() << tr("解析字符出错") << msg;
                     return false;
@@ -122,11 +122,12 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
                 QString filename = strList.at(2);
                 int hascalcubackup = strList.at(3).toInt();
                 qint64 calinterruptfc = strList.at(4).toLongLong();
+                QString parentpath = strList.at(5);
                 bool hasinterrupted = false;
                 if (hascalcubackup == 1)
                     hasinterrupted = true;
                 if (checkHasFreeThread())
-                    lzcalc->startFuseCalc(tunnelid, filename, hasinterrupted, calinterruptfc);
+                    lzcalc->startExtractHeightCalc(tunnelid, filename, hasinterrupted, calinterruptfc, parentpath);
                 else
                     return false;
 

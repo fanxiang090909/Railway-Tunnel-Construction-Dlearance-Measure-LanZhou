@@ -61,7 +61,7 @@ public:
     /**
      * 开始提取高度+RT校正计算
      */
-    bool startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc);
+    bool startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath);
 
     /**
      * 当前所有线程暂停计算

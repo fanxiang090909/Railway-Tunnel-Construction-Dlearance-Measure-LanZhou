@@ -1,4 +1,6 @@
 ﻿#include "LzCalc.h"
+
+#include "LzCalc_ExtractHeight.h"
 #include <QDateTime>
 
 LzSlaveCalculate::LzSlaveCalculate(LzCalcThreadType initcalcthreadtype, int initnumofthreads, QObject * parent) : calcuthreadtype(initcalcthreadtype), maxnumofthreads(initnumofthreads), 
@@ -377,9 +379,32 @@ bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinte
 /**
  * 开始提取高度+RT校正计算
  */
-bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc)
+bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath)
 {
-    return false;
+    LzCalculate_ExtractHeight calcExtractHeight;
+
+    QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
+
+    QString fdat_nort = projectpath + "/fuse_calcu/" + filename + ".fdat";
+    QString mdat_Q = projectpath + "/mid_calcu/" + filename + ".mdat";
+    QString mdat_R = projectpath + "/mid_calcu/" + filename + ".mdat";
+
+    QString syninput = parentpath + "/calcu_calibration/heights.rectify";
+    QString syndat = projectpath + "/syn_data/" + filename + ".syn";
+    
+    std::list<int> Item = OutputHeightsList::getOutputHeightsListInstance()->list();
+
+    // 初始化计算参数
+    calcExtractHeight.init(Item, fdat_nort.toLocal8Bit().constData(), mdat_Q.toLocal8Bit().constData(), mdat_R.toLocal8Bit().constData(),
+                                                    syninput.toLocal8Bit().constData(), syndat.toLocal8Bit().constData());
+    
+    // 计算
+    int ret = calcExtractHeight.run();
+
+    if (ret == 0)
+        return true;
+    else
+        return false;
 }
 
 
