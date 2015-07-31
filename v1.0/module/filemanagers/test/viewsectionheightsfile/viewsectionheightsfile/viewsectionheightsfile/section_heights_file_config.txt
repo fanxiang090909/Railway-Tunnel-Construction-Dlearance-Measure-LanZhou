@@ -1,0 +1,6 @@
+检查车（测量值）：
+example.sec
+6666
+断面仪（真值）：
+example.sec
+6669
