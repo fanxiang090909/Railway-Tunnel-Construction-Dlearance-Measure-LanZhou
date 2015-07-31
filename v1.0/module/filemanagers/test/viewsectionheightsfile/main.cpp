@@ -150,13 +150,13 @@ int main(int argc, char* argv[])
     imagesection.show();
     
     imagesection.initPointsArray(data1.getMaps().size(), true);
-    imagesection.SectionDataToPointsArray(data1, false);
+    imagesection.SectionDataToPointsArray(data1, true);
 
     imagesection.initPointsArray(data2.getMaps().size(), false);
     imagesection.SectionDataToPointsArray(data2, false);
 
     imagesection.setFusePointArrayVisible(false);
-    
+   
     imagesection.saveImage(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".jpg");
     imagesection.repaint();
 
