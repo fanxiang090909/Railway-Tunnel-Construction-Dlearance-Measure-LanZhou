@@ -109,6 +109,11 @@ public:
      */
     bool updateToMapVals(int height, float leftVal, float rightVal);
 
+	/**
+	 * 重置左侧或右侧为-1
+	 */
+	bool resetLeftOrRight(bool leftorright);
+
     /**
      * 初始化map（长度已知，从配置文件中读出）
      */
@@ -284,6 +289,11 @@ public:
     bool updateToMapVals(int height, float leftVal, float rightVal, double leftpos, double rightpos, 
 							int lefttunnelid, int righttunnelid, float leftradius, float rightradius);
 
+	/**
+	 * 重置左侧或右侧为-1
+	 */
+	bool resetLeftOrRight(bool leftorright);
+
     /**
      * 初始化map（长度已知，从配置文件中读出）
      */
@@ -367,6 +377,13 @@ public:
     int getTunnelID();
 
     void setTunnelID(int newtunnelid);
+
+    /**
+     * 检查是否超限
+     * 如果有左值、右值小于超限值，则返回true
+     * 如果当前值为-1不做比较
+     */
+    bool checkLessThanStdSectionData(SectionData & basedata);
 
 private:
 

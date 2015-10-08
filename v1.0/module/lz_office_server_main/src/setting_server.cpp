@@ -1,5 +1,6 @@
 ﻿#include "setting_server.h"
 #include <QDebug>
+#include <QDir>
 
 #include <string>
 #include <QString>
@@ -35,10 +36,14 @@ ServerSetting::ServerSetting(QObject *parent) :
     initprojectok = false;
     parentpath = ".";
     projectpath = ".";
+
+    lineNamesModel = new QStringListModel(this);
 }
 
 ServerSetting::~ServerSetting()
 {
+    if (lineNamesModel != NULL)
+        delete lineNamesModel;
 }
 
 /**
@@ -46,6 +51,9 @@ ServerSetting::~ServerSetting()
  */
 void ServerSetting::setParentPath(QString newpath) { parentpath = newpath; }
 QString ServerSetting::getParentPath() { return parentpath; }
+
+void ServerSetting::setNASIPAddress(QString newnasaddress) { nasip = newnasaddress; }
+QString ServerSetting::getNASAddress() { return nasip; }
 
 /**
  * 设置工程存放路径
@@ -92,4 +100,26 @@ ProjectModel & ServerSetting::getProjectModel()
     return currentProjectModel;
 }
 
+/**
+ * 得到所有可编辑线路名称
+ */
+QStringListModel * ServerSetting::getEditableLineNames()
+{
+    QDir dir;
+    dir.setPath(ServerSetting::getSettingInstance()->getNASAddress());
+    dir.setFilter(QDir::Dirs | QDir::Hidden);
+    dir.setSorting(QDir::DirsFirst);
+    QStringList names = dir.entryList();
 
+    // 除去该目录下非工程目录名，如“..”“plan_tasks”“tmp_img”“system”“output”等等，以便显示给用户
+    QStringList resultlist;
+    for (int i = 0; i < names.length(); i++)
+    {
+        QStringList tmp(names.at(i).split("_"));
+        if (tmp.length() >= 2 && tmp.at(0).length() > 0 && tmp.at(tmp.length() - 1).length() == 8)
+            resultlist.append(names.at(i));
+    }
+
+    lineNamesModel->setStringList(resultlist);
+    return lineNamesModel;
+}

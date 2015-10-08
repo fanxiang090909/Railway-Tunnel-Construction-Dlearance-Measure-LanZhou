@@ -167,21 +167,21 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\Boost\include\boost-1_55;C:\Qt2\4.8.0\include\QtSql;C:\Qt2\4.8.0\include\QtCore;C:\Qt2\4.8.0\include;C:\Qt2\4.8.0\include\QtGui;C:\Qt2\4.8.0\include\QtNetwork;C:\Qt2\4.8.0\include\Qt;C:\Qt2\4.8.0\include\ActiveQt;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt2\4.8.0\lib;C:\Qt2\4.8.0\plugins\codecs;C:\Qt2\4.8.0\plugins\iconengines;C:\Qt2\4.8.0\plugins\graphicssystems;C:\Qt2\4.8.0\plugins\sqldrivers;D:\Boost\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_DIR)\include\boost-1_55;$(QT_DIR)\include\QtSql;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\Qt;$(QT_DIR)\include\ActiveQt;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(QT_DIR)\plugins\codecs;$(QT_DIR)\plugins\iconengines;$(QT_DIR)\plugins\graphicssystems;$(QT_DIR)\plugins\sqldrivers;$(BOOST_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\opencvx64\include;C:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\..\xmlloader\include\tinyxml;..\..\..\xmlloader\include;..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;C:\Boost\lib\x64;C:\opencvx64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(BOOST_DIR)\include\boost-1_55;$(QT_DIR)\include\QtSql;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\Qt;$(QT_DIR)\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\..\xmlloader\include\tinyxml;..\..\..\xmlloader\include;..\..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(QT_DIR)\plugins\codecs;$(QT_DIR)\plugins\iconengines;$(QT_DIR)\plugins\graphicssystems;$(QT_DIR)\plugins\sqldrivers;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\opencvx64\include;D:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;D:\Boost\lib\x64;D:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(BOOST_DIR)\include\boost-1_55;$(QT_DIR)\include\QtSql;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\Qt;$(QT_DIR)\include\ActiveQt;..\..\..\calculate\include\icp;..\..\..\filemanagers\include\gui;..\..\..\xmlloader\include\tinyxml;..\..\..\xmlloader\include;..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(QT_DIR)\plugins\codecs;$(QT_DIR)\plugins\iconengines;$(QT_DIR)\plugins\graphicssystems;$(QT_DIR)\plugins\sqldrivers;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

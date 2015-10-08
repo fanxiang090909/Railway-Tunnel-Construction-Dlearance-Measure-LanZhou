@@ -418,7 +418,8 @@ void BaseImage::ConvertPixeltoMM()
  */
 void BaseImage::saveImage(QPixmap & pixmap)
 {
-    pixmap.save(saveimgpathfilename);
+	qDebug() << saveimgpathfilename;
+    bool ret = pixmap.save(saveimgpathfilename);
 }
 
 /**
@@ -938,7 +939,7 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
         QColor color(128, 64, 0);
         pp.setPen(QPen(color, 3));
         // -50表示让出距离
-        pp.drawText((widthpixel/2)-50,(originy-(tmpMinHeightVal/scale)/pixeltomm),QString("%1").arg(tmpMinHeightVal));//标记时为了使数字在横线下方可以改为810
+        pp.drawText((widthpixel/2)-50,(originy-(tmpMinHeightVal/scale)/pixeltomm),QString("%1").arg((int)tmpMinHeightVal));//标记时为了使数字在横线下方可以改为810
     }
 }
 
@@ -1015,7 +1016,25 @@ void ClearanceImage::mousePressEvent(QMouseEvent *event)
 
 void ClearanceImage::mouseMoveEvent(QMouseEvent *event)
 {
-    isDrawRect=true;
+	int newx=event->pos().x();
+    int newy=event->pos().y();
+        
+    int gui_height, gui_width;
+    if(newx<=widthpixel/2)
+    {
+        gui_width=(int)(((newx)-(widthpixel/2))*pixeltomm*scale);
+        gui_height=(int)((originy-(newy))*pixeltomm*scale);//距轨面高度
+    }
+    else
+    {
+        gui_width=(int)(((newx)-(widthpixel/2))*pixeltomm*scale);
+        gui_height=(int)((originy-(newy))*pixeltomm*scale);
+    }
+    emit sendMousePos(gui_width, gui_height);
+    setCursor(QCursor(Qt::ArrowCursor));//加上这一句才行
+	update();
+
+	isDrawRect=true;
 	if(event->buttons()&Qt::LeftButton)//鼠标左键按下的同时移动鼠标
 	{
 		endRectPoint = event->pos();
@@ -1474,7 +1493,7 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
         QColor color(128, 64, 0);
         pp.setPen(QPen(color, 3));
         // -50表示让出距离
-        pp.drawText((widthpixel/2) - 50,(originy-((*minh)/scale)/pixeltomm),QString("%1").arg((*minh)));//标记时为了使数字在横线下方可以改为810
+        pp.drawText((widthpixel/2) - 50,(originy-((*minh)/scale)/pixeltomm),QString("%1").arg((int)(*minh)));//标记时为了使数字在横线下方可以改为810
     }
 }
 
@@ -1489,13 +1508,16 @@ void SectionImage::Draw_Fuse(QPainter &pp)
         {
             // 开始画实际的隧道数据
             int groupindex = fuse_points_cameragroup.at(i);
+            if (groupindex < 1 || groupindex > 16)
+                continue;
+
             QColor color(0, 0, 255);
             if (groupindex%3 == 0)
                 color = QColor(255, 0, 255);
             else if (groupindex%3 == 2)
                 color = QColor(0, 255, 255);
 
-            pp.setPen(QPen(color, 2));
+            pp.setPen(QPen(color, 1));
             QBrush bruch(Qt::FDiagPattern);//画刷
             bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
             pp.setBrush(bruch);

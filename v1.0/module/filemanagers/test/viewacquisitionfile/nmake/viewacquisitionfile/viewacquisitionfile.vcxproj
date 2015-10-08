@@ -237,16 +237,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\opencvx64\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;D:\Boost\include\boost-1_55;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\opencvx64\lib;C:\Qt\lib;D:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;$(BOOST_DIR)\include\boost-1_55;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OPENCV_DIR)\lib;$(QT_DIR)\lib;$(BOOST_DIR)\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\opencvx64\include;C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;D:\Boost\include\boost-1_55;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;D:\opencvx64\lib;D:\Boost\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtGui;..\..\..\..\..\..\include;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\datastructure\include;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\compress\include;..\..\..\..\lz_exception\include;$(BOOST_DIR)\include\boost-1_55;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(OPENCV_DIR)\lib;$(QT_DIR)\lib;$(BOOST_DIR)\lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

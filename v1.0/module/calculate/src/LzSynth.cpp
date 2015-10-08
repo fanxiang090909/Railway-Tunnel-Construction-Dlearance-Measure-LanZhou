@@ -20,6 +20,9 @@ LzSynthesis::LzSynthesis(QObject *parent) : QObject(parent)
     currentCheckedTunnelModel = NULL;
     carriageDireciton = false;
     hasinit = false;
+	startframeno = -1;
+	endframeno = -1;
+	leftrightvalid = 0;
 }
 
 LzSynthesis::~LzSynthesis()
@@ -35,13 +38,17 @@ LzSynthesis::~LzSynthesis()
  * @return true 检查输出高度配置文件（output_heights.xml）是否加载
  */
 bool LzSynthesis::initSynthesis(string initialTunnelheight_syn_name, TunnelDataModel * initialTunnelData, 
-								CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection)
+								CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection, long long startframeno, long long endframeno, int leftrightvalid)
 {
     tunnelheight_syn_name = initialTunnelheight_syn_name;
     currentTunnelData = initialTunnelData;
     currentCheckedTunnelModel = initialCheckedTunnelModel;
     carriageDireciton = newCarriageDirection;
     currentFrameDistance = framedistance;
+	this->leftrightvalid = leftrightvalid;
+
+	this->startframeno = startframeno;
+	this->endframeno = endframeno;
 
     if (OutputHeightsList::getOutputHeightsListInstance()->getCurrentHeightsVersion() == 0)
     {
@@ -129,7 +136,7 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
     //}
 
     // 两个隧道综合判断里程的必要变量
-    bool carriage_direction = dataread.carriage_direction;  // 此次采集的车厢正反
+    bool carriage_direction = carriageDireciton;//dataread.carriage_direction;  // 此次采集的车厢正反
     bool is_normal = dataread.is_normal;                   // 此次拍摄的双线正常/非正常信息，（单线正序/逆序信息）
     bool is_doubleline = dataread.is_double_line;
     bool is_down_link = dataread.is_downlink;
@@ -156,23 +163,39 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
     }
 
     // 反馈计算起始、终止帧号
-    emit initfc(keys.at(0), keys.at(keys.size()-1));
-    __int64 startfc = keys.at(0);
+	__int64 startfc = keys.at(0);
     __int64 endfc = keys.at(keys.size()-1);
 
-    __int64 framecount = endfc - startfc;
+	if (this->startframeno != -1 && endframeno != -1)
+	{
+		startfc = startframeno;
+		endfc = endframeno;
+	}
+	emit initfc(startfc, endfc);
+    
+	__int64 framecount = endfc - startfc;
 
     // 临时变量findInterMile()函数引用
     CurveType curvetype = CurveType::Curve_Straight;
     int curveid;
     int curveradius;
     bool intermileret;
-
+	bool ret1;
     std::cout << "retrive result:" << ret;
-    for (int i = 0; i < keys.size(); i++)
+	
+	long long size = keys.size();
+	if (this->startframeno != -1 && endframeno != -1)
+		size = endframeno - startframeno + 1;
+
+    for (int i = 0; i < size; i++)
     {
         // 在readMap中调用的blocktomap中已调用data.resetMaps();
-        ret = syn->readMap(framecounter, mile, centerheight, tempdata);
+		if (this->startframeno != -1 && endframeno != -1)
+			ret1 = syn->retrieveMap(startframeno + i);
+		else
+			ret1 = syn->retrieveMap(keys.at(i));
+        
+		ret = syn->readMap(framecounter, mile, centerheight, tempdata);
         if (ret == false)
              continue;
 
@@ -255,6 +278,20 @@ void LzSynthesis::synthesis(ClearanceData& straightdata, ClearanceData& leftdata
 
     if (hasright)
         clearanceReduction(rightdata, carriage_direction);
-        
+
+    ///////////左侧右侧是否有效
+	if (leftrightvalid > 0)
+	{
+		// 如果是左侧有效
+		bool leftorright = true;
+		if (leftrightvalid == 1)
+			leftorright = true;
+		else  
+			leftorright = false;
+		straightdata.resetLeftOrRight(leftorright);
+		leftdata.resetLeftOrRight(leftorright);
+		rightdata.resetLeftOrRight(leftorright);
+	}
+
     delete syn;
 }

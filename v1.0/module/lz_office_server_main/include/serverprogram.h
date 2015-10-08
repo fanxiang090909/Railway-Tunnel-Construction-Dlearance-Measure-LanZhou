@@ -78,6 +78,12 @@ private:
 
     /*****************关于计算*********************/
 
+    /**
+     * 重启slave程序
+     */
+    void resetSlaveProgram();
+    void terminateSlaveProgram();
+
 private:
     explicit ServerProgram(QObject *parent = 0);
 

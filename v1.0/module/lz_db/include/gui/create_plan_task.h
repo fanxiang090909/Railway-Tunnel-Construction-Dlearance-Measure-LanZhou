@@ -14,6 +14,8 @@
 #include "xmltaskfileloader.h"
 #include "xmlcheckedtaskfileloader.h"
 
+#include "lz_working_enum.h"
+
 namespace Ui {
     class PlanTaskWidget;
 }
@@ -30,7 +32,7 @@ class PlanTaskWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit PlanTaskWidget(QWidget *parent = 0);
+    explicit PlanTaskWidget(QWidget *parent = 0, double defaultDistanceMode_500mm = 0.5103);
     ~PlanTaskWidget();
 
     /**
@@ -51,6 +53,15 @@ private:
     Ui::PlanTaskWidget *ui;
 
     int static TABLE_COLUMN_COUNT;
+
+    /**
+     * 兰州外触发模式下
+     * 采集帧间隔 0.5m 0.75m 1m 1.25m 一帧
+     */
+    LzCollectHardwareTriggerDistanceMode defaultcomboindex;
+
+    double defaultDistanceMode_500mm;
+    double currentDistanceMode;
 
     /**
      *  线路listView中用的数据访问对象模型
@@ -78,7 +89,13 @@ private:
      * 更新采集日期
      */
     void updateDateTime();
+
 private slots:
+
+    /**
+     * 选择两帧之间间隔里程
+     */
+    void comboBoxcurrentIndexChanged(int);
 
     /**
      * 点击线路的lineView更新隧道的TableView槽函数

@@ -3,6 +3,8 @@
 #include "daoclearanceoutput.h"
 #include "daotasktunnel.h"
 
+#include <QDateTime>
+
 /**
  * 单隧道综合结果数据模型
  * @author fanxiang
@@ -76,10 +78,27 @@ QString ClearanceSingleTunnel::getTaskTunnelInfo()
 {
     if (!hasinit)
         return "";
-    QString tunnelname, date;
+    QString tunnelname, date, linename;
     int tunnelid;
-    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tasktunnelid, tunnelid, tunnelname, date);
+    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tasktunnelid, tunnelid, tunnelname, date, linename);
     return tunnelname + "_" + date;
+}
+
+/**
+ * 得到采集隧道信息
+ * @return “隧道名_采集时间”,没有找到返回""
+ */
+QString ClearanceSingleTunnel::getTaskTunnelInfoFormat()
+{
+    if (!hasinit)
+        return "";
+    QString tunnelname, date, linename;
+    int tunnelid;
+    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tasktunnelid, tunnelid, tunnelname, date, linename);
+
+    QDateTime tmpdate = QDateTime::fromString(date, "yyyyMMdd");
+    date = tmpdate.toString("yyyy-MM-dd");
+    return linename + "-" + tunnelname + "-" + date;
 }
 
 /**
@@ -87,7 +106,32 @@ QString ClearanceSingleTunnel::getTaskTunnelInfo()
  */
 int ClearanceSingleTunnel::getMinRadius()
 {
-    return 0;
+    if (!hasinit)
+        return 0;
+
+    // 没有曲线的情况
+    if (!hasleft && !hasright)
+        return 0;
+
+    int minRadius = 9999999; // 最大半径
+    if (hasleft)
+    {
+        int tmp = leftdata.getMinRadius();
+        if (tmp < minRadius && tmp > 0)
+            minRadius = tmp;
+    }
+
+    if (hasright)
+    {
+        int tmp = rightdata.getMinRadius();
+        if (tmp < minRadius && tmp > 0)
+            minRadius = tmp;
+    }
+
+    if (minRadius < 0 || minRadius >= 9999999)
+        return 0;
+
+    return minRadius;
 }
 
 /**

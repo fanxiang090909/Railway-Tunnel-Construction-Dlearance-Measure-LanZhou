@@ -10,11 +10,13 @@
  * @version 1.0.0
  * @date 2014-03-01
  */
-CollectWidget::CollectWidget(QWidget *parent) :
-    QWidget(parent),
+CollectWidget::CollectWidget(QWidget *parent, double defualtDistanceMode) :
+    QWidget(parent), defaultDistanceMode(defualtDistanceMode), currentProjectModel(1.0),
     ui(new Ui::CollectWidget)
 {
     ui->setupUi(this);
+
+    settingwindow = NULL;
 
     // 不查看主控机帧号 @date 20150625
     ui->masterLabel_status->setVisible(false);
@@ -502,7 +504,11 @@ void CollectWidget::changeLayser(QString layseridint, HardwareStatus status)
  */
 void CollectWidget::showModeSettingWidget()
 {
-    TriggerSettingWidget * settingwindow = new TriggerSettingWidget(this);
+    if (settingwindow != NULL)
+        delete settingwindow;
+
+    settingwindow = new TriggerSettingWidget(this, defaultDistanceMode, currentDistanceModeType);
+    connect(settingwindow, SIGNAL(signalSetDistanceMode(int)), this, SLOT(setDistanceMode(int)));
     settingwindow->show();
 }
 
@@ -578,4 +584,77 @@ void CollectWidget::hardwareReset()
     int ret = QMessageBox::warning(this, tr("提示"), tr("您确认硬件发生异常，各个从机采集复位？"),QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::Yes)
         MasterProgram::getMasterProgramInstance()->collect_ResetSlaves();
+}
+
+/**
+ * 得到计划任务配置的帧间隔里程
+ */
+void CollectWidget::getDistanceMode(QString projectfilename)
+{
+    currentProjectModel = LzProjectAccess::getLzProjectAccessInstance()->getProjectModel(LzProjectClass::Collect);
+ 
+    if (currentProjectModel == NULL)
+    {
+        QMessageBox::warning(this, tr("工程导入"), tr("工程入口文件导入失败"));
+        hasinintproject = false;
+        return;
+    }
+    hasinintproject = true;
+
+    if (!hasinintproject)
+        return;
+
+    QString path = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Collect);
+    QString filename = path + "/" + currentProjectModel.getPlanFilename();
+    
+    XMLTaskFileLoader *newtask = new XMLTaskFileLoader(tr(filename.toLocal8Bit().data()));
+    bool ret = newtask->loadFile(LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect));//计划隧道文件解析之后存入list
+ 
+    if (!ret)
+        return;
+    
+    // 动态添加行
+    for (int i = 0; i < LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->length(); i++)
+    {
+        PlanTask tmp = LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->at(i);
+        
+        if (tmp.pulsepermeter > 0)
+        {
+            qDebug() << tmp.pulsepermeter;
+
+            currentDistanceMode = tmp.pulsepermeter;
+            currentDistanceModeType = (int)(currentDistanceMode - 0.5) / 0.25;
+            break;
+        }
+    }
+}
+
+void CollectWidget::setDistanceMode(int newCurrentDistanceModeType)
+{
+    if (!hasinintproject)
+        return;
+
+    switch (newCurrentDistanceModeType)
+    {
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_500mm: currentDistanceMode = defaultDistanceMode; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_750mm: currentDistanceMode = defaultDistanceMode * 1.5; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_1000mm: currentDistanceMode = defaultDistanceMode * 2; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_1250mm: currentDistanceMode = defaultDistanceMode * 2.5; break;
+        default : currentDistanceMode = defaultDistanceMode; break;
+    }
+
+    QString path = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Collect);
+    QString filename = path + "/" + currentProjectModel.getPlanFilename();
+    
+    // 动态添加行
+    for (int i = 0; i < LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->length(); i++)
+    {
+        PlanTask tmp = LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->at(i);
+        tmp.pulsepermeter = currentDistanceMode;
+    }
+
+    XMLTaskFileLoader *newtask = new XMLTaskFileLoader(tr(filename.toLocal8Bit().data()));
+    bool ret = newtask->saveFile(LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect));//计划隧道文件解析之后存入list
+ 
+    qDebug() << "save file " <<  filename <<  ", isok:" << ret;
 }

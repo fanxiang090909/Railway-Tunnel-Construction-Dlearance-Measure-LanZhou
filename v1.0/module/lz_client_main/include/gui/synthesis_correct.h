@@ -40,7 +40,7 @@ signals:
     void sendCurrentFrame(_int64);
     
     // 发送给隧道综合、图形修正两个界面
-    void signalSelectedTunnelToEdit(int, QString, bool);
+    void signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long);
 
 private:
     Ui::SynthesisCorrectWidget *ui;
@@ -53,7 +53,7 @@ private:
 
 public slots:
     // 界面切换槽函数
-    void slotSelectedTunnelToSynthesis(int tunnelid, QString, bool);
+    void slotSelectedTunnelToSynthesis(int tunnelid, QString, bool, bool, long long, long long);
 
 private slots:
     // 界面切换槽函数

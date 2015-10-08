@@ -70,14 +70,12 @@ OutputClearanceWidget::OutputClearanceWidget(QWidget *parent) :
     ui->tab_2->layout()->addWidget(scrollArea);
 
     // 单隧道、多隧道综合数据Tab布局[无效]
-    /*QWidget * widgetone = new QWidget(ui->tab);
-    QWidget * widgettwo = new QWidget(ui->tab_2);
+
+    /*ui->gridLayout_2->addWidget(ui->page_2, 0, 0, 1, 1);
+
     QGridLayout *layout1 = new QGridLayout();
-    layout1->addWidget(widgetone);
-    ui->tab->setLayout(layout1);
-    QGridLayout *layout2 = new QGridLayout();
-    layout2->addWidget(widgettwo);
-    ui->tab_2->setLayout(layout2);*/
+    layout1->addWidget(ui->page_2);
+    ui->page_2->setLayout(layout1);*/
 
     // 多隧道综合数据list显示
     ui->listView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -131,6 +129,7 @@ OutputClearanceWidget::~OutputClearanceWidget()
     if (outputAccess != NULL)
         delete outputAccess;
 }
+
 
 /**
  * 初始化PDF预览接口
@@ -447,6 +446,8 @@ void OutputClearanceWidget::updateClearanceTableModel(SingleOrMultiSelectionMode
             int lineType = tunnelDataModel->getLineType();
             bool isDoubleLine = tunnelDataModel->getIsDoubleLine();
             bool isDownLink = tunnelDataModel->getIsDownlink();
+
+			bool isNormalTravel = tunnelDataModel->getIsNormalTravel();
             //qDebug() << "isNewLine:" << isNewLine << ", lineType:" << lineType << ", isDoubleLine:" << isDoubleLine << ", isDownLink:" << isDownLink;
 
             if (isNewLine == 1) // 新线
@@ -482,6 +483,16 @@ void OutputClearanceWidget::updateClearanceTableModel(SingleOrMultiSelectionMode
                 ui->lineEdit_isDownLink->setText(tr("上行"));
             else
                 ui->lineEdit_isDownLink->setText(tr(""));
+			
+			/*if(isNormalTravel == true) //正常行驶
+				ui->lineEdit_isNormalTravel->setText(tr("正常行驶"));
+			else if(isNormalTravel == false)
+				ui->lineEdit_isNormalTravel->setText(tr("非正常行驶"));
+			else
+				ui->lineEdit_isNormalTravel->setText(tr(""));*/
+
+
+
         }
         else
         {
@@ -548,17 +559,17 @@ void OutputClearanceWidget::pdfPreview()
         singleTunnelModel.setJieChuWangGaoDu(jiechuwanggaodu);
 
         // 获得输出文件名
-        outputfilename = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + singleTunnelModel.getTaskTunnelInfo() + ".html";
+        outputfilename = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + singleTunnelModel.getTaskTunnelInfoFormat() + ".html";
         makedir(outputfilename);
 
         // 保存图片
-        insertimgfile = insertimgfile + singleTunnelModel.getTaskTunnelInfo() + ".jpg";
+        insertimgfile = insertimgfile + singleTunnelModel.getTaskTunnelInfoFormat() + ".jpg";
         syntunnelcorrect->saveImage(insertimgfile);
 
         bool ret1;
         ret = outputAccess->outputSingleTunnel(ClientSetting::getSettingInstance()->getOutputTunnelDataModel(ret1), &singleTunnelModel, outputfilename, insertimgfile);
 
-        statusShow(outputfilename, ret, false);
+        statusShow(outputfilename, ret, true);
     }
     else // 多隧道综合
     {
@@ -566,18 +577,19 @@ void OutputClearanceWidget::pdfPreview()
         multiTunnelsModel.setWaiGuiChaoGao(waiguichaogao);
         multiTunnelsModel.setJieChuWangGaoDu(jiechuwanggaodu);
 
-        // 获得输出文件名
-        outputfilename = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + QObject::tr("区段综合") + "_" + QDateTime::currentDateTime().toString("yyyyMMdd")+ ".html";
+        // 获得输出文件名 TODO
+        QString datetimestr = QDateTime::currentDateTime().toString("yyyyMMdd hhmmss");
+        outputfilename = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + QObject::tr("区段综合") + "_" + datetimestr + ".html";
         makedir(outputfilename);
 
         // 保存图片
-        insertimgfile = insertimgfile + QObject::tr("区段综合") + "_" + QDateTime::currentDateTime().toString("yyyyMMdd")+ ".jpg";
+        insertimgfile = insertimgfile + QObject::tr("区段综合") + "_" + datetimestr+ ".jpg";
         syntunnelcorrect->saveImage(insertimgfile);
 
         // 输出到excel
         ret = outputAccess->outputMultiTunnels(&multiTunnelsModel, outputfilename, insertimgfile);
         
-        statusShow(outputfilename, ret, false);
+        statusShow(outputfilename, ret, true);
     }
 
     if (ret != 0)
@@ -628,17 +640,19 @@ void OutputClearanceWidget::excelPreview()
         singleTunnelModel.setJieChuWangGaoDu(jiechuwanggaodu);
 
         // 获得输出文件名
-        QString openFileDir = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + singleTunnelModel.getTaskTunnelInfo();
-        outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"),openFileDir, tr("EXCEL (*.xls)"));
+        QString openFileDir = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + singleTunnelModel.getTaskTunnelInfoFormat();
+;
+        outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"), openFileDir, tr("EXCEL (*.xls)"));
 
         // 保存图片
-        insertimgfile = insertimgfile + singleTunnelModel.getTaskTunnelInfo() + ".jpg";
-        syntunnelcorrect->saveImage(insertimgfile);
+        insertimgfile = QString(openFileDir.constData()) + ".jpg";
+		qDebug() << insertimgfile;
+		syntunnelcorrect->saveImage(insertimgfile);
 
-        bool ret1;
+		bool ret1;
         ret = outputAccess->outputSingleTunnel(ClientSetting::getSettingInstance()->getOutputTunnelDataModel(ret1), &singleTunnelModel, outputfilename, insertimgfile);
         
-        statusShow(outputfilename, ret, false);
+        statusShow(outputfilename, ret, true);
     }
     else // 多隧道综合
     {
@@ -647,17 +661,18 @@ void OutputClearanceWidget::excelPreview()
         multiTunnelsModel.setJieChuWangGaoDu(jiechuwanggaodu);
 
         // 获得输出文件名
-        QString openFileDir = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + QObject::tr("区段综合") + "_" + QDateTime::currentDateTime().toString("yyyyMMdd");
+        QString datetimestr = QDateTime::currentDateTime().toString("yyyy-MM-dd");
+        QString openFileDir = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + multiTunnelsModel.getLineName() + "-" + QObject::tr("区段综合") + "_" + datetimestr;
         outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"),openFileDir, tr("EXCEL (*.xls)"));
         
         // 保存图片
-        insertimgfile = insertimgfile + QObject::tr("区段综合") + "_" + QDateTime::currentDateTime().toString("yyyyMMdd")+ ".jpg";
+        insertimgfile = QString(openFileDir.constData()) + ".jpg";
         syntunnelcorrect->saveImage(insertimgfile);
 
         // 输出到excel
         ret = outputAccess->outputMultiTunnels(&multiTunnelsModel, outputfilename, insertimgfile);
         
-        statusShow(outputfilename, ret, false);
+        statusShow(outputfilename, ret, true);
     }
 }
 
@@ -700,24 +715,30 @@ void OutputClearanceWidget::exportAllToExcels()
                 int tmptunnelid = -1;
                 QString tmptunnelname;
                 QString tmpdate;
+                QString tmplinename;
                 QString insertimgfilepath = ClientSetting::getSettingInstance()->getParentPath() + "/output/";
                 QString tmpinsertimgfile;
                 while (it != multiTunnelsModel.tasktunnelids.end())
                 {
                     tmptasktunnelid = (*it);
                     // 根据采集隧道ID得到隧道基本ID
-                    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tmptasktunnelid, tmptunnelid, tmptunnelname, tmpdate);
+                    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tmptasktunnelid, tmptunnelid, tmptunnelname, tmpdate, tmplinename);
                     // 设置隧道基本信息
                     ClientSetting::getSettingInstance()->setOutputTunnelDataModel(tmptunnelid);
 
                     // 从数据库中加载当个隧道限界数据
                     singleTunnelModel.initClearanceDatas(tmptasktunnelid);
-                    singleTunnelModel.loadsynthesisdata();
+                    ret = singleTunnelModel.loadsynthesisdata();
+                    
+                    // 更新限界图
+                    singleMultiMode = SingleOrMultiSelectionMode::Single_Mode;
+                    clearanceImagePreview();
+                    singleMultiMode = SingleOrMultiSelectionMode::Multi_Mode;
 
-                    outputfilename = openFileDir + "/" + tmptunnelname + "_" + tmpdate + ".xls";
+                    outputfilename = openFileDir + "/" + singleTunnelModel.getTaskTunnelInfoFormat() + ".xls";
 
                     // 保存图片
-                    tmpinsertimgfile = insertimgfilepath + singleTunnelModel.getTaskTunnelInfo() + ".jpg";
+                    tmpinsertimgfile = insertimgfilepath + singleTunnelModel.getTaskTunnelInfoFormat() + ".jpg";
                     syntunnelcorrect->saveImage(tmpinsertimgfile);
 
                     bool ret1;
@@ -726,6 +747,7 @@ void OutputClearanceWidget::exportAllToExcels()
                     statusShow(outputfilename, ret, true);
                     it++;
                 }
+                clearanceImagePreview();
             }
             else
             {

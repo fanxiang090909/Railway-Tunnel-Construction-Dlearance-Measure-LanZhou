@@ -254,6 +254,9 @@ int TunnelDataModel::getLineType() { return lineType; }
 bool TunnelDataModel::getIsDoubleLine() { return isDoubleLine; }
 bool TunnelDataModel::getIsDownlink() { return isDownlink; }
 
+bool TunnelDataModel::getIsNormalTravel() { return isNormalTravel; }
+
+
 // 线路名称和编号
 string TunnelDataModel::getLinename() { return linename; }
 int TunnelDataModel::getLineid() { return lineid; }

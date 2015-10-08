@@ -21,6 +21,21 @@ class MultiThreadTcpServer : public QObject
     Q_OBJECT
 protected:
     /**
+     * 消息监听TcpServer端口号
+     */
+    int listenPort;
+
+    /**
+     * 文件接收TcpServer端口号
+     */
+    int fileReceivePort;
+
+    /**
+     * 文件发送TcpSocket端口号
+     */
+    int fileSendPort;
+
+    /**
      * Tcp 多线程服务器类
      */
     QTcpServer * tcpServer;
@@ -60,7 +75,7 @@ protected:
     QTimer * timer;
 
 public:
-    MultiThreadTcpServer(QObject *parent);
+    MultiThreadTcpServer(QObject *parent, int msgListenPort = 9424, int fileReceivePort = 7777, int fileSendPort = 8888);
 
     virtual ~MultiThreadTcpServer();
 

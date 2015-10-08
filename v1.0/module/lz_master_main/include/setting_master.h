@@ -75,6 +75,13 @@ public:
      * @return 当前操作用户名
      */
     QString getCurrentUser();
+    
+    /**
+     * 按里程模式采集下相邻两帧的间隔距离
+     */
+    double getDefaultDistanceMode();
+    void setDefaultDistanceMode(double newDefaultDistanceMode);
+
 private:
     explicit MasterSetting(QObject *parent = 0);
 
@@ -114,6 +121,11 @@ private:
      * 当前操作用户
      */
     QString currentUser;
+
+    /**
+     * 按里程模式采集下相邻两帧的间隔距离
+     */
+    double defaultDistanceMode;
 };
 
 #endif // SETTING_MASTER_H

@@ -2,6 +2,8 @@
 #define SERVERSETTING_H
 
 #include <QObject>
+#include <QStringListModel>
+
 #include "projectmodel.h"
 
 /**
@@ -33,6 +35,15 @@ public:
     QString getParentPath();
 
     /**
+     * NASIP地址
+     */
+    void setNASIPAddress(QString newnasaddress);
+    /**
+     * NASIP地址
+     */
+    QString getNASAddress() ;
+
+    /**
      * 设置工程存放路径
      */
     void setProjectPath(QString newpath);
@@ -54,6 +65,10 @@ public:
      */
     ProjectModel & getProjectModel();
 
+    /**
+     * 包含目录名的List模型，用于在View中显示
+     */
+    QStringListModel * getEditableLineNames();
 
 private:
     explicit ServerSetting(QObject *parent = 0);
@@ -82,7 +97,16 @@ private:
      * 顶级存储目录变量
      */
     QString parentpath;
+    
+    /**
+     * 包含目录名的List模型，用于在View中显示
+     */
+    QStringListModel * lineNamesModel;
 
+    /**
+     * NASIP地址
+     */
+    QString nasip;
 };
 
 #endif // SERVERSETTING_H

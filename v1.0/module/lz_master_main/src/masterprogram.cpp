@@ -282,7 +282,8 @@ void MasterProgram::init()
         delete multiThreadTcpServer;
         multiThreadTcpServer = NULL;
     }
-    multiThreadTcpServer = new MasterMultiThreadTcpServer(this);
+    // 消息监听端口号为9424，7777为文件接收端口号
+    multiThreadTcpServer = new MasterMultiThreadTcpServer(this, 9424, 7777);
 
     connect(multiThreadTcpServer, SIGNAL(signalMsgToMaster(QString)), this, SLOT(parseMsg(QString)));
     connect(multiThreadTcpServer, SIGNAL(signalErrorToMaster(QString)), this, SLOT(parseMsg(QString)));
@@ -2042,6 +2043,65 @@ void MasterProgram::calculate_Fuse_beginStartOneTunnel(int tunnelid)
 void MasterProgram::calculate_Fuse_stop()
 {
     lzFuseCalcQueue->suspend();
+}
+
+void MasterProgram::calculate_ExtractHeight_beginStartAll()
+{
+    bool ret = true;
+    bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
+    if (!ret1)
+        ret = false;
+
+    // TODO
+}
+
+void MasterProgram::calculate_ExtractHeight_beginStartOneTunnel(int tunnelid)
+{
+    bool ret = true;
+    bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
+    if (!ret1)
+        ret = false;
+
+    QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Calculate);
+    QString date = projectname.right(13).left(8);
+    ToDoMsg todomsg;
+
+    int tmphasbackup;
+    __int64 tmpinterruptfc;
+    int tmphasbackupnum = 0;
+    int totalhasbackupnum = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).list()->size();
+
+    bool ret2 = false;
+    QList<CheckedTunnelTaskModel>::iterator it = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).begin();
+    while (it != LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).end())
+    {
+
+        ret2 = (*it).calcuItem.getHasBackupCalc("fuse", tmphasbackup, tmpinterruptfc);
+        if (ret2)
+        {
+
+            if (tunnelid == (*it).planTask.tunnelnum)
+            {
+                QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+                QString parentpath = MasterSetting::getSettingInstance()->getParentPath();
+                if (tmphasbackup == 1)
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath);
+                else
+                {
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath);
+                    QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
+
+                    qDebug() << projectpath + "/fuse_calcu/" + filename + ".fdat";
+
+                    qDebug() << projectpath + "/syn_calcu/" + filename + ".syn";
+
+                }
+                lzFuseCalcQueue->pushBack(todomsg);
+                break;
+            }
+        }
+        it++;
+    }
 }
 
 void MasterProgram::calculate_FeedbackPerTunnel_CameraGroup_R(int threadid, QString filename, int slaveid, int tunnelid, QString cameragroup_index, bool isinterrupt, __int64 interruptfc)

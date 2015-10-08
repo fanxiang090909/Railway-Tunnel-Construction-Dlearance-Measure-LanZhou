@@ -108,6 +108,7 @@ bool ExcelEngine::Open(UINT nSheet, bool visible)
     }
 
     /*如果指向的文件不存在，则需要新建一个*/
+    qDebug() << sXlsFile;
     QFile f(sXlsFile);
     if (!f.exists())
     {

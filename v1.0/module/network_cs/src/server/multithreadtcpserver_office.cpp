@@ -11,7 +11,7 @@
  * @date 2014-2-17
  */
 
-OfficeMultiThreadTcpServer::OfficeMultiThreadTcpServer(QObject *parent) : MultiThreadTcpServer(parent)
+OfficeMultiThreadTcpServer::OfficeMultiThreadTcpServer(QObject *parent, int msgListenPort, int fileReceivePort, int fileSendPort) : MultiThreadTcpServer(parent, msgListenPort, fileReceivePort, fileSendPort)
 {
 
 }

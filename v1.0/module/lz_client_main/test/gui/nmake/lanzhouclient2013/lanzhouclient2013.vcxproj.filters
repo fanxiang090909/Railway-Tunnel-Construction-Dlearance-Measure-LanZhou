@@ -273,6 +273,12 @@
     <CustomBuild Include="..\..\..\..\..\lz_master_main\src\gui\setvalidframes.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\include\gui\correct_clearance_batchoutput.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\gui\correct_clearance_batchoutput.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_clientprogram.cpp">
@@ -866,6 +872,15 @@
     <ClCompile Include="..\..\..\..\..\lz_master_main\src\gui\setvalidframes.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_correct_clearance_batchoutput.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_correct_clearance_batchoutput.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\gui\correct_clearance_batchoutput.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\datastructure\include\tunneldatamodel.h">
@@ -1058,6 +1073,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_setvalidframes.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\datastructure\include\lz_working_enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_correct_clearance_batchoutput.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

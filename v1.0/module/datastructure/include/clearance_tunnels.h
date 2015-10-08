@@ -2,7 +2,9 @@
 #define CLEARANCE_MULTI_TUNNELS_H
 
 #include <QStringListModel>
+#include <QObject>
 #include "clearance_item.h"
+#include "lz_working_enum.h"
 #include <list>
 
 using namespace std;
@@ -15,6 +17,7 @@ using namespace std;
  */
 class ClearanceMultiTunnels
 {
+
 public:
     /**
      * 构造函数
@@ -42,7 +45,7 @@ public:
     /**
      * 初始化上面三个ClearanceData
      */
-    void initClearanceDatas(std::list<_int64> inttasktunnelids);
+    void initClearanceDatas(std::list<_int64> inttasktunnelids, QString templatepath, OutputClearanceImageType type = OutType_B_DianLi);
 
     /**
      * 调用多隧道区段综合计算类
@@ -53,12 +56,23 @@ public:
     int getNumOfLeft();
     int getNumOfRight();
 
+    /**
+     * 得到超限隧道数量
+     */
+    int getNumOfOutOfClearanceTunnels();
+    int getNumOfOutOfClearanceBridges();
+
     bool getHasInit();
 
     /**
      * 包含综合隧道信息的List模型，用于在View中显示
      */
     QStringListModel * getTunnelsNames();
+
+    // 得到区段综合中的隧道数量
+    int getTunnelsNum();
+    // 得到区段综合中的桥梁数量
+    int getBridgesNum();
 
     /**
      * 格外手动输入到表格项-最大外轨超高
@@ -117,6 +131,15 @@ private:
     int numofright;
 
     bool hasinit;
+
+    /**
+     * 限界类型，记录超限桥隧数量
+     */
+    OutputClearanceImageType tunnelsType;
+    int numofOutOfClearanceTunnels;
+    int numofOutOfClearanceBridges;
+    // 超限桥隧限界值模板路径
+    QString templatepath;
 
     /**
      * 格外手动输入到表格项-最大外轨超高

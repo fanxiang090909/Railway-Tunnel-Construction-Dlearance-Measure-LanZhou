@@ -59,7 +59,9 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
     currenttunneldate = "";
     // 默认正在编辑帧号为-1
     framecounter = -1;
-    
+	current_startframeno = -1;
+	current_endframeno = -1;
+
     // 默认车厢为正向 // TODO TOADDSTH
     currentCarriageDirection = true;
 
@@ -127,9 +129,15 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
     // 单幅断面打印预览
     connect(ui->htmlPreviewButton, SIGNAL(clicked()), this, SLOT(htmlPreview()));
     connect(ui->excelPreviewButton, SIGNAL(clicked()), this, SLOT(excelPreview()));
+    connect(ui->excelOutputAllSectionsButton, SIGNAL(clicked()), this, SLOT(excelExportAll()));
     // 初始不能点击
     ui->htmlPreviewButton->setEnabled(false);
     ui->excelPreviewButton->setEnabled(false);
+    ui->excelOutputAllSectionsButton->setEnabled(false);
+
+    // 批量输出界面
+    batchoutputWidget = NULL;
+    interframe_mile = 0.5103; // 默认
 
     // 关闭文件并，（上一步）切换界面信号槽定义
     connect(ui->finishButton, SIGNAL(clicked()), this, SLOT(finishButton()));
@@ -204,6 +212,7 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
     ui->saveButton->setEnabled(false);
     ui->htmlPreviewButton->setEnabled(true);
     ui->excelPreviewButton->setEnabled(true);
+    ui->excelOutputAllSectionsButton->setEnabled(true);
 
     // 初始化界面
     ui->lineEdit_name->setText("");
@@ -240,6 +249,9 @@ CorrectClearanceWidget::~CorrectClearanceWidget()
     if (webview != NULL)
         delete webview;
 
+    if (batchoutputWidget != NULL)
+        delete batchoutputWidget;
+
     // 删除outputAccess
     if (outputAccess != NULL)
         delete outputAccess;
@@ -257,11 +269,14 @@ void CorrectClearanceWidget::getMousePos(int newx1, int newy1)
 // 把单隧道综合界面的矩形传递到修正界面
 void CorrectClearanceWidget::getRectPoint(float topleftx, float toplefty, float bottomrightx, float bottomrighty, bool carriagedirection)
 {
+    // @author 范翔 20150902 不做区分
+    imagesection->setInterestRectangle(topleftx, toplefty, bottomrightx, bottomrighty, this->originy);
+
     // 继续传递到画图界面
-    if (carriagedirection)
-        imagesection->setInterestRectangle(topleftx, toplefty, bottomrightx, bottomrighty, this->originy);
-    else
-        imagesection->setInterestRectangle((-1)*bottomrightx, toplefty, (-1)*topleftx, bottomrighty, this->originy);
+    //if (carriagedirection)
+    //    imagesection->setInterestRectangle(topleftx, toplefty, bottomrightx, bottomrighty, this->originy);
+    //else
+    //    imagesection->setInterestRectangle((-1)*bottomrightx, toplefty, (-1)*topleftx, bottomrighty, this->originy);
 }
 
 void CorrectClearanceWidget::startViewFromFirst(bool newdirection)
@@ -321,6 +336,7 @@ void CorrectClearanceWidget::loadSynthesisDataFile()
         // 可以输出图表
         ui->htmlPreviewButton->setEnabled(true);
         ui->excelPreviewButton->setEnabled(true);
+        ui->excelOutputAllSectionsButton->setEnabled(true);
 
         qDebug() << "open file:" << QString::fromLocal8Bit(synfilename.c_str());
 
@@ -330,7 +346,11 @@ void CorrectClearanceWidget::loadSynthesisDataFile()
         //    qDebug() << keys.at(i);
         // 文件取出帧数
         if (!israndom)
+		{
             framecounter = keys.at(0);
+			if (current_startframeno != -1 && current_endframeno != -1)
+				framecounter = current_startframeno;
+		}
 
         // 在readMap中调用的blocktomap中已调用data.resetMaps();
         //framercounti=this->correct_frame;
@@ -436,6 +456,9 @@ void CorrectClearanceWidget::closeSynthesisDataFile()
         syn->closeFile();
         isfileopen_syn = false;
         framecounter = 0;
+		current_startframeno = -1;
+		current_endframeno = -1;
+
         qDebug() << "close file:" << QString::fromLocal8Bit(synfilename.c_str());
         delete syn;
         syn = NULL;
@@ -469,6 +492,7 @@ void CorrectClearanceWidget::closeSynthesisDataFile()
         ui->saveButton->setEnabled(false);
         ui->htmlPreviewButton->setEnabled(true);
         ui->excelPreviewButton->setEnabled(true);
+        ui->excelOutputAllSectionsButton->setEnabled(true);
     }
     catch (LzException & ex)
     {
@@ -570,13 +594,27 @@ void CorrectClearanceWidget::viewFirstFrame()
         qDebug() << "the file " << QString::fromLocal8Bit(synfilename.c_str()) << "is not open";
         return;
     }
-    if (framecounter <= keys.at(0))
-    {
-        qDebug() << "it is the first frame, cannot move to last one";
-        return;
-    }
-    viewFrameAt(keys.at(0));
-    emit viewRawImageSignalAtBegin();
+
+	if (current_startframeno == -1 || current_endframeno == -1)
+	{
+		if (framecounter <= keys.at(0))
+		{
+			qDebug() << "it is the first frame, cannot move to last one";
+			return;
+		}
+		viewFrameAt(keys.at(0));
+	}
+	else
+	{
+		if (framecounter <= current_startframeno)
+		{
+			qDebug() << "it is the first frame, cannot move to last one";
+			return;
+		}
+		viewFrameAt(current_startframeno);
+	}
+
+	emit viewRawImageSignalAtBegin();
 }
 
 void CorrectClearanceWidget::viewEndFrame()
@@ -586,13 +624,27 @@ void CorrectClearanceWidget::viewEndFrame()
         qDebug() << "the file " << QString::fromLocal8Bit(synfilename.c_str()) << "is not open";
         return;
     }
-    if (framecounter >= (keys.at(keys.size() - 1)))
+
+	if (current_startframeno == -1 || current_endframeno == -1)
     {
-        qDebug() << "the frame cannot move to the next, it's already the last one";
-        return;
-    }
-    viewFrameAt(keys.at(keys.size() - 1));
-    emit viewRawImageSignalAtEnd();
+		if (framecounter >= (keys.at(keys.size() - 1)))
+		{
+			qDebug() << "the frame cannot move to the next, it's already the last one";
+			return;
+		}
+		viewFrameAt(keys.at(keys.size() - 1));
+	}
+	else 
+	{
+		if (framecounter >= current_endframeno)
+		{
+			qDebug() << "the frame cannot move to the next, it's already the last one";
+			return;
+		}
+		viewFrameAt(current_endframeno);
+	}
+
+	emit viewRawImageSignalAtEnd();
 }
 
 void CorrectClearanceWidget::viewLastFrame()
@@ -603,16 +655,26 @@ void CorrectClearanceWidget::viewLastFrame()
         qDebug() << "the file " << QString::fromLocal8Bit(synfilename.c_str()) << "is not open";
         return;
     }
-    if (framecounter <= keys.at(0))
-    {
-        qDebug() << "it is the first frame, cannot move to last one";
-        return;
-    }
-    else
-    {
-        viewFrameAt(framecounter - 1);
-        emit viewRawImageSignalAtLast();
-    }
+
+	if (current_startframeno == -1 || current_endframeno == -1)
+	{
+		if (framecounter <= keys.at(0))
+		{
+			qDebug() << "it is the first frame, cannot move to last one";
+			return;
+		}
+	}
+	else
+	{
+		if (framecounter <= current_startframeno)
+		{
+			qDebug() << "it is the first frame, cannot move to last one";
+			return;
+		}
+	}
+
+	viewFrameAt(framecounter - 1);
+	emit viewRawImageSignalAtLast();
 }
 
 void CorrectClearanceWidget::viewNextFrame()
@@ -623,17 +685,28 @@ void CorrectClearanceWidget::viewNextFrame()
         qDebug() << "the file " << QString::fromLocal8Bit(synfilename.c_str()) << "is not open";
         return;
     }
-    if (framecounter >= (keys.at(keys.size() - 1)))
-    {
-        qDebug() << "the frame cannot move to the next, it's already the last one";
-        ui->stopLabel->click();
-        return;
-    }
-    else
-    {
-        viewFrameAt(framecounter + 1);
-        emit viewRawImageSignalAtNext();
-    }
+
+	if (current_startframeno == -1 || current_endframeno == -1)
+	{
+		if (framecounter >= (keys.at(keys.size() - 1)))
+		{
+			qDebug() << "the frame cannot move to the next, it's already the last one";
+			ui->stopLabel->click();
+			return;
+		}
+	}
+	else
+	{
+		if (framecounter >= current_endframeno)
+		{
+			qDebug() << "the frame cannot move to the next, it's already the last one";
+			ui->stopLabel->click();
+			return;
+		}
+	}
+
+	viewFrameAt(framecounter + 1);
+    emit viewRawImageSignalAtNext();
 }
 
 void CorrectClearanceWidget::playAllframe()
@@ -773,6 +846,7 @@ void CorrectClearanceWidget::showMinHeightValid(bool isshow)
     ui->saveButton->setEnabled(true);
     ui->htmlPreviewButton->setEnabled(false);
     ui->excelPreviewButton->setEnabled(false);
+    ui->excelOutputAllSectionsButton->setEnabled(false);
 
     //imagesection->setShowMinHeight(isshow);
 
@@ -875,6 +949,7 @@ void CorrectClearanceWidget::saveButton()
         ui->cancelButton->setEnabled(false);
         ui->htmlPreviewButton->setEnabled(true);
         ui->excelPreviewButton->setEnabled(true);
+        ui->excelOutputAllSectionsButton->setEnabled(true);
     }
 }
 
@@ -898,6 +973,7 @@ void CorrectClearanceWidget::cancelOneStep()
                 ui->saveButton->setEnabled(false);
                 ui->htmlPreviewButton->setEnabled(true);
                 ui->excelPreviewButton->setEnabled(true);
+                ui->excelOutputAllSectionsButton->setEnabled(true);
                 iseditingsection = false;
             }
         }
@@ -1081,6 +1157,7 @@ void CorrectClearanceWidget::updateSectionData(int newval, int newheight, bool i
         ui->saveButton->setEnabled(true);
         ui->htmlPreviewButton->setEnabled(false);
         ui->excelPreviewButton->setEnabled(false);
+        ui->excelOutputAllSectionsButton->setEnabled(false);
     }
 }
 
@@ -1107,7 +1184,7 @@ void CorrectClearanceWidget::slotSetCarriageDirection(bool newdirect)
 }
 
 // 从上一步接收文件名参数界面切换槽函数
-void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir)
+void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir, bool isNormal, long long startframeno, long long endframeno)
 {
     if (isfileopen_syn)
     {
@@ -1123,8 +1200,12 @@ void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString sign
     currenttunnelname = QStringList(logname.split("_")).at(0);
     currenttunneldate = QStringList(logname.split("_")).at(1);
     currentCarriageDirection = carriagedir;
+
+
     mile = 0;
     framecounter = 0;
+	this->current_startframeno = startframeno;
+	this->current_endframeno = endframeno;
 
     QString logfilename1 = info.path() + "/" + logname + "_correct.log";
     ba = logfilename1.toLocal8Bit();
@@ -1150,6 +1231,7 @@ void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString sign
 
     ui->htmlPreviewButton->setEnabled(false);
     ui->excelPreviewButton->setEnabled(false);
+    ui->excelOutputAllSectionsButton->setEnabled(false);
     // 初始未在编辑
     iseditingsection = false;
 }
@@ -1365,6 +1447,110 @@ void CorrectClearanceWidget::excelPreview()
     ret = outputAccess->outputSingleSection(tmptunneldatamodel, currenttunneldate, data, outputfilename, tmpinsertimgfile);
         
     statusShow(outputfilename, ret, false);
+}
+
+/**
+ * excel批量导出
+ */
+void CorrectClearanceWidget::excelExportAll()
+{
+    if (batchoutputWidget != NULL)
+        delete batchoutputWidget;
+
+    batchoutputWidget = new CorrectClearanceBatchOutputWidget(this);
+
+    connect(batchoutputWidget, SIGNAL(exportAll(int)), this, SLOT(slotExportAll(int)));
+
+    batchoutputWidget->setMinUnit(this->interframe_mile);
+
+    batchoutputWidget->show();
+
+}
+
+/**
+ * 批量输出Excel槽函数
+ */
+void CorrectClearanceWidget::slotExportAll(int param)
+{
+    long long tmpframecount = framecounter;
+
+    int ret = QMessageBox::information(this, tr("输出到Excel"), tr("确认批量输出以上各个隧道的限界图表到excel？"), QMessageBox::Ok | QMessageBox::No);
+    switch (ret)
+    {
+        case QMessageBox::No:
+            return;
+        case QMessageBox::Ok:
+        {
+            // 选择创建目录，默认为刚刚创建的目录
+            QString openFileDir = ClientSetting::getSettingInstance()->getParentPath() + "/output/";
+            QFileDialog *fd = new QFileDialog(this, tr("全部导出到Excel，请选择导出目录"));
+            fd->setFileMode(QFileDialog::DirectoryOnly);
+            fd->setDirectory(openFileDir);
+            if(fd->exec() == QFileDialog::Accepted) // ok
+            {
+                QStringList folders = fd->selectedFiles();
+                if(folders.size() <= 0)
+                {
+                    ui->status->setText(tr("全部导出到Excel终止，目录未选择。"));
+                    delete fd;
+                    framecounter = tmpframecount;
+                    viewFrameAt(framecounter);
+                    return;
+                }
+                openFileDir = folders[0];
+                qDebug() << "directory" << openFileDir;
+                QString outputfilename = openFileDir;
+
+                // 设置输出方式为Excel
+                outputAccess->initOutput(LzOutputAccess::OutputInExcel);
+
+                if (batchoutputWidget != NULL)
+                    batchoutputWidget->initProgressBar(current_startframeno, current_endframeno);
+
+                // 遍历隧道准备单隧道数据输出
+                QString tmptunnelname;
+                QString tmpdate;
+                QString tmplinename;
+                QString insertimgfilepath = ClientSetting::getSettingInstance()->getParentPath() + "/output/";
+                QString tmpinsertimgfile;
+                // 批量输出
+                for (framecounter = current_startframeno; framecounter != current_endframeno; framecounter++)
+                {
+                    // 改mile值
+                    viewFrameAt(framecounter);
+
+                    outputfilename = openFileDir + "/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.xls").arg(mile);
+
+                    // 保存图片
+                    tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.jpg").arg(mile);
+                    imagesection->saveImage(tmpinsertimgfile);
+
+                    bool ret1;
+                    ret = outputAccess->outputSingleSection(ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret1), currenttunneldate, data, outputfilename, tmpinsertimgfile);
+
+                    if (batchoutputWidget != NULL)
+                        batchoutputWidget->setProgressBar(framecounter);
+
+                    statusShow(outputfilename, ret, true);
+                }
+            }
+            else
+            {
+                ui->status->setText(tr("全部导出到Excel终止，目录未选择。"));
+                delete fd;
+                framecounter = tmpframecount;
+                viewFrameAt(framecounter);
+                return;
+            }
+            delete fd;
+        }
+    }
+
+    if (batchoutputWidget != NULL)
+        batchoutputWidget->endProgressBar();
+
+    framecounter = tmpframecount;
+    viewFrameAt(framecounter);
 }
 
 /**

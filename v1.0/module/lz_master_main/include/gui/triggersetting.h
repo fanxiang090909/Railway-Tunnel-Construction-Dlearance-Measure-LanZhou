@@ -19,7 +19,7 @@ class TriggerSettingWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit TriggerSettingWidget(QWidget *parent = 0);
+    explicit TriggerSettingWidget(QWidget *parent = 0, double defaultDistanceMode = 0.5103, int currentDistanceModeType = 0);
     
     ~TriggerSettingWidget();
 
@@ -37,6 +37,8 @@ private slots:
 signals:
     void sendframestocheck_task(int,int);
 
+    void signalSetDistanceMode(int);
+
 private:
     Ui::TriggerSettingWidget *ui;
 
@@ -52,6 +54,11 @@ private:
      * 手动触发模式 自动检测模式 下采集间隔 默认1米1帧
      */
     LzCollectHardwareTriggerDistanceMode distanceMode;
+
+    /**
+     * 外面传进来的 默认的0.5m一帧模式下的 相邻两帧间隔里程，比如0.5103，并非绝对的0.5
+     */
+    double defaultDistanceMode;
 
     /**
      * 自由触发模式下采集帧率 30Hz、40Hz、50Hz、60Hz

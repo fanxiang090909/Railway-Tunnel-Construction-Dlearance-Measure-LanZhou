@@ -159,6 +159,36 @@ bool SectionData::updateToMapVals(int height, float leftVal, float rightVal)
 }
 
 /**
+ * 重置左侧或右侧为-1
+ */
+bool SectionData::resetLeftOrRight(bool leftorright)
+{
+    std::map<int,item>::iterator it = vals.begin();
+    int tempkey;
+	while (it != vals.end())
+    {
+        /*
+        vs2012下不行，出错“初始化”: 无法从“std::pair<_Ty1,_Ty2>”转换为“std::pair<_Ty1,_Ty2>”
+        std::pair<int,item&> pair = (*it);
+        pair.second.left = -1;
+        pair.second.right = -1;
+        */
+        std::pair<int,item> pair = (*it);
+        tempkey = pair.first;
+		if (leftorright)
+		{
+	        vals[tempkey].left = -1;
+		}
+		else
+		{
+			vals[tempkey].right = -1;
+		}
+		it++;
+    }
+    return true;
+}
+
+/**
  * 初始化map（长度已知，从配置文件中读出）
  */
 bool SectionData::initMaps()
@@ -435,6 +465,42 @@ bool ClearanceData::updateToMapVals(int height, float leftVal, float rightVal, d
 }
 
 /**
+ * 重置左侧或右侧为-1
+ */
+bool ClearanceData::resetLeftOrRight(bool leftorright)
+{
+    std::map<int,ClearanceItem>::iterator it = vals.begin();
+    int tempkey;
+	while (it != vals.end())
+    {
+        /*
+        vs2012下不行，出错“初始化”: 无法从“std::pair<_Ty1,_Ty2>”转换为“std::pair<_Ty1,_Ty2>”
+        std::pair<int,item&> pair = (*it);
+        pair.second.left = -1;
+        pair.second.right = -1;
+        */
+        std::pair<int,ClearanceItem> pair = (*it);
+        tempkey = pair.first;
+		if (!leftorright)
+	    {
+			vals[tempkey].leftval = -1;
+			vals[tempkey].leftpos = -1;
+			vals[tempkey].leftradius = -1;
+			vals[tempkey].lefttunnelid = -1;
+		}
+		else
+		{
+			vals[tempkey].rightval = -1;
+			vals[tempkey].rightpos = -1;
+			vals[tempkey].rightradius = -1;
+			vals[tempkey].righttunnelid = -1;
+		}
+		it++;
+    }
+    return true;
+}
+
+/**
  * 初始化map（长度已知，从配置文件中读出）
  */
 bool ClearanceData::initMaps()
@@ -633,6 +699,38 @@ int ClearanceData::getTunnelID()
 void ClearanceData::setTunnelID(int newtunnelid)
 {
     this->tunnelid = newtunnelid;
+}
+
+/**
+ * 检查是否超限
+ * 如果有左值、右值小于超限值，则返回true
+ * 如果当前值为-1不做比较
+ */
+bool ClearanceData::checkLessThanStdSectionData(SectionData & basedata)
+{
+    std::map<int,ClearanceItem>::iterator it = vals.begin();
+    std::map<int, item> & basemap = basedata.getMaps();
+    int tempkey;
+    float tmpvalf;
+    int tmpvali;
+	while (it != vals.end())
+    {
+        /*
+        vs2012下不行，出错“初始化”: 无法从“std::pair<_Ty1,_Ty2>”转换为“std::pair<_Ty1,_Ty2>”
+        std::pair<int,item&> pair = (*it);
+        pair.second.left = -1;
+        pair.second.right = -1;
+        */
+        std::pair<int,ClearanceItem> pair = (*it);
+        tempkey = pair.first;
+        if (vals[tempkey].leftval > 0 && vals[tempkey].leftval < basemap[tempkey].left)
+            return true;
+        if (vals[tempkey].rightval > 0 && vals[tempkey].rightval < basemap[tempkey].right)
+            return true;
+
+        it++;
+    }
+    return false;
 }
 
 /**

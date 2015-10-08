@@ -11,19 +11,28 @@
  * @version 1.0.0
  * @date 2014-6-11
  */
-ClearanceMultiTunnels::ClearanceMultiTunnels() 
+ClearanceMultiTunnels::ClearanceMultiTunnels() : tunnelsType(OutputClearanceImageType::OutType_B_DianLi)
 {
     hasinit = false;
     hasloadnames = false;
     tunnelsModel = new QStringListModel();
+
+    // 超限隧道类型及数量初始为0
+    templatepath = "";
+    tunnelsType = OutputClearanceImageType::OutType_B_DianLi;
+    numofOutOfClearanceTunnels = 0;
+    numofOutOfClearanceBridges = 0;
+
+    tasktunnelids = std::list<_int64>();
 }
 
 ClearanceMultiTunnels::~ClearanceMultiTunnels() 
 {
     delete tunnelsModel;
+    tasktunnelids.clear();
 }
 
-void ClearanceMultiTunnels::initClearanceDatas(std::list<_int64> inittasktunnelids)
+void ClearanceMultiTunnels::initClearanceDatas(std::list<_int64> inittasktunnelids,  QString inittemplatepath, OutputClearanceImageType type)
 {
     // 限界数据初始化
     straightdata.initMaps();
@@ -31,6 +40,13 @@ void ClearanceMultiTunnels::initClearanceDatas(std::list<_int64> inittasktunneli
     rightdata.initMaps();
 
     tasktunnelids = inittasktunnelids;
+
+    // 超限隧道类型及数量初始为0
+    templatepath = inittemplatepath;
+    tunnelsType = type;
+    numofOutOfClearanceTunnels = 0;
+    numofOutOfClearanceBridges = 0;
+
     hasinit = true;
 }
 
@@ -40,8 +56,8 @@ void ClearanceMultiTunnels::initClearanceDatas(std::list<_int64> inittasktunneli
 bool ClearanceMultiTunnels::synthesis()
 {
     LzNTunnelsSynthesis ntunnelsSynthesis;
-    ntunnelsSynthesis.initSynthesis(tasktunnelids);
-    ntunnelsSynthesis.synthesis(straightdata, leftdata, rightdata, numofstraight, numofleft, numofright);
+    ntunnelsSynthesis.initSynthesis(tasktunnelids, templatepath.toLocal8Bit().constData(), tunnelsType);
+    ntunnelsSynthesis.synthesis(straightdata, leftdata, rightdata, numofstraight, numofleft, numofright, numofOutOfClearanceTunnels, numofOutOfClearanceBridges);
     if (numofleft == 0 && numofstraight == 0 && numofright == 0)
         return false;
     else
@@ -65,6 +81,12 @@ int ClearanceMultiTunnels::getNumOfStraight() { return numofstraight; }
 int ClearanceMultiTunnels::getNumOfLeft() { return numofleft; }
 int ClearanceMultiTunnels::getNumOfRight() { return numofright; }
 
+/**
+ * 得到超限隧道数量
+ */
+int ClearanceMultiTunnels::getNumOfOutOfClearanceTunnels() { return numofOutOfClearanceTunnels; }
+int ClearanceMultiTunnels::getNumOfOutOfClearanceBridges() { return numofOutOfClearanceBridges; }
+
 bool ClearanceMultiTunnels::getHasInit() { return hasinit; }
 
 /**
@@ -73,21 +95,26 @@ bool ClearanceMultiTunnels::getHasInit() { return hasinit; }
 QStringListModel * ClearanceMultiTunnels::getTunnelsNames()
 {
     // 如果已经加载
-    if (hasloadnames)
-        return tunnelsModel;
+    //if (hasloadnames)
+    //    return tunnelsModel;
 
     QString tmptunnelname;
     QString tmpdate;
+    QString tmplinename;
     int tmptunnelid;
     QStringList tmplist;
     std::list<_int64>::iterator it = tasktunnelids.begin();
     bool ret;
     while (it != tasktunnelids.end())
     {
-        ret = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate);
+        ret = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate, tmplinename);
         if (!ret)
-            return NULL;
-        tmplist << QObject::tr("%1_%2").arg(tmptunnelname).arg(tmpdate);
+        {
+            tunnelsModel->setStringList(tmplist);
+            hasloadnames = true;
+            return tunnelsModel;
+        }
+        tmplist << QObject::tr("%1-%2-%3").arg(tmplinename).arg(tmptunnelname).arg(tmpdate);
         it++;
     }
     tunnelsModel->setStringList(tmplist);
@@ -95,27 +122,84 @@ QStringListModel * ClearanceMultiTunnels::getTunnelsNames()
     return tunnelsModel;
 }
 
+// 得到区段综合中的隧道数量
+int ClearanceMultiTunnels::getTunnelsNum()
+{
+    QString tmptunnelname;
+    QString tmpdate;
+    QString tmplinename;
+    int tmptunnelid;
+    std::list<_int64>::iterator it = tasktunnelids.begin();
+    bool ret;
+    int times = 0;
+    while (it != tasktunnelids.end())
+    {
+        ret = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate, tmplinename);
+        if (ret)
+        {
+            bool ret1 = TunnelDAO::getTunnelDAOInstance()->getTunnelIsBriage(tmptunnelid);
+            if (!ret1)
+                times++;
+        }
+        it++;
+    }
+    return times;
+}
+
+// 得到区段综合中的桥梁数量
+int ClearanceMultiTunnels::getBridgesNum()
+{
+    QString tmptunnelname;
+    QString tmpdate;
+    QString tmplinename;
+    int tmptunnelid;
+    std::list<_int64>::iterator it = tasktunnelids.begin();
+    bool ret;
+    int times = 0;
+    while (it != tasktunnelids.end())
+    {
+        ret = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate, tmplinename);
+        if (ret)
+        {
+            bool ret1 = TunnelDAO::getTunnelDAOInstance()->getTunnelIsBriage(tmptunnelid);
+            if (!ret1)
+                times++;
+        }
+        it++;
+    }
+    return times;
+}
+
 QString ClearanceMultiTunnels::getLineName()
 {
-    // 如果已经加载
-    int lasttunnelid = -1;
-    QString linename = "";
-    if (hasloadnames)
+    QString tmptunnelname;
+    QString tmpdate;
+    QString tmplinename;
+    QString lastlinename = "";
+    int tmptunnelid;
+    QString retname = "";
+    std::list<_int64>::iterator it = tasktunnelids.begin();
+    bool ret;
+    while (it != tasktunnelids.end())
     {
-        if (tunnelsModel->rowCount() > 0)
+        ret = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo((*it), tmptunnelid, tmptunnelname, tmpdate, tmplinename);
+        if (ret)
         {
-            QString tunnelname = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_name_std).toString();
-            int lineid = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_line_ID).toInt();
-            if (lasttunnelid != lineid)
+            if (lastlinename.compare("") == 0)
             {
-                lasttunnelid = lineid;
-            
-                //QString linename = LineDAO::getLineDAOInstance()->getLineName(lineid);
+                retname += tmplinename;
+                lastlinename = tmplinename;
             }
-            //qDebug() << tunnelname << TunnelDAO::getTunnelDAOInstance()->get
+            else if (lastlinename.compare(tmplinename) != 0)
+            {
+                retname += "-" + tmplinename;
+                lastlinename = tmplinename;
+            }
         }
+        it++;
     }
-    return "";
+
+    return retname;
 }
 
 QString ClearanceMultiTunnels::getEndStationName()
@@ -125,19 +209,43 @@ QString ClearanceMultiTunnels::getEndStationName()
     {
         QString tunnelname = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_name_std).toString();
         int lineid = tunnelsModel->data(tunnelsModel->index(0, 0), Tunnel_line_ID).toInt();
-
+        QString name = LineDAO::getLineDAOInstance()->getEndStationName(lineid);
+        return name;
     }
     return "";
 }
-
 
 /**
  * 最小曲线半径
  */
 int ClearanceMultiTunnels::getMinRadius()
 {
-    return 0;
-}
+    if (!hasinit)
+        return 0;
+
+    // 没有曲线的情况
+    if (numofleft == 0 && numofright == 0)
+        return 0;
+
+    int minRadius = 9999999; // 最大半径
+    if (numofleft > 0)
+    {
+        int tmp = leftdata.getMinRadius();
+        if (tmp < minRadius && tmp > 0)
+            minRadius = tmp;
+    }
+
+    if (numofright > 0)
+    {
+        int tmp = rightdata.getMinRadius();
+        if (tmp < minRadius && tmp > 0)
+            minRadius = tmp;
+    }
+
+    if (minRadius < 0 || minRadius >= 9999999)
+        return 0;
+
+    return minRadius;}
 
 /**
  * 最低中心净高

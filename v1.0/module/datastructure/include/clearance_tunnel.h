@@ -57,6 +57,7 @@ public:
      * @return “隧道名_采集时间”,没有找到返回""
      */
     QString getTaskTunnelInfo();
+    QString getTaskTunnelInfoFormat();
 
     /**
      * 格外手动输入到表格项-起讫站名

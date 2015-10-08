@@ -121,6 +121,13 @@ SelectHistoricalTunnelDataWidget::SelectHistoricalTunnelDataWidget(QWidget *pare
     else
         loadLinesData();
     loadTunnelData();
+
+    // 模板路径
+    templatepath = ClientSetting::getSettingInstance()->getOutExcelTemplatePath();
+
+    // 界面上默认的底板是基础隧道限界--电力牵引
+    connect(ui->comboBox_OutImageType, SIGNAL(currentIndexChanged(int)), SLOT(selectOutputClearanceImageType(int)));
+    ui->comboBox_OutImageType->setCurrentIndex(1);
 }
 
 SelectHistoricalTunnelDataWidget::~SelectHistoricalTunnelDataWidget()
@@ -707,7 +714,7 @@ void SelectHistoricalTunnelDataWidget::loadClearanceDataToOutput()
             return;
         }
 
-        multiTunnelsModel.initClearanceDatas(tasktunnelids);
+        multiTunnelsModel.initClearanceDatas(tasktunnelids, templatepath, outImageType);
         bool ret = multiTunnelsModel.synthesis();
 
         int numofstraight = multiTunnelsModel.getNumOfStraight();
@@ -757,6 +764,15 @@ void SelectHistoricalTunnelDataWidget::clearClearanceDataInfo()
     ui->synthesisInfoLabel->setText(QObject::tr("隧道数据未加载"));
     canGoNextPage = false;
     ui->outputButton->setEnabled(false);
+}
+
+/**
+ * 区段综合，限界选择
+ */
+void SelectHistoricalTunnelDataWidget::selectOutputClearanceImageType(int type)
+{
+    // 从1开始索引
+    this->outImageType = (OutputClearanceImageType)(type + 1);
 }
 
 /**

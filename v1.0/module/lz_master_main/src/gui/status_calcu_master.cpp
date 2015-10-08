@@ -57,3 +57,13 @@ void CalcuMasterWidget::fuse_beginStartOneTunnel(int tunnelid)
 {
     MasterProgram::getMasterProgramInstance()->calculate_Fuse_beginStartOneTunnel(tunnelid);
 }
+
+void CalcuMasterWidget::extract_beginStartAll()
+{
+    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartAll();
+}
+
+void CalcuMasterWidget::extract_beginStartOneTunnel(int tunnelid)
+{
+    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartOneTunnel(tunnelid);
+}

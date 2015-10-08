@@ -7,6 +7,7 @@
 #include "drawimage.h"
 #include "imageviewer_client.h"
 #include "imageviewer_3dtv.h"
+#include "correct_clearance_batchoutput.h"
 #include "clearance_item.h"
 #include <QScrollArea>
 
@@ -109,6 +110,9 @@ private:
      */
     bool currentCarriageDirection;
 
+	long long current_startframeno;
+	long long current_endframeno;
+
     /**
      * 当前正在修正帧号
      */
@@ -184,6 +188,17 @@ private:
      * 转到帧相关
      */
     bool firsttime;
+
+    /**
+     * 批量输出界面
+     */
+    CorrectClearanceBatchOutputWidget * batchoutputWidget;
+
+    /**
+     * 里程折算系数，相邻帧间隔里程
+     */
+    double interframe_mile;
+
 private:
     /**
      * makedir，在用textEdit生成html时不选择生成目录，因此可能目录不存在
@@ -251,6 +266,11 @@ private slots:
      */
     void htmlPreview();
     void excelPreview();
+
+    /**
+     * excel批量导出
+     */
+    void excelExportAll();
 
     // 关闭文件并，（上一步）切换界面信号槽定义
     void finishButton();
@@ -320,7 +340,7 @@ private slots:
 
 public slots:
     // 从上一步接收文件名参数界面切换槽函数
-    void slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir);
+    void slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir, bool isNormal, long long startframeno, long long endframeno);
     
     // 设置车厢正反
     void slotSetCarriageDirection(bool newdirect);
@@ -332,6 +352,11 @@ public slots:
 
     // 参数均为矩形区域左上、右下角的图像坐标（像素）
     void getRectPoint(float topleftx, float toplefty, float bottomrightx, float bottomrighty, bool carriagedirection);
+
+    /**
+     * 批量输出Excel槽函数
+     */
+    void slotExportAll(int);
 
 signals:
     void sendspinBoxvalue(int);

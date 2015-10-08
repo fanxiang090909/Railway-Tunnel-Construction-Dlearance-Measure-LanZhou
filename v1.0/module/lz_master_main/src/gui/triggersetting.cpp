@@ -10,8 +10,8 @@
  * @version 1.0.0
  * @date 2014-10-23
  */
-TriggerSettingWidget::TriggerSettingWidget(QWidget *parent) :
-    QDialog(parent),
+TriggerSettingWidget::TriggerSettingWidget(QWidget *parent, double defaultDistanceMode, int currentDistanceModeType) :
+    QDialog(parent), defaultDistanceMode(defaultDistanceMode),
     ui(new Ui::TriggerSettingWidget)
 {
     ui->setupUi(this);
@@ -21,7 +21,8 @@ TriggerSettingWidget::TriggerSettingWidget(QWidget *parent) :
 
     defaultcomboindex = LzCollectingMode::Lz_Collecting_Manual_DistanceMode;
 
-    distanceMode = LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_500mm;
+    // @author 范翔 @date 20151003改，从plan配置文件读入传进来
+    distanceMode = (LzCollectHardwareTriggerDistanceMode) currentDistanceModeType;//LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_500mm;
     noDistanceMode = LzCollectHardwareTriggerNoDistanceMode::Lz_Collecting_FreeMode_30Hz;
 
     // 默认方式
@@ -96,10 +97,12 @@ void TriggerSettingWidget::comboBox2currentIndexChanged(int index)
     case Lz_Collecting_Manual_DistanceMode:
         distanceMode = (LzCollectHardwareTriggerDistanceMode) ui->comboBox_2->currentIndex();
         defaultcomboindex_2 = distanceMode;
+        emit signalSetDistanceMode(distanceMode);
         break;
     case Lz_Collecting_Automatic_DistanceMode:
         distanceMode = (LzCollectHardwareTriggerDistanceMode) ui->comboBox_2->currentIndex();
         defaultcomboindex_2 = distanceMode;
+        emit signalSetDistanceMode(distanceMode);
         break;
     case Lz_Collecting_FreeMode_NoDistanceMode:
         noDistanceMode = (LzCollectHardwareTriggerNoDistanceMode) ui->comboBox_2->currentIndex();
@@ -123,12 +126,12 @@ void TriggerSettingWidget::setframes()
         QMessageBox::warning(this, tr("提示"), tr("曝光时间不在范围50-10000中，请重新输入！"), QMessageBox::Yes | QMessageBox::No);
         return;
     }
-    int triggermode = ui->comboBox->currentIndex();
-    int distancemode = ui->comboBox_3->currentIndex();
+    int triggermode = ui->comboBox_3->currentIndex();
+    int distancemode = ui->comboBox_2->currentIndex();
 
     defaultcomboindex_2 = ui->comboBox_2->currentIndex();
 
-    MasterProgram::getMasterProgramInstance()->setTriggerModeAndExposureTime((LzCameraCollectingMode)triggermode, exposureTime, (LzCollectingMode)defaultcomboindex, defaultcomboindex_2);
+    MasterProgram::getMasterProgramInstance()->setTriggerModeAndExposureTime(LzCameraCollectingMode::Lz_Camera_HardwareTrigger, exposureTime, (LzCollectingMode)defaultcomboindex, defaultcomboindex_2);
     this->close();
 }
 

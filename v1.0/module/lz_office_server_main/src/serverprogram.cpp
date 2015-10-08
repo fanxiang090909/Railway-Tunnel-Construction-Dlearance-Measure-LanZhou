@@ -62,7 +62,8 @@ void ServerProgram::init()
     qDebug() << "Begin init...";
     emit signalMsgToGUI(QObject::tr("[服务器] 程序初始化"));
 
-    multiThreadTcpServer = new OfficeMultiThreadTcpServer(this);
+    // @author 范翔 @date 20151003修改端口号配置
+    multiThreadTcpServer = new OfficeMultiThreadTcpServer(this, 9425, 7778, 8889);
 
     connect(multiThreadTcpServer, SIGNAL(signalMsgToMaster(QString)), this, SLOT(parseMsg(QString)));
     connect(multiThreadTcpServer, SIGNAL(signalErrorToMaster(QString)), this, SLOT(parseMsg(QString)));
@@ -182,6 +183,21 @@ void ServerProgram::parseMsg(QString msg)
                     emit signalErrorToGUI(QObject::tr("[服务器] 接收客户端%1的文件%2出错%3").arg(clientip).arg(filename).arg(error));
                 else
                     emit signalErrorToGUI(QObject::tr("[服务器] 发送至客户端%1的文件%2出错%3").arg(clientip).arg(filename).arg(error));
+                break;
+            }
+            case -20: // 关闭+重启
+            {
+                emit signalMsgToGUI(QObject::tr("[客户端%1] 重启从控程序成功").arg(clientip));
+                break;    
+            }
+            case -21: // 只关闭
+            {
+                emit signalMsgToGUI(QObject::tr("[客户端%1] 关闭从控程序成功").arg(clientip));
+                break;
+            }
+            case -22: // 只启动运行
+            {
+                emit signalMsgToGUI(QObject::tr("[客户端%1] 启动从控程序成功").arg(clientip));
                 break;
             }
             default:;
@@ -334,3 +350,18 @@ void ServerProgram::sendRawImagesPackage(QString toip, QString filename)
     emit signalMsgToGUI(QObject::tr("[服务器] 发送原始图像压缩包到%1").arg(toip));
 }
 /*******************************/
+
+/**
+ * 重启slave程序
+ */
+void ServerProgram::resetSlaveProgram()
+{
+    getMultiThreadTcpServer()->sendMessageToSlaves(QObject::tr("-20"));
+    emit signalMsgToGUI(QObject::tr("[服务器] 发送从控程序重启命令"));
+}
+
+void ServerProgram::terminateSlaveProgram()
+{
+    getMultiThreadTcpServer()->sendMessageToSlaves(QObject::tr("-21"));
+    emit signalMsgToGUI(QObject::tr("[服务器] 发送从控程序关闭命令"));
+}

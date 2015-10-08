@@ -153,6 +153,21 @@ QStringListModel * TunnelDAO::getTunnelNames(int lineid)
 }
 
 /**
+ * 判断是否为桥梁
+ */
+bool TunnelDAO::getTunnelIsBriage(int tunnelid)
+{
+    QSqlQuery query;
+    query.exec(QObject::tr("SELECT t.is_bridge "
+               "FROM tunnel t WHERE t.tunnel_id = %1").arg(tunnelid));
+    while (query.next()) {
+        bool isbridge = query.value(0).toBool();
+        return isbridge;
+    }
+    return false;
+}
+
+/**
  * 某条隧道
  * @param tunnelid 隧道ID
  */

@@ -254,6 +254,9 @@
     <CustomBuild Include="..\..\..\..\..\pulsehandle\include\ReadWriteHardwareInterface.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\calculate\include\LzCalc_ExtractHeight.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_about.cpp">
@@ -872,6 +875,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\pulsehandle\src\WriteHardware.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LzCalc_ExtractHeight.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LzCalc_ExtractHeight.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_ExtractHeight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

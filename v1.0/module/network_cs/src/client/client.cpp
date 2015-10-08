@@ -11,7 +11,7 @@
  * @date 2014-2-12
  * @version 1.0.0
  */
-Client::Client(QString masterip, bool autoconnect, QObject *parent)
+Client::Client(QString masterip, bool autoconnect, int msgSendServerPort, int fileSendServerPort, int fileReceivePort, QObject *parent) : msgSendServerPort(msgSendServerPort), fileSendServerPort(fileSendServerPort), fileReceivePort(fileReceivePort)
 {
     qDebug() << tr("构造Client");
 
@@ -40,7 +40,7 @@ Client::Client(QString masterip, bool autoconnect, QObject *parent)
     connect(fileListSender, SIGNAL(end_transfer(QString, QString, int, int, int)), this, SLOT(fileend(QString, QString, int, int, int)));
 
     // 多文件接收类,多线程并行接收不同主机发来的文件
-    fileReceiverServer = new FileReceiverServer(8888);
+    fileReceiverServer = new FileReceiverServer(this->fileReceivePort);
     connect(fileReceiverServer, SIGNAL(error_openfile(QString, QString, int)), this, SLOT(fileopenError(QString, QString,int)));
     connect(fileReceiverServer, SIGNAL(current_progress(QString, QString, qint64, qint64, int)), this, SLOT(updateClientProgress(QString, QString, qint64, qint64,int)));
     connect(fileReceiverServer, SIGNAL(error_transfer(QString, QString, QString, int)), this, SLOT(fileError(QString, QString, QString, int)));
@@ -87,7 +87,7 @@ int Client::start()
     bool a;
     while(!m_bConnected)
 	{        
-        m_tcpSocket->connectToHost(masterIPAddress, 9424);
+        m_tcpSocket->connectToHost(masterIPAddress, this->msgSendServerPort);
         a = m_tcpSocket->waitForConnected(10000);
 
         // 若不是自动连接，可以不等待开始就连接
@@ -128,7 +128,7 @@ void Client::onDisconnected()
         {
             break;
         }
-        m_tcpSocket->connectToHost(masterIPAddress, 9424);
+        m_tcpSocket->connectToHost(masterIPAddress, this->msgSendServerPort);
         a = m_tcpSocket->waitForConnected(10000);
         qDebug() << "connected?" << a;
     }
@@ -204,7 +204,7 @@ void Client::sendFileToServer(QString ipaddress, QString fileName)
     // 添加到发送文件队列
     FileToSend newtask;
     newtask.toip = ipaddress;
-    newtask.toport = 7777;
+    newtask.toport = this->fileSendServerPort;
     newtask.filename = fileName;
     bool ret = fileListSender->pushBack(newtask);
 

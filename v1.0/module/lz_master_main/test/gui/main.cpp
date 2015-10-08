@@ -65,6 +65,12 @@ int main(int argc, char *argv[])
     {
         QString parentpath = file.readLine().trimmed();
         MasterSetting::getSettingInstance()->setParentPath(parentpath);
+        
+        double defaultDistanceMode = 0.5103;
+        QString tmpbastr = file.readLine().trimmed();
+        if (tmpbastr.split(':').length() >= 2)
+            defaultDistanceMode = tmpbastr.split(':').at(1).toDouble();
+        MasterSetting::getSettingInstance()->setDefaultDistanceMode(defaultDistanceMode);
         file.close();
     }
 

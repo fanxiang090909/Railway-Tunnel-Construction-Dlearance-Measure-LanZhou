@@ -108,6 +108,13 @@ QString MasterSetting::getNASAccessIP() { return nasaccessip; }
  */
 void MasterSetting::setCurrentUser(QString newUser) { currentUser = newUser; }
 /**
-* @return 当前操作用户名
-*/
+ * @return 当前操作用户名
+ */
 QString MasterSetting::getCurrentUser() { return currentUser; }
+
+/**
+ * 按里程模式采集下相邻两帧的间隔距离
+ */
+double MasterSetting::getDefaultDistanceMode() { return defaultDistanceMode; }
+
+void MasterSetting::setDefaultDistanceMode(double newDefaultDistanceMode) { this->defaultDistanceMode = newDefaultDistanceMode; }

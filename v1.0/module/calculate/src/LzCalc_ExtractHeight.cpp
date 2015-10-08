@@ -471,6 +471,11 @@ int LzCalculate_ExtractHeight::run()
     // @author 范翔改
     // 记录18组文件是否有数据
     DataHead towritedatahead;
+
+    if (is_open)
+    {
+        lzMatFuse->readHead((char*)&towritedatahead);
+    }
     // @author 范翔添加
     carriagedirect = true;
     
@@ -537,7 +542,7 @@ int LzCalculate_ExtractHeight::run()
             extra_high->closeFile();
             return ret;
         }
-        qDebug() << "fuse " << Info.key;
+        qDebug() << "extract " << Info.key;
         // @author 范翔改 继承自QObject 可以通过消息槽反馈计算进度
         emit statusShow(Info.key, false);
 
@@ -557,6 +562,8 @@ int LzCalculate_ExtractHeight::run()
 
     lzMatFuse->closeFile();
     extra_high->closeFile();
+    qDebug() << "extract end!!!!!!";
+
 	//system("pause");
     return ret;
 }

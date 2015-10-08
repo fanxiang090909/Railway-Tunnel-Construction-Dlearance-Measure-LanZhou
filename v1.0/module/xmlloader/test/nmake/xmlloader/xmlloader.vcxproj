@@ -233,14 +233,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;..\..\..\..\datastructure\include;..\..\..\include;..\..\..\include\tinyxml;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtSql;..\..\..\..\datastructure\include;..\..\..\include;..\..\..\include\tinyxml;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtSql;..\..\..\..\datastructure\include;..\..\..\include;..\..\..\include\tinyxml;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

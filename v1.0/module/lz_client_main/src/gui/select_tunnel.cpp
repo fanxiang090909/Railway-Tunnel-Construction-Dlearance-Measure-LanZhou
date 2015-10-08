@@ -117,16 +117,19 @@ void SelectAvaliableTunnelWidget::updateCheckedTunnelsView(const QModelIndex &in
             LzProjectAccess::getLzProjectAccessInstance()->setProjectName(LzProjectClass::Main, ClientSetting::getSettingInstance()->getParentPath() + "/" + projectname + "/" + projectfilename);
             LzProjectAccess::getLzProjectAccessInstance()->setProjectPath(LzProjectClass::Main, ClientSetting::getSettingInstance()->getParentPath() + "/" + projectname);
 
-            loadCheckedTaskTunnelData();
-          	QString checkedFile = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/" + LzProjectAccess::getLzProjectAccessInstance()->getProjectModel(LzProjectClass::Main).getCheckedFilename();
-            ui->textEdit->setText(QObject::tr("打开校正隧道文件%1成功。").arg(checkedFile));
+            bool ret = loadCheckedTaskTunnelData();
+          	if (ret)
+			{
+				QString checkedFile = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/" + LzProjectAccess::getLzProjectAccessInstance()->getProjectModel(LzProjectClass::Main).getCheckedFilename();
+				ui->textEdit->setText(QObject::tr("打开校正隧道文件%1成功。").arg(checkedFile));
+			}
         }
     }
     else
         ui->textEdit->setText(QObject::tr("没有指定校正隧道文件，请刷新后重试！"));
 }
 
-void SelectAvaliableTunnelWidget::loadCheckedTaskTunnelData()//添加实际隧道文件
+bool SelectAvaliableTunnelWidget::loadCheckedTaskTunnelData()//添加实际隧道文件
 {
     ui->actualTasksWidget->clear();
     ui->actualTasksWidget->setRowCount(0);
@@ -151,10 +154,10 @@ void SelectAvaliableTunnelWidget::loadCheckedTaskTunnelData()//添加实际隧�
     ui->actualTasksWidget->setSelectionBehavior(QAbstractItemView::SelectRows);  //整行选中的方式
     ui->actualTasksWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);   //表格禁止编辑
 
-    updateCheckedTaskWidget();
+    return updateCheckedTaskWidget();
 }
 
-void SelectAvaliableTunnelWidget::updateCheckedTaskWidget()
+bool SelectAvaliableTunnelWidget::updateCheckedTaskWidget()
 {
     // 引用赋值
     CheckedTaskList & clist = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main);
@@ -169,7 +172,7 @@ void SelectAvaliableTunnelWidget::updateCheckedTaskWidget()
     {
         qDebug() << tr("不能加载校正任务文件--- checkedtaskfile");
         ui->textEdit->setText(tr("不能加载校正任务文件--- checkedtaskfile"));
-        return;
+        return false;
     }
 
     clist.showList();
@@ -269,6 +272,7 @@ void SelectAvaliableTunnelWidget::updateCheckedTaskWidget()
 
     ui->actualTasksWidget->resizeColumnsToContents();
     ui->actualTasksWidget->horizontalHeader()->setStretchLastSection(false);
+	return true;
 }
 
 void SelectAvaliableTunnelWidget::askforEditableTunnel()
@@ -323,6 +327,9 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
     }
     // 记录当前所选择隧道
     tunnelname = ui->actualTasksWidget->item(currow, CHECKEDTASK_TUNNELNAME)->text();
+	long long startframeno = ui->actualTasksWidget->item(currow, CHECKEDTASK_STARTFRAME)->text().toLongLong();
+	long long endframeno = ui->actualTasksWidget->item(currow, CHECKEDTASK_ENDFRAME)->text().toLongLong();
+
     ClientSetting::getSettingInstance()->setCurrentEditingTunnel(tunnelname);
     //QString projectfilename = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Main);
     ClientSetting::getSettingInstance()->setCurrentEditingProject(projectname);
@@ -339,11 +346,22 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
     CheckedTaskList & clist = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main);
     int tunnelid = clist.getTunnelIDByTunnelName(tunnelname1);
     bool traindirection = true;
+
+	bool isNormal = true;
+
     CheckedTunnelTaskModel & tmp = clist.getCheckedTunnelModel(tunnelid, traindirection);
+
     if (traindirection)
-        traindirection = tmp.planTask.traindirection;
+		traindirection = tmp.planTask.traindirection;
     else
         traindirection = true; // 默认正向车厢
+
+	if(isNormal)
+		isNormal = tmp.planTask.isnormal;
+	else
+		isNormal = true;   //默认为正常行驶
+
+
 
     // 设置可编辑的基础隧道信息到全局空间
     bool ret = ClientSetting::getSettingInstance()->setCorrectTunnelDataModel(tunnelid);
@@ -360,7 +378,7 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
 
     QString signalfilename = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/syn_data/" + filename;
 
-    emit signalSelectedTunnelToEdit(tunnelid, signalfilename, traindirection);
+    emit signalSelectedTunnelToEdit(tunnelid, signalfilename, traindirection, isNormal, startframeno, endframeno);
 }
 
 /** 
@@ -444,8 +462,8 @@ void SelectAvaliableTunnelWidget::getframesfromsetvalidframes(long long  newstar
     qDebug() << "find tunnelid:" << tunnelid << tunnelname << filenameprefix;
 
     QString logfile = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/syn_data/" + filenameprefix + "_correct.log";
-
-    QString checkedFile = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main)  + "/" + filenameprefix + ".checked";
+	QString checkedFilename = LzProjectAccess::getLzProjectAccessInstance()->getProjectModel(LzProjectClass::Main).getCheckedFilename();
+    QString checkedFile = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main)  + "/" + checkedFilename;
 
     qDebug() << "checked filename: " << checkedFile << ", tunnelid:" << tunnelid << ", tunnelname:" << tunnelname << ",startseqno:" << startseqno;
 

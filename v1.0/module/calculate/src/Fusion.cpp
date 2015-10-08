@@ -296,7 +296,7 @@ void Fusion::get_vector(Mat& mat_point, int cameragroupid, bool carriagedirectio
     int a = 1;
     if (!carriagedirection)
         a = -1;
-    if(4 != mat_point.cols)
+    if(0 < mat_point.cols)
         for(int i=0; i<mat_point.cols; i++)                          
         {
             point.x = (*mat_point.ptr<float>(0,i));

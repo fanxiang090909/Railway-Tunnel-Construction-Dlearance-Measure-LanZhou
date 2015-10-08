@@ -41,6 +41,9 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
     tunnelid = -1;
     currentcollectdate = "";
 
+	current_startframeno = -1;
+	current_endframeno = -1;
+
     connect(ui->editTunnelButton, SIGNAL(clicked()), this, SLOT(turnToEditWidget()));
 	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(frameSearchInInterestArea()));
    
@@ -55,6 +58,15 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
 	scrollArea->setWidget(syntunnelcorrect);
 	ui->verticalLayout->addWidget(scrollArea);
 
+	//@author 9月2号
+	connect(ui->submitWidthButton,SIGNAL(clicked()),this,SLOT(setNewWidth()));
+	connect(ui->submitHeightButton,SIGNAL(clicked()),this,SLOT(setNewCenterHeight()));
+	connect(ui->setDirectionValComboBox, SIGNAL(currentIndexChanged(int)),this, SLOT(setDirectionVal()));
+
+	//@author 9月2号
+
+	// 实时获得画图界面的鼠标位置
+    connect(syntunnelcorrect, SIGNAL(sendMousePos(int, int)), this, SLOT(getMousePos(int, int)));
 
     connect(syntunnelcorrect, SIGNAL(sendInterestRectangle(float, float, float, float)), this, SLOT(getInterestRectangle(float, float, float, float)));
 
@@ -165,6 +177,10 @@ void SynthesisTunnelWidget::initProgressBar(long long start, long long end)
     ui->finishButton->setEnabled(false);
     ui->editTunnelButton->setEnabled(false);
 
+
+	//@zengwang 2015年10月7日
+	ui->leftRightValidComboBox->setEnabled(false);
+
     update();
 }
 
@@ -186,6 +202,9 @@ void SynthesisTunnelWidget::endProgressBar()
     ui->finishButton->setEnabled(true);
     ui->editTunnelButton->setEnabled(true);
 
+	//@zengwang 2015年10月7日
+	ui->leftRightValidComboBox->setEnabled(true);
+
     update();
 }
 
@@ -197,21 +216,62 @@ void SynthesisTunnelWidget::carriageDirectionChanged(int index)
     if (carriagedirectionlock)
         return;
 
-    QString abc = QObject::tr("正");
+    QString abc = QObject::tr("一致（同向）");
     currentcarriagedirection = true;
     if (index == 1)
     {
-        abc = QObject::tr("反");
+        abc = QObject::tr("不一致（反向）");
         currentcarriagedirection = false;
     }
 
-    QMessageBox::StandardButton rb = QMessageBox::warning(NULL, tr("警告"),tr("要将本条采集隧道配置为【车厢%1向采集】（一般由于计划配置时出错），确认？").arg(abc), QMessageBox::Yes | QMessageBox::No);
+	//@zengwang 2015年10月7日添加
+	bool ret;
+    TunnelDataModel *tunnelDataModel = ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret);
+	ClearanceData & straightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceStraightData();
+    ClearanceData & leftdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceLeftData();
+    ClearanceData & rightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceRightData();
+	bool isDoubleLine = tunnelDataModel->getIsDoubleLine();
+	bool isAccord = true;
+	if(isDoubleLine)
+	{
+		if(index == 0)
+		{
+			//index为0，表示采集方向与出表方向一致，只显示出左边数据即可
+			straightdata.resetLeftOrRight(isAccord);
+			leftdata.resetLeftOrRight(isAccord);
+			rightdata.resetLeftOrRight(isAccord);
+			ui->statusArea->append(QObject::tr("采集方向与出表方向一致，只显示左边数据"));
+
+		}
+		else if(index == 1)
+		{
+			//index为1，表示采集方向与出表方向不一致，只显示右边数据
+			isAccord = false;
+			straightdata.resetLeftOrRight(isAccord);
+			leftdata.resetLeftOrRight(isAccord);
+			rightdata.resetLeftOrRight(isAccord);
+			ui->statusArea->append(QObject::tr("采集方向与出表方向不一致，只显示右边数据"));
+
+		}
+		else
+		{
+			ui->statusArea->append(QObject::tr("采集方向与出表方向出错"));
+			return;
+		}
+	}
+
+
+
+
+
+
+    QMessageBox::StandardButton rb = QMessageBox::warning(NULL, tr("警告"),tr("要将本条采集隧道配置为【车厢方向与出表方向%1】（一般由于计划配置时出错），确认？").arg(abc), QMessageBox::Yes | QMessageBox::No);
     if (rb == QMessageBox::Yes)
     {
         bool ret = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main).setTunnelCarriageDirection(tunnelid, currentcarriagedirection);
         if (!ret)
         {
-            ui->statusArea->setText(QObject::tr("将隧道%1配置为【车厢%2向采集】失败，找不到隧道ID为%3").arg(tunnelname).arg(abc).arg(tunnelid));
+            ui->statusArea->append(QObject::tr("将隧道%1配置为【车厢%2向采集】失败，找不到隧道ID为%3").arg(tunnelname).arg(abc).arg(tunnelid));
             return;
         }
         QString path = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main);
@@ -225,7 +285,7 @@ void SynthesisTunnelWidget::carriageDirectionChanged(int index)
         ret = checktask->saveFile(LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main));//生成listtask
         delete checktask;
 
-        ui->statusArea->setText(QObject::tr("将隧道%1配置为【车厢%2向采集】成功").arg(tunnelname).arg(abc));
+        ui->statusArea->append(QObject::tr("将隧道%1配置为【车厢方向与出表方向%2】成功").arg(tunnelname).arg(abc));
     }
 }
 
@@ -259,7 +319,7 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
     else
         ui->carriageDirectionComboBox->setCurrentIndex(1);
     carriagedirectionlock = false;
-
+	
     bool ret;
     TunnelDataModel *tunnelDataModel = ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret);
     if (ret)
@@ -393,31 +453,38 @@ void SynthesisTunnelWidget::calculateSynthesisData()
         
         // 打开文件名
         string tunnelheightssynname = filename;
-        
+        qDebug() << "currentcollectdate:" << currentcollectdate;
+
         __int64 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
         __int64 taskid = TaskDAO::getTaskDAOInstance()->getTaskID(tunnelid, currentcollectdate);
 
         if (tasktunnelid < 0)
         {
-
+            ui->statusArea->append(QObject::tr("首次综合计算该任务组(任务工程)，创建新计算任务组。。。"));
             // 没有这个任务组
             if (taskid < 0)
                 taskid = TaskDAO::getTaskDAOInstance()->addTask(tmp.planTask.pulsepermeter, currentcollectdate, currentcarriagedirection, QObject::tr(tmp.planTask.tunnelname.c_str()));
 
             if (taskid < 0)
             {
-                ui->statusArea->setText(QObject::tr("重新综合计算文件%1失败，数据库中无法添加采集日期为%2的任务隧道组").arg(QObject::tr(tunnelheightssynname.c_str())).arg(currentcollectdate));
+                ui->statusArea->append(QObject::tr("创建新计算任务组失败！重新综合计算文件%1失败，数据库中无法添加采集日期为%2的任务隧道组").arg(QObject::tr(tunnelheightssynname.c_str())).arg(currentcollectdate));
                 return;
             }
+            else
+            {
+                ui->statusArea->append(QObject::tr("创建新计算任务组成功！"));
+            }
 
+            ui->statusArea->append(QObject::tr("创建新计算隧道任务（工程中的隧道任务）。。。"));
             // 有当天采集的任务组，但没有这个隧道任务
             if (TaskTunnelDAO::getTaskTunnelDAOInstance()->addTaskTunnel(taskid, tunnelid, interframe_mile, currentcarriagedirection, tmp.planTask.isnormal, 0) == 0)
             {
                 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
+                ui->statusArea->append(QObject::tr("创建新计算隧道任务（工程中的隧道任务）成功，tasktunnelid=%1！").arg(tasktunnelid));
             }
             else
             {
-                ui->statusArea->setText(QObject::tr("重新综合计算文件%1失败，数据库中采集日期为%2的任务组存在，但无法添加采集隧道").arg(QObject::tr(tunnelheightssynname.c_str())).arg(currentcollectdate));
+                ui->statusArea->append(QObject::tr("创建新计算隧道任务（工程中的隧道任务）失败！重新综合计算文件%1失败，数据库中采集日期为%2的任务组存在，但无法添加采集隧道").arg(QObject::tr(tunnelheightssynname.c_str())).arg(currentcollectdate));
                 return;
             }
         }
@@ -437,8 +504,11 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             connect(&lzsyn, SIGNAL(initfc(long long, long long)), this, SLOT(initProgressBar(long long, long long)));
             connect(&lzsyn, SIGNAL(currentfc(long long)), this, SLOT(updateProgressBar(long long)));
             
+			// 左右侧有效
+			int leftrightvalid = ui->leftRightValidComboBox->currentIndex();
+
             // @TODO 系数0.5103应改为外部配置文件输入
-            lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection);
+			lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection, this->current_startframeno, this->current_endframeno, leftrightvalid);
             bool hasstraight = false, hasleft = false, hasright = false;
             lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
 
@@ -449,7 +519,11 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             qDebug() << "clearanceDataToDBData" << ret1 << ret2 << ret3;
             //straightdata.showMaps();
 
-            ui->statusArea->setText(QObject::tr("重新综合计算文件%1并添加到数据库完成").arg(QObject::tr(tunnelheightssynname.c_str())));
+            ui->statusArea->append(QObject::tr("重新综合计算文件%1并添加到数据库完成").arg(QObject::tr(tunnelheightssynname.c_str())));
+        }
+        else 
+        {
+            ui->statusArea->append(QObject::tr("重新综合计算文件%1失败，计算隧道任务（工程中的隧道任务）找不到ID为%2的tasktunnel").arg(QObject::tr(tunnelheightssynname.c_str()).arg(tasktunnelid)));
         }
 
         // 进度条
@@ -473,9 +547,18 @@ void SynthesisTunnelWidget::loadGaugeImage(ClearanceData& data, CurveType newtyp
     if(ret1)
         syntunnelcorrect->update();//即更新绘图
   
+
+
+
+	//@zengwang  2015年10月6日修改
+	/*
     ui->red_label->setPixmap(QPixmap(ClientSetting::getSettingInstance()->getParentPath() + "/system/red.jpg"));
     ui->green_label->setPixmap(QPixmap(ClientSetting::getSettingInstance()->getParentPath() + "/system/black.jpg"));
     ui->blue_label->setPixmap(QPixmap(ClientSetting::getSettingInstance()->getParentPath() + "/system/blue.jpg"));
+	*/
+
+
+
 }
 
 /**
@@ -488,7 +571,9 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
         qDebug() << "can init clearance value map:";
         return;
     }
-    
+
+    qDebug() << "frameSearchInInterestArea   TopLeftPoint.x() = " << TopLeftPoint.x() << "TopLeftPoint.y() = " << TopLeftPoint.y() << "BottomRightPoint.x() = " << BottomRightPoint.x() << "BottomRightPoint.y() = " << BottomRightPoint.y();
+
     std::vector<BLOCK_KEY> keys;
     _int64 framecounter;
     double mile;
@@ -536,17 +621,51 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
 
     int fcindex;
 
-    // 进度条
-    initProgressBar(keys.at(0), keys.size() - 1);
+	long long startfc = keys.at(0);
+	long long endfc = keys.at(keys.size() - 1);
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+	{
+		startfc = current_startframeno;
+		endfc = current_endframeno;
+	}
 
-	for(int i = 0; i < keys.size(); i++)
+    // 进度条
+    initProgressBar(startfc, endfc);
+
+	long long size = keys.size();
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+		size = current_endframeno - current_startframeno + 1;
+
+	for(int i = 0; i < size; i++)
 	{
 	    fcindex = i;
 		bool ret1 = false;
 
-	    ret1 = syn->retrieveMap(keys.at(fcindex));//表示显示第2帧(0代表第一帧,1代表第二帧....)
+		if (this->current_startframeno != -1 && current_endframeno != -1)
+			ret1 = syn->retrieveMap(current_startframeno + fcindex);
+		else
+			ret1 = syn->retrieveMap(keys.at(fcindex));//表示显示第2帧(0代表第一帧,1代表第二帧....)
+
         ret = syn->readMap(framecounter, mile, centerheight, sectiondata);
+
+		//@author 2015年9月2号
+		//int  newheight = 0;
+		//float newleftval = 0;
+		//float newrightval = 0;
+
 		
+
+		//std::cout <<"newHeight = " << newHeight << " newLeftVal = " << newLeftVal << " newRightVal = " << newRightVal << std::endl;
+
+		//sectiondata.updateToMapVals(newHeight, newLeftVal, newRightVal);
+		
+		//syn->rewriteMapV2(framecounter, mile, centerheight, sectiondata.getMaps());
+
+
+		//@author 2015年9月2号
+
+
+
         //qDebug()<<"testframecount:"<<testframecount<<endl;
         // 把SectionData加到点数组中
         std::map <int,item>::iterator it = sectiondata.getMaps().begin();
@@ -559,7 +678,7 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
                 {
                     if (TopLeftPoint.x() < 0)
                     {
-                        if ((pair.second.left >= (-1)*BottomRightPoint.x()) && (pair.second.left <= (-1)*TopLeftPoint.x()))
+                        if (pair.second.left >= 0 && (pair.second.left >= (-1)*BottomRightPoint.x()) && (pair.second.left <= (-1)*TopLeftPoint.x()))
                         {
 	                        emit updateFramesInSearchArea(framecounter, mile, 1);
 	                        break;
@@ -567,7 +686,7 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
                     }
                     else
                     {
-                        if ((pair.second.right >= TopLeftPoint.x()) && (pair.second.right <= BottomRightPoint.x()))
+                        if (pair.second.right >= 0 && (pair.second.right >= TopLeftPoint.x()) && (pair.second.right <= BottomRightPoint.x()))
                         {
 	                        emit updateFramesInSearchArea(framecounter, mile, 1);
 	                        break;
@@ -578,7 +697,7 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
                 {
                     if (TopLeftPoint.x() < 0)
                     {
-                        if ((pair.second.left >= (-1)*BottomRightPoint.x()) && (pair.second.left <= (-1)*TopLeftPoint.x()))
+                        if (pair.second.right >= 0 && (pair.second.right >= (-1)*BottomRightPoint.x()) && (pair.second.right <= (-1)*TopLeftPoint.x()))
                         {
 	                        emit updateFramesInSearchArea(framecounter, mile, 1);
 	                        break;
@@ -586,7 +705,7 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
                     }
                     else
                     {
-                        if ((pair.second.right >= TopLeftPoint.x()) && (pair.second.right <= BottomRightPoint.x()))
+                        if (pair.second.left >= 0 && (pair.second.left >= TopLeftPoint.x()) && (pair.second.left <= BottomRightPoint.x()))
                         {
 	                        emit updateFramesInSearchArea(framecounter, mile, 1);
 	                        break;
@@ -596,8 +715,12 @@ void SynthesisTunnelWidget::frameSearchInInterestArea()
             }
 
             // 进度条
-            updateProgressBar(keys.at(fcindex));
-            it++;
+			if (this->current_startframeno != -1 && current_endframeno != -1)
+				updateProgressBar(current_startframeno + fcindex);
+			else
+				updateProgressBar(keys.at(fcindex));
+
+			it++;
 	    }
 	}
 	//qDebug() << "find fc" << framecounter << "," << mile << endl; 
@@ -673,13 +796,16 @@ void SynthesisTunnelWidget::on_finishButton_clicked()
     emit finish();
 }
 
-void SynthesisTunnelWidget::slotSelectedTunnelToSynthesis(int newtunnelid, QString signalfilename, bool carriagedirect)
+void SynthesisTunnelWidget::slotSelectedTunnelToSynthesis(int newtunnelid, QString signalfilename, bool carriagedirect, bool isNormal, long long startframeno, long long endframeno)
 {
     tunnelid = newtunnelid;
     username = ClientSetting::getSettingInstance()->getCurrentUser();
     projectname =  ClientSetting::getSettingInstance()->getCurrentEditingProject();
     tunnelname = ClientSetting::getSettingInstance()->getCurrentEditingTunnel();
     currentcarriagedirection = carriagedirect;
+
+	this->current_startframeno = startframeno;
+	this->current_endframeno = endframeno;
 
     // QDateTime time = QDateTime::fromString(currentProjectModel.getCreateDate(), "yyyy-MM-dd hh:mm:ss");  
     // currentcollectdate = time.toString("yyyyMMdd");
@@ -704,4 +830,349 @@ void SynthesisTunnelWidget::turnToEditWidget()
     }
 
     emit startFromFirst(currentcarriagedirection);
+}
+
+void SynthesisTunnelWidget::setNewCenterHeight()
+{
+	newCenterHeight = ui->labelEdit_newCenterHeight->text().toInt();
+	qDebug() <<"currentcarriagedirection = " << currentcarriagedirection <<  " ui->setDirectionValComboBox->currentIndex() = " <<ui->setDirectionValComboBox->currentIndex() << endl;
+	if (hasinitheightsval == false)
+    {
+        qDebug() << "can init clearance value map:";
+        return;
+    }
+    
+    std::vector<BLOCK_KEY> keys;
+    _int64 framecounter;
+    double mile;
+    float centerheight;
+    SectionData sectiondata;
+    bool ret;
+
+    // 流式文件查看
+    LzSerialStorageSynthesis * syn;
+    bool isfileopen;
+    // 打开文件
+    try {
+        // 调用读取指定高度流式文件类
+        syn = new LzSerialStorageSynthesis();
+
+        // 临时存储当前帧的高度数据
+        ret = sectiondata.initMaps(); // 初始化高度，不可缺少
+		if (ret == false)
+		{
+            qDebug() << "can init clearance value map:";
+            isfileopen = false;
+            return;
+        }
+
+        // 打开文件
+        // 【注意！】设置缓存大小1M，默认1G太大
+        syn->setting(100, 1024*1024, true);
+        if (!syn->openFile(filename.c_str()))
+        {
+            qDebug() << "can not open file:" << QString::fromLocal8Bit(filename.c_str());
+            isfileopen = false;
+            return;
+        }
+        isfileopen = true;
+        qDebug() << "open file:" << QString::fromLocal8Bit(filename.c_str());
+        keys = syn->readKeys();
+    }
+    catch (LzException & ex)
+    {
+        qDebug() << "loadSynthesisDataFile exception:" << ex.what();
+        return;
+    }
+    
+	emit clearlistwidget();
+
+    int fcindex;
+
+	long long startfc = keys.at(0);
+	long long endfc = keys.at(keys.size() - 1);
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+	{
+		startfc = current_startframeno;
+		endfc = current_endframeno;
+	}
+
+    // 进度条
+    initProgressBar(startfc, endfc);
+
+	long long size = keys.size();
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+		size = current_endframeno - current_startframeno + 1;
+
+	for(int i = 0; i < size; i++)
+	{
+	    fcindex = i;
+		bool ret1 = false;
+
+		if (this->current_startframeno != -1 && current_endframeno != -1)
+			ret1 = syn->retrieveMap(current_startframeno + fcindex);
+		else
+			ret1 = syn->retrieveMap(keys.at(fcindex));//表示显示第2帧(0代表第一帧,1代表第二帧....)
+    
+		ret = syn->readMap(framecounter, mile, centerheight, sectiondata);
+
+		//@author 2015年9月2号
+		//int  newheight = 0;
+		//float newleftval = 0;
+		//float newrightval = 0;
+
+		sectiondata.showMaps();
+
+		//qDebug() << "newHeight = " << newHeight << " newLeftVal = " << newLeftVal << " newRightVal = " << newRightVal;
+		//qDebug()  << "sectiondata.getMaps().at(newHeight).left = " << sectiondata.getMaps().at(newHeight).left;
+		//qDebug()  << "sectiondata.getMaps().at(newHeight).right = " << sectiondata.getMaps().at(newHeight).right;
+		//qDebug()  << "centerheight = " << centerheight << endl;
+		//if(sectiondata.getMaps().at(newHeight).left < newLeftVal)
+		//	sectiondata.getMaps().at(newHeight).left = newLeftVal;
+		//if(sectiondata.getMaps().at(newHeight).right < newRightVal)
+		//	sectiondata.getMaps().at(newHeight).right = newRightVal;
+		if(centerheight < newCenterHeight)
+			//centerheight = newCenterHeight;
+			centerheight = -1;
+		//qDebug() <<"centerheight = " << centerheight << " leftval = " << sectiondata.getMaps().at(newHeight).left << " rightVal = " << sectiondata.getMaps().at(newHeight).right << endl;
+		//sectiondata.updateToMapVals(newHeight, sectiondata.getMaps().at(newHeight).left, sectiondata.getMaps().at(newHeight).right);
+		
+		syn->rewriteMapV2(framecounter, mile, centerheight, sectiondata.getMaps());
+
+
+		//@author 2015年9月2号
+
+        // 进度条
+		if (this->current_startframeno != -1 && current_endframeno != -1)
+			updateProgressBar(current_startframeno + fcindex);
+		else
+			updateProgressBar(keys.at(fcindex));
+
+	}
+	//qDebug() << "find fc" << framecounter << "," << mile << endl; 
+    
+    // 关闭文件
+    try {
+        // 关闭文件
+        syn->closeFile();
+        isfileopen = false;
+        qDebug() << "close file:" << QString::fromLocal8Bit(filename.c_str());
+        delete syn;
+    }
+    catch (LzException & ex)
+    {
+        qDebug() << "closeSynthesisDataFile exception:" << ex.what(); 
+    }
+
+    // 进度条
+    endProgressBar();
+
+}
+
+
+
+void SynthesisTunnelWidget::setNewWidth()
+{
+	//QString newHeigth,newLeftVal,newRightVal;
+	newHeight = ui->labelEdit_newHeight->text().toInt();
+	
+	//@zengwang 2015年10月7号
+	//isValidHeight用来检查输入的高度值是不是正确的高度值，若是，则能正确地限定宽度；若不是，则应该在状态栏中提示用户，输入正确的高度再进行批量限宽
+	bool isValidHeight = false;
+	list<int>::iterator it = OutputHeightsList::getOutputHeightsListInstance()->heightsBegin();
+    while (it != OutputHeightsList::getOutputHeightsListInstance()->heightsEnd())
+    {
+		if(*it == newHeight)
+		{
+			isValidHeight = true;
+			break;
+		}
+        it++;
+    }
+	if(!isValidHeight)
+	{
+		ui->statusArea->append(tr("批量限宽的高度错误，请输入正确的批量限宽高度！"));
+		return;
+	}
+	
+
+	if(currentcarriagedirection)
+	{
+		if(ui->setDirectionValComboBox->currentIndex() == 0)
+		{
+			newLeftVal = ui->labelEdit_newWidthVal->text().toInt();
+			newRightVal = 0;
+		}
+		else
+		{
+			newRightVal = ui->labelEdit_newWidthVal->text().toInt();
+			newLeftVal = 0;
+		}
+			
+	}
+	else
+	{
+		if(ui->setDirectionValComboBox->currentIndex() == 0)
+		{
+			newRightVal = ui->labelEdit_newWidthVal->text().toInt();
+			newLeftVal = 0;
+		}
+		else
+		{
+			newLeftVal = ui->labelEdit_newWidthVal->text().toInt();
+			newRightVal = 0;
+		}
+			
+	}
+	qDebug() <<"currentcarriagedirection = " << currentcarriagedirection <<  " ui->setDirectionValComboBox->currentIndex() = " <<ui->setDirectionValComboBox->currentIndex() << endl;
+	if (hasinitheightsval == false)
+    {
+        qDebug() << "can init clearance value map:";
+        return;
+    }
+    
+    std::vector<BLOCK_KEY> keys;
+    _int64 framecounter;
+    double mile;
+    float centerheight;
+    SectionData sectiondata;
+    bool ret;
+
+    // 流式文件查看
+    LzSerialStorageSynthesis * syn;
+    bool isfileopen;
+    // 打开文件
+    try {
+        // 调用读取指定高度流式文件类
+        syn = new LzSerialStorageSynthesis();
+
+        // 临时存储当前帧的高度数据
+        ret = sectiondata.initMaps(); // 初始化高度，不可缺少
+		if (ret == false)
+		{
+            qDebug() << "can init clearance value map:";
+            isfileopen = false;
+            return;
+        }
+
+        // 打开文件
+        // 【注意！】设置缓存大小1M，默认1G太大
+        syn->setting(100, 1024*1024, true);
+        if (!syn->openFile(filename.c_str()))
+        {
+            qDebug() << "can not open file:" << QString::fromLocal8Bit(filename.c_str());
+            isfileopen = false;
+            return;
+        }
+        isfileopen = true;
+        qDebug() << "open file:" << QString::fromLocal8Bit(filename.c_str());
+        keys = syn->readKeys();
+    }
+    catch (LzException & ex)
+    {
+        qDebug() << "loadSynthesisDataFile exception:" << ex.what();
+        return;
+    }
+    
+	emit clearlistwidget();
+
+    int fcindex;
+
+    long long startfc = keys.at(0);
+	long long endfc = keys.at(keys.size() - 1);
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+	{
+		startfc = current_startframeno;
+		endfc = current_endframeno;
+	}
+
+    // 进度条
+    initProgressBar(startfc, endfc);
+
+	long long size = keys.size();
+	if (this->current_startframeno != -1 && current_endframeno != -1)
+		size = current_endframeno - current_startframeno + 1;
+
+	for(int i = 0; i < size; i++)
+	{
+	    fcindex = i;
+		bool ret1 = false;
+
+		if (this->current_startframeno != -1 && current_endframeno != -1)
+			ret1 = syn->retrieveMap(current_startframeno + fcindex);
+		else
+			ret1 = syn->retrieveMap(keys.at(fcindex));//表示显示第2帧(0代表第一帧,1代表第二帧....)
+
+        ret = syn->readMap(framecounter, mile, centerheight, sectiondata);
+
+		//@author 2015年9月2号
+		//int  newheight = 0;
+		//float newleftval = 0;
+		//float newrightval = 0;
+
+		sectiondata.showMaps();
+
+		qDebug() << "newHeight = " << newHeight << " newLeftVal = " << newLeftVal << " newRightVal = " << newRightVal;
+		qDebug()  << "sectiondata.getMaps().at(newHeight).left = " << sectiondata.getMaps().at(newHeight).left;
+		qDebug()  << "sectiondata.getMaps().at(newHeight).right = " << sectiondata.getMaps().at(newHeight).right;
+		qDebug()  << "centerheight = " << centerheight << endl;
+		if(sectiondata.getMaps().at(newHeight).left < newLeftVal)
+			sectiondata.getMaps().at(newHeight).left = newLeftVal;
+		if(sectiondata.getMaps().at(newHeight).right < newRightVal)
+			sectiondata.getMaps().at(newHeight).right = newRightVal;
+		if(centerheight < newCenterHeight)
+			//centerheight = newCenterHeight;
+			centerheight = -1;
+		qDebug() <<"centerheight = " << centerheight << " leftval = " << sectiondata.getMaps().at(newHeight).left << " rightVal = " << sectiondata.getMaps().at(newHeight).right << endl;
+		sectiondata.updateToMapVals(newHeight, sectiondata.getMaps().at(newHeight).left, sectiondata.getMaps().at(newHeight).right);
+		
+		syn->rewriteMapV2(framecounter, mile, centerheight, sectiondata.getMaps());
+
+
+		//@author 2015年9月2号
+
+        // 进度条
+		if (this->current_startframeno != -1 && current_endframeno != -1)
+			updateProgressBar(current_startframeno + fcindex);
+		else
+			updateProgressBar(keys.at(fcindex));
+
+	}
+	//qDebug() << "find fc" << framecounter << "," << mile << endl; 
+    
+    // 关闭文件
+    try {
+        // 关闭文件
+        syn->closeFile();
+        isfileopen = false;
+        qDebug() << "close file:" << QString::fromLocal8Bit(filename.c_str());
+        delete syn;
+    }
+    catch (LzException & ex)
+    {
+        qDebug() << "closeSynthesisDataFile exception:" << ex.what(); 
+    }
+
+    // 进度条
+    endProgressBar();
+}
+
+
+void SynthesisTunnelWidget::setDirectionVal()
+{
+	if(ui->setDirectionValComboBox->currentText() == QObject::tr("左"))
+	{
+		ui->setDirectionValComboBox->setCurrentIndex(0);
+	}
+	else 
+		ui->setDirectionValComboBox->setCurrentIndex(1);
+
+}
+
+
+// 得到鼠标坐标
+void SynthesisTunnelWidget::getMousePos(int newx1, int newy1)
+{
+    ui->mouseX->setText(QString("%1").arg(newx1));
+    ui->mouseY->setText(QString("%1").arg(newy1));
 }

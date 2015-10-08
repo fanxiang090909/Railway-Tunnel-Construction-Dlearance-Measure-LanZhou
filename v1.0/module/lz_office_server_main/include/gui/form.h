@@ -6,7 +6,7 @@
 #include <QMenu>
 #include "serverprogram.h"
 #include <QStringListModel>
-
+#include "select_tunnel_copyresult.h"
 
 namespace Ui {
     class Form;
@@ -46,6 +46,17 @@ private slots:
     void on_pushButton_7_clicked();
 
     /**
+     * 存储工程数据
+     */
+    void saveProjData();
+
+    /**
+     * 重启从控程序
+     */
+    void resetSlaveProgram();
+    void terminateSlaveProgram();
+
+    /**
      * 更新当前连接IP列表
      * @param ip ip地址
      * @param addorremove 增加到iplist还是从iplist中删除，true为增加，false为删除
@@ -66,6 +77,11 @@ private slots:
     void on_iplistView_clicked(const QModelIndex &index);
 
 private:
+
+    /**
+     * 目录拷贝界面
+     */
+    CopyAvaliableTunnelWidget * copywidget;
 
     /**
      * 将Ip地址队列转换为界面显示的listModel

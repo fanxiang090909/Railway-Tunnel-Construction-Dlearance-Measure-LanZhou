@@ -7,6 +7,7 @@
 
 #include "multiframecorrect.h"
 #include "clearance_item.h"
+#include "lz_output.h"
 
 #include <opencv2\opencv.hpp>
 #include <opencv\highgui.h>
@@ -15,20 +16,6 @@
 #include <list>
 
 using namespace cv;
-
-/**
- * 输出限界图形时的底板限界
- * 输出形式 会在限界图中不同。@see \\10.13.29.236\Public Resource\0.科研项目\Lz兰州铁路2012\相关铁路标准\铁路桥隧建筑标准限界
- * DianLi电力牵引，与NeiRan内燃牵引为隧道属性
- * B与D（双层集装箱）为选择属性，可选择B或D输出表格
- */
-enum OutputClearanceImageType
-{
-    OutType_B_NeiRan = 1,  // 隧道建筑限界，内燃牵引
-    OutType_B_DianLi = 2,  // 隧道建筑限界，电力牵引
-    OutType_D_NeiRan = 3,  // 双层集装箱桥隧建筑限界，内燃牵引
-    OutType_D_DianLi = 4   // 双层集装箱桥隧建筑限界，电力牵引
-};
 
 enum ShowDataType
 {
@@ -340,6 +327,12 @@ signals:
      * 将rowcount,row1count,row2count发送到单隧道综合界面，判断是否有各种曲线
      */
     void LineTypeCount(int, int, int);
+
+    /**
+     * 传递实时鼠标坐标像素值到修正图像界面显示
+     * @param int,int 分中坐标系下坐标（单位：毫米）
+     */
+    void sendMousePos(int,int);
 
 private:
    

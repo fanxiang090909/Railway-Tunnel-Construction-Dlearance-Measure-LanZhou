@@ -23,7 +23,7 @@ class OfficeMultiThreadTcpServer : public MultiThreadTcpServer
     Q_OBJECT
 
 public:
-    OfficeMultiThreadTcpServer(QObject *parent);
+    OfficeMultiThreadTcpServer(QObject *parent, int msgListenPort = 9424, int fileReceivePort = 7777, int fileSendPort = 8888);
 
     ~OfficeMultiThreadTcpServer();
 

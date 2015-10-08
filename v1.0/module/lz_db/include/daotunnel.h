@@ -74,6 +74,11 @@ public:
     QStringListModel * getTunnelNames(int lineid);
 
     /**
+     * 判断是否为桥梁
+     */
+    bool getTunnelIsBriage(int tunnelid);
+
+    /**
      * 某条隧道
      * @param tunnelid 隧道ID
      */

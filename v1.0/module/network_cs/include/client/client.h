@@ -18,7 +18,8 @@ class Client : public QObject  //这个类用来与主控交互，互相传送�
 {
     Q_OBJECT
 public:
-    explicit Client(QString masterip, bool autoconnect = true, QObject *parent = 0);
+    explicit Client(QString masterip, bool autoconnect = true, int msgSendServerPort = 9424, int fileSendServerPort = 7777, int fileReceivePort = 8888, QObject *parent = 0);
+    
     ~Client();
 	
     /**
@@ -35,6 +36,22 @@ public:
     void sendMsgToMaster(const QString & msg);
 
 private:
+
+    /**
+     * 消息发送TcpSocket的服务器端端口号
+     */
+    int msgSendServerPort;
+
+    /**
+     * 文件发送TcpSocket的服务器端端口号
+     */
+    int fileSendServerPort;
+
+    /**
+     * 文件接收TcpServer端口号
+     */
+    int fileReceivePort;
+
     /**
      * 是否正在连接
      */

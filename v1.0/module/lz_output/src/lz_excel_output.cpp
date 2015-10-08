@@ -2,6 +2,7 @@
 
 #include <QFileInfo>
 #include <QTextCodec>
+#include <QDateTime>
 
 /**
  * 兰州项目限界数据图表输出
@@ -26,6 +27,8 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
 {
     QString templatename = "SingleSectionTemplate.xls";
     int ret = copy(templatepath, templatename, outputfile);
+    qDebug() << templatepath << outputfile << insertimgpath;
+
     if (ret != 0)
         return ret;
 
@@ -115,7 +118,11 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
             std::pair<int, item> pair = (*it);
 
             if (pair.first > minHeight)
+            {
+                it++;
+                k++;
                 continue;
+            }
 
             // 此处写要插入的内容
             if (pair.second.left >= 0)
@@ -225,7 +232,10 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
     // 时间
     QStringList strList = inputdata->getTaskTunnelInfo().split("_");
     QByteArray ba = strList.at(1).toLocal8Bit();
-    excel.SetCellData(54,16,ba.constData());
+    QDateTime tmpdate = QDateTime::fromString(ba.constData(), "yyyyMMdd");
+    QString date = tmpdate.toString("yyyy-MM-dd");
+    excel.SetCellData(54,16, date.toLocal8Bit().constData());
+    // TODO表上再插入一个时间
 
     // 起讫里程
     _int64 startdistance = inputbasicdata->getStartPoint();
@@ -415,46 +425,47 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
 
     excel.Open(outputfile, 1, false);
     
-    QString linename = ""; 
+    QString linename = inputdata->getLineName(); 
     // 限界表名称
-    excel.SetCellData(1,1,QObject::tr("%1区段桥隧综合最小建筑限界尺寸表").arg(linename));
-    excel.SetCellData(52,1,QObject::tr("%1区段桥隧综合最小建筑限界尺寸图").arg(linename));
+    excel.SetCellData(1,1,QObject::tr("%1-区段桥隧综合最小建筑限界尺寸表").arg(linename));
+    excel.SetCellData(52,1,QObject::tr("%1-区段桥隧综合最小建筑限界尺寸图").arg(linename));
 
     // 线路名称
     excel.SetCellData(3,3,linename);
     excel.SetCellData(54,2,linename);
+    excel.SetCellData(54,5,linename);
 
-    // 区段///TODO
-    excel.SetCellData(3,9,linename);////TODO
+    // 区段
+    excel.SetCellData(3,9,linename);
+
+    QString endStationName = inputdata->getEndStationName();
     // 面向站名
-    excel.SetCellData(3,15,linename);////TODO
-    excel.SetCellData(54,13,linename);////TODO
+    excel.SetCellData(3,15,endStationName);
+    excel.SetCellData(54,13,endStationName);
 
     QStringListModel * tunnelsmodel = inputdata->getTunnelsNames();
 
     // 桥隧总数
     excel.SetCellData(4,4,tunnelsmodel->rowCount());
     // 桥梁数
-    excel.SetCellData(4,11,tunnelsmodel->rowCount());///TODO
+    excel.SetCellData(4,11,inputdata->getNumOfOutOfClearanceBridges());
     // 隧道数
-    excel.SetCellData(4,14,tunnelsmodel->rowCount());///TODO
-
-    // 桥隧名称
-    excel.SetCellData(4,4,linename);
-    excel.SetCellData(54,5,linename);
+    excel.SetCellData(4,14,inputdata->getNumOfOutOfClearanceTunnels());
 
     // 时间
     // 采集日期
     QModelIndex index = tunnelsmodel->index(0,0);
     QString tunnelinfo = index.data().toString();//这两行代码获取QStringListModel中第一行的值
-    QStringList strlist = tunnelinfo.split("_");
-    if (strlist.length() < 2)
+    QStringList strlist = tunnelinfo.split("-");
+    if (strlist.length() < 3)
         return -1;
-    QString collectdate = strlist.at(1);
+    QString collectdate = strlist.at(2);
     excel.SetCellData(54,16,collectdate);
 
-    // 最小曲线半径///TODO
-    excel.SetCellData(5,5,"0");
+    // 最小曲线半径
+
+    int minRadius = inputdata->getMinRadius();
+    excel.SetCellData(5,5,minRadius);
     // 最大外轨超高
     excel.SetCellData(5,10,inputdata->getWaiGuiChaoGao()); 
     // 最低接触网高度

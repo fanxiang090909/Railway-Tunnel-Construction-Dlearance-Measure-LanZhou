@@ -21,6 +21,7 @@ class CalcuStatusNoSlaveWidget : public CalcuWidget
 
 public:
     explicit CalcuStatusNoSlaveWidget(QWidget *parent = 0);
+
     ~CalcuStatusNoSlaveWidget();
 
 protected slots:

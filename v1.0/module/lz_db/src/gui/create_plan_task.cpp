@@ -39,8 +39,8 @@
 // 隧道任务界面表格列数
 int PlanTaskWidget::TABLE_COLUMN_COUNT = 11;
 
-PlanTaskWidget::PlanTaskWidget(QWidget *parent) :
-    QWidget(parent),
+PlanTaskWidget::PlanTaskWidget(QWidget *parent, double defaultDistanceMode_500mm) :
+    QWidget(parent), defaultDistanceMode_500mm(defaultDistanceMode_500mm), 
     ui(new Ui::PlanTaskWidget)
 {
     ui->setupUi(this);
@@ -60,6 +60,15 @@ PlanTaskWidget::PlanTaskWidget(QWidget *parent) :
     loadTunnelData();
 
     prepareTaskTunnelsView();
+
+    ui->pulseNumEdit->setText(QString("%1").arg(this->defaultDistanceMode_500mm));
+
+    /**
+     * 帧间间隔里程数
+     */
+    connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxcurrentIndexChanged(int)));
+    // 默认里程数
+    comboBoxcurrentIndexChanged(0);
 
     /* 线路及隧道数据列表更新信号槽 */
     connect(ui->linesView, SIGNAL(clicked(QModelIndex)), this, SLOT(updateTunnelsView(const QModelIndex &)));
@@ -96,6 +105,22 @@ PlanTaskWidget::~PlanTaskWidget()
     delete task;
     delete tunnelcheck;
 
+}
+
+void PlanTaskWidget::comboBoxcurrentIndexChanged(int index)
+{
+    defaultcomboindex = (LzCollectHardwareTriggerDistanceMode) ui->comboBox->currentIndex();
+
+    switch (defaultcomboindex)
+    {
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_500mm: currentDistanceMode = defaultDistanceMode_500mm; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_750mm: currentDistanceMode = defaultDistanceMode_500mm * 1.5; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_1000mm: currentDistanceMode = defaultDistanceMode_500mm * 2; break;
+        case LzCollectHardwareTriggerDistanceMode::Lz_HardwareTrigger_1250mm: currentDistanceMode = defaultDistanceMode_500mm * 2.5; break;
+        default : currentDistanceMode = defaultDistanceMode_500mm; break;
+    }
+
+    ui->actualPulseNum->setText(QString("%1m").arg(currentDistanceMode));
 }
 
 // 更新采集日期
@@ -616,17 +641,18 @@ void PlanTaskWidget::turnToNextTaskTunnel()//下移，即下一个
 void PlanTaskWidget::makeTaskFile()//生成task.xml任务文件
 {
     // 如果没有输入脉冲数和配置车厢正反，不能生成
-    if (ui->pulseNumEdit->text().trimmed().compare("") == 0 || ui->pulseNumEdit->text().trimmed().toInt() <= 0)
+    QString tmppulsenumstr = ui->actualPulseNum->text().trimmed();
+    if (tmppulsenumstr.compare("") == 0 || tmppulsenumstr.left(tmppulsenumstr.size()-1).toDouble() <= 0)
     {
         QMessageBox::critical(0, QObject::tr("提示"),
-                              QObject::tr("脉冲没有输入，不能生成文件!"),
+                              QObject::tr("相邻两帧之间里程数没有输入，不能生成文件!"),
                               QMessageBox::Ok);
         return;
     }
     if (ui->radioButton_5->isChecked() == false && ui->radioButton_6->isChecked() == false)
     {
         QMessageBox::critical(0, QObject::tr("提示"),
-                              QObject::tr("车厢正反未选择，不能生成文件!"),
+                              QObject::tr("车厢方向与出表方向一致与否未选择，不能生成文件!"),
                               QMessageBox::Ok);
         return;
     }
@@ -693,7 +719,7 @@ void PlanTaskWidget::makeTaskFile()//生成task.xml任务文件
         else//则表示选中反向这个radioButton_6这个按钮
             tmp.downstream = false;
 
-        tmp.pulsepermeter = ui->pulseNumEdit->text().toInt();
+        tmp.pulsepermeter = tmppulsenumstr.left(tmppulsenumstr.size()-1).toDouble();
 
         //从Tablewidget获得QComboBox中的值
         QWidget * widget=ui->taskTunnelTableWidget->cellWidget(i,10);//获得widget

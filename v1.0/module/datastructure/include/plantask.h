@@ -91,7 +91,7 @@ public:
     int linetype;       //线路类型
     bool doubleline;    //是否为双线
     bool downstream;    //是否为下行
-    int pulsepermeter;  //每米脉冲数
+    double pulsepermeter;  //每米脉冲数
     bool isnormal;      //是否正常
     string datetime;    //采集日期
 };

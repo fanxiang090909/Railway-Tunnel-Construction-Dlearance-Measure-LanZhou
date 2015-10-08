@@ -100,6 +100,9 @@ public:
     bool getIsDoubleLine();
     bool getIsDownlink();
 
+	bool getIsNormalTravel();
+
+
     // 线路名称和编号
     string getLinename();
     int getLineid();
@@ -125,6 +128,8 @@ private:
     int lineType;
     bool isDoubleLine;
     bool isDownlink;
+
+	bool isNormalTravel;
 
     // 线路名称和编号
     string linename;

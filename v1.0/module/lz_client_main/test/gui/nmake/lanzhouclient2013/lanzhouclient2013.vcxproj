@@ -113,6 +113,7 @@
     <ClCompile Include="..\..\..\..\src\clientprogram.cpp" />
     <ClCompile Include="..\..\..\..\src\gui\about.cpp" />
     <ClCompile Include="..\..\..\..\src\gui\correct_clearance.cpp" />
+    <ClCompile Include="..\..\..\..\src\gui\correct_clearance_batchoutput.cpp" />
     <ClCompile Include="..\..\..\..\src\gui\imageviewer_3dtv.cpp" />
     <ClCompile Include="..\..\..\..\src\gui\imageviewer_client.cpp" />
     <ClCompile Include="..\..\..\..\src\gui\login.cpp" />
@@ -147,6 +148,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_correct_clearance.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_correct_clearance_batchoutput.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -399,6 +404,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_correct_clearance.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_correct_clearance_batchoutput.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -658,6 +667,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\..\..\..\datastructure\include\lz_working_enum.h" />
     <ClInclude Include="..\..\..\..\..\datastructure\include\plantask.h" />
     <ClInclude Include="..\..\..\..\..\datastructure\include\projectmodel.h" />
     <ClInclude Include="..\..\..\..\..\datastructure\include\realtask.h" />
@@ -1065,7 +1075,26 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\include\gui\correct_clearance_batchoutput.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing correct_clearance_batchoutput.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing correct_clearance_batchoutput.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing correct_clearance_batchoutput.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing correct_clearance_batchoutput.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I.\..\..\..\..\include"</Command>
+    </CustomBuild>
     <ClInclude Include="GeneratedFiles\ui_backup_db.h" />
+    <ClInclude Include="GeneratedFiles\ui_correct_clearance_batchoutput.h" />
     <ClInclude Include="GeneratedFiles\ui_drawimage.h" />
     <ClInclude Include="GeneratedFiles\ui_imageviewer.h" />
     <ClInclude Include="GeneratedFiles\ui_imageviewer_3dtv.h" />
@@ -1892,6 +1921,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -2579,6 +2609,24 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\gui\correct_clearance_batchoutput.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Text Include="client_datastore_path.txt" />
@@ -2630,16 +2678,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\opencvx64\include;D:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\QtNetwork;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;C:\Qt\include\QtWebKit;C:\Qt\include\QtOpenGL;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\filemanagers\include\gui\openglpoints;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;..\..\..\..\..\lz_master_main\include\gui;..\..\..\..\..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;D:\Boost\lib\x64;D:\opencvx64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(BOOST_DIR)\include\boost-1_55;$(QT_DIR)\include\QtSql;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\Qt;$(QT_DIR)\include\ActiveQt;$(QT_DIR)\include\QtWebKit;$(QT_DIR)\include\QtOpenGL;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\filemanagers\include\gui\openglpoints;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;..\..\..\..\..\lz_master_main\include\gui;..\..\..\..\..\..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(QT_DIR)\plugins\codecs;$(QT_DIR)\plugins\iconengines;$(QT_DIR)\plugins\graphicssystems;$(QT_DIR)\plugins\sqldrivers;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>D:\opencvx64\include;D:\Boost\include\boost-1_55;C:\Qt\include\QtSql;C:\Qt\include\QtCore;C:\Qt\include;C:\Qt\include\QtGui;C:\Qt\include\QtNetwork;C:\Qt\include\Qt;C:\Qt\include\ActiveQt;C:\Qt\include\QtWebKit;C:\Qt\include\QtOpenGL;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\filemanagers\include\gui\openglpoints;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;..\..\..\..\..\lz_master_main\include\gui;..\..\..\..\..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;C:\Qt\plugins\codecs;C:\Qt\plugins\iconengines;C:\Qt\plugins\graphicssystems;C:\Qt\plugins\sqldrivers;D:\Boost\lib\x64;D:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(OPENCV_DIR)\include;$(BOOST_DIR)\include\boost-1_55;$(QT_DIR)\include\QtSql;$(QT_DIR)\include\QtCore;$(QT_DIR)\include;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\Qt;$(QT_DIR)\include\ActiveQt;$(QT_DIR)\include\QtWebKit;$(QT_DIR)\include\QtOpenGL;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\..\filetransport\include;..\..\..\..\..\compress\include;..\..\..\..\..\datastructure\include;..\..\..\..\..\network_cs\include\client;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\filemanagers\include\gui\openglpoints;..\..\..\..\..\lz_exception\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\calculate\include;..\..\..\..\..\lz_output\include;..\..\..\..\..\lz_output\include\gui;..\..\..\..\..\lz_logger\include;..\..\..\..\..\lz_master_main\include\gui;..\..\..\..\..\..\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(QT_DIR)\plugins\codecs;$(QT_DIR)\plugins\iconengines;$(QT_DIR)\plugins\graphicssystems;$(QT_DIR)\plugins\sqldrivers;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

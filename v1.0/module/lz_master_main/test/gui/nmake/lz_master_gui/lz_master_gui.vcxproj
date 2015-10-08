@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\..\..\..\calculate\src\kdtree.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalculator.cpp" />
+    <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_ExtractHeight.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_thread.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzEdgeMarker.cpp" />
     <ClCompile Include="..\..\..\..\..\calculate\src\LzImgArgument.cpp" />
@@ -234,6 +235,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_LzCalc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LzCalc_ExtractHeight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -482,6 +487,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_LzCalc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LzCalc_ExtractHeight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -968,6 +977,24 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
     </CustomBuild>
     <ClInclude Include="..\..\..\..\..\calculate\include\LzCalculator.h" />
+    <CustomBuild Include="..\..\..\..\..\calculate\include\LzCalc_ExtractHeight.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing LzCalc_ExtractHeight.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing LzCalc_ExtractHeight.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing LzCalc_ExtractHeight.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing LzCalc_ExtractHeight.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\."</Command>
+    </CustomBuild>
     <ClInclude Include="..\..\..\..\..\calculate\include\LZ_Calculation.h" />
     <ClInclude Include="..\..\..\..\..\calculate\include\Lz_RT_Calc.h" />
     <ClInclude Include="..\..\..\..\..\calculate\include\opencvhead.h" />
@@ -2514,8 +2541,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;D:\Boost\include\boost-1_55;D:\opencvx64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencvx64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtSql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;$(BOOST_DIR)\include\boost-1_55;$(OPENCV_DIR)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -2523,8 +2550,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>C:\Qt\include;C:\Qt\include\QtCore;C:\Qt\include\QtNetwork;C:\Qt\include\QtGui;C:\Qt\include\QtSql;C:\MySQL\include;C:\MySQL\include\mysql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\lz_logger\include;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;D:\Boost\include\boost-1_55;D:\opencvx64\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Qt\lib;D:\Boost\lib\x64;D:\opencvx64\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
+    <IncludePath>$(QT_DIR)\include;$(QT_DIR)\include\QtCore;$(QT_DIR)\include\QtNetwork;$(QT_DIR)\include\QtGui;$(QT_DIR)\include\QtSql;..\..\..\..\..\datastructure\include;..\..\..\..\..\filetransport\include;..\..\..\..\..\lz_db\include;..\..\..\..\..\lz_db\include\gui;..\..\..\..\..\xmlloader\include;..\..\..\..\..\xmlloader\include\tinyxml;..\..\..\..\include;..\..\..\..\include\gui;..\..\..\..\..\network_cs\include\server;..\..\..\..\..\compress\include;..\..\..\..\..\calculate\include;..\..\..\..\..\calculate\include\icp;..\..\..\..\..\lz_exception\include;..\..\..\..\..\lz_logger\include;..\..\..\..\..\filemanagers\include;..\..\..\..\..\filemanagers\include\gui;..\..\..\..\..\pulsehandle\include;..\..\..\..\..\pulsehandle\include\bdaq;..\..\..\..\..\..\include;$(BOOST_DIR)\include\boost-1_55;$(OPENCV_DIR)\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(QT_DIR)\lib;$(BOOST_DIR)\lib\x64;$(OPENCV_DIR)\lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -2597,7 +2624,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" Qt5Version_x0020_Win32="Qt4.8" Qt5Version_x0020_x64="Qt4.8" />
+      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" Qt5Version_x0020_Win32="Qt4.8" Qt5Version_x0020_x64="QT5" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

@@ -58,7 +58,7 @@ public slots:
     /**
      * 界面之间消息传递槽函数
      */
-    void slotSelectedTunnelToSynthesis(int newtunnelid, QString, bool);
+    void slotSelectedTunnelToSynthesis(int newtunnelid, QString, bool, bool, long long, long long);
     void activatecombox();
     void setLineType(int,int,int);
 
@@ -127,6 +127,10 @@ private:
     bool currentcarriagedirection;
     bool carriagedirectionlock;
 
+
+	long long current_startframeno;
+	long long current_endframeno;
+
     /**
      * 当前隧道采集日期
      */
@@ -165,6 +169,14 @@ private:
      */
     QPointF TopLeftPoint, BottomRightPoint;
 
+
+	//9月2号添加
+	int newHeight;
+	float newLeftVal;
+	float newRightVal;
+	float newCenterHeight;
+	//9月2号添加
+
 private slots:
   
     /**
@@ -188,6 +200,7 @@ private slots:
     void on_finishButton_clicked();
     void turnToEditWidget();
 
+
     /**
      * 从我们画的感兴趣区域内查找限界半宽更小的“危险”帧数
      */
@@ -209,6 +222,16 @@ private slots:
     void updateProgressBar(long long);
     // 更新进度条
     void endProgressBar();
+
+
+	//9月2号添加
+	void setNewWidth();
+	void setNewCenterHeight();
+	void setDirectionVal();
+	//9月2号添加
+
+	void getMousePos(int newx1, int newy1);
+
 };
 
 #endif // SYNTHESIS_TUNNEL_H

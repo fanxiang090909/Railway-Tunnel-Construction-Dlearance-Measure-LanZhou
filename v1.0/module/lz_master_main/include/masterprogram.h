@@ -290,6 +290,13 @@ public:
      */
     void calculate_Fuse_stop();
 
+    /**
+     * 开始做提高度计算
+     * 前提是已经融合好
+     */
+   	void calculate_ExtractHeight_beginStartAll();
+    void calculate_ExtractHeight_beginStartOneTunnel(int tunnelid);
+
     /*****************关于备份 *********************/
     /**
      * 开始备份

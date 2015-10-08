@@ -17,7 +17,7 @@
  * @date 2013-11-25
  */
 
-MasterMultiThreadTcpServer::MasterMultiThreadTcpServer(QObject *parent) : MultiThreadTcpServer(parent)
+MasterMultiThreadTcpServer::MasterMultiThreadTcpServer(QObject *parent, int msgListenPort, int fileReceivePort, int fileSendPort) : MultiThreadTcpServer(parent, msgListenPort, fileReceivePort, fileSendPort)
 {
 
 }

@@ -107,6 +107,18 @@ bool LineDAO::hasLineID(int lineid)
     return false;
 }
 
+QString LineDAO::getEndStationName(int lineid)
+{
+    QSqlQuery query;
+    query.exec(QString("SELECT s.station_name_std FROM railway_line l JOIN railway_station s ON s.station_id = l.end_station_id WHERE line_id = %1 "
+               ).arg(lineid));
+
+    while (query.next()) {
+        return query.value(0).toString();
+    }
+    return "";
+}
+
 int LineDAO::getLineTypeStd(int lineid)
 {
     QSqlQuery query;

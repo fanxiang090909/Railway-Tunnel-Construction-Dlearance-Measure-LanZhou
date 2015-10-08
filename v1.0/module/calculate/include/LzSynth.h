@@ -34,10 +34,11 @@ public:
      * @param initialTunnelheight_syn_name 输入隧道提高度结果文件名（含路径）
      * @param initialTunnelData 输入数据库中查出的该隧道模型, 包含有无左曲线、有曲线、直线及其曲线里程起止信息、 @see TunnelDataModel
      * @param initialCheckedTunnelModel 输入的校对后的隧道信息模型，包含对应的计划隧道信息，实际采集的“隧道”文件信息，可能不只一条（误触发多采集） @see CheckedTunnelTaskModel
+	 * @param leftrightvalid 0代表都有效，1代表左侧有效，2代表右侧有效，要配合newCarriageDirection来看左侧右侧
      * @return true 检查输出高度配置文件（output_heights.xml）是否加载
      */
     bool initSynthesis(string initialTunnelheight_syn_name, TunnelDataModel * initialTunnelData,
-                       CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection);
+                       CheckedTunnelTaskModel * initialCheckedTunnelModel, float framedistance, bool newCarriageDirection, long long startframeno = -1, long long endframeno = -1, int leftrightvalid = 0);
     /**
      * 综合函数
      * @param straightdata 返回值：直线段断面数据
@@ -66,6 +67,22 @@ private:
      * 车厢正反
      */
     bool carriageDireciton;
+
+	/**
+	 * 当前计算中使用的起始帧终止帧
+	 */
+	long long startframeno;
+	long long endframeno;
+
+	int leftrightvalid;
+
+
+
+	//@zengwang 2015年10月7号添加
+	//isAccord用来标记采集方向与出表方向是否一致，当isAccord为0时，表示一致，仅出左边数据，当isAccord为1时，表示不一致，出右边数据
+	int isAccord;
+
+
 
     /**
      * 帧间隔

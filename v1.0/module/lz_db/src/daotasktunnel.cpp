@@ -92,12 +92,12 @@ QStringListModel * TaskTunnelDAO::getTaskTunnelNames(_int64 taskid)
  * @param outputtunnelname 输出的隧道名，从数据库中找出
  * @param output 输出的采集时间，从数据库中找出
  */
-bool TaskTunnelDAO::getTaskTunnelInfo(_int64 newtasktunnelid, int &outputtunnelid, QString & outputtunnelname, QString & outputdate)
+bool TaskTunnelDAO::getTaskTunnelInfo(_int64 newtasktunnelid, int &outputtunnelid, QString & outputtunnelname, QString & outputdate, QString & outputlinename)
 {
     QSqlQuery query;
-    query.exec(QObject::tr("SELECT t.tunnel_name_std, DATE_FORMAT(t0.date,'%Y%m%d'), t.tunnel_id "
-                           "FROM task_tunnel tt JOIN tunnel t JOIN task t0 "
-                           "ON t.tunnel_id = tt.tunnel_id AND t0.task_id = tt.task_id "
+    query.exec(QObject::tr("SELECT t.tunnel_name_std, DATE_FORMAT(t0.date,'%Y%m%d'), t.tunnel_id, l.line_name_std  "
+                           "FROM task_tunnel tt JOIN tunnel t JOIN task t0 JOIN railway_line l "
+                           "ON t.tunnel_id = tt.tunnel_id AND t0.task_id = tt.task_id AND l.line_id = t.line_id "
                            "WHERE tt.task_tunnel_id = %1 ").arg(newtasktunnelid));
     QSqlQueryModel tmpmodel;
     tmpmodel.setQuery(query);
@@ -108,6 +108,7 @@ bool TaskTunnelDAO::getTaskTunnelInfo(_int64 newtasktunnelid, int &outputtunneli
         outputtunnelname = tmpmodel.record(0).value(0).toString();
         outputdate = tmpmodel.record(0).value(1).toString();
         outputtunnelid = tmpmodel.record(0).value(2).toInt();
+        outputlinename = tmpmodel.record(0).value(3).toString();
         return true;
     }
 }

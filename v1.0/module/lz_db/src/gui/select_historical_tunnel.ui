@@ -271,14 +271,14 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="multiPage">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QWidget" name="multipagewidget" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -346,6 +346,59 @@
               </item>
               <item>
                <widget class="QTableWidget" name="multiTunnelsTableWidget"/>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="font">
+                 <font>
+                  <family>微软雅黑</family>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>统计超限方式</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_OutImageType">
+                <property name="minimumSize">
+                 <size>
+                  <width>200</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>微软雅黑</family>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>内燃区段-基本建筑限界</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>电力区段-基本建筑限界</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>内燃区段-双层集装箱建筑限界</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>电力区段-双层集装箱建筑限界</string>
+                 </property>
+                </item>
+               </widget>
               </item>
              </layout>
             </item>

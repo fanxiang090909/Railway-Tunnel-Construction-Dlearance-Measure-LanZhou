@@ -15,6 +15,8 @@ Form::Form(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    copywidget = NULL;
+
     /*******************************/
 
     // 【注意】顺序：先有masterProgramInstance，才能连接信号槽
@@ -52,6 +54,19 @@ Form::Form(QWidget *parent) :
 
     editinglistmodel = new QStringListModel(this);
     ui->editingProjectListView->setModel(editinglistmodel);
+
+    // 测试按钮不可见
+    ui->pushButton->setVisible(false);
+    ui->pushButton_2->setVisible(false);
+    ui->pushButton_3->setVisible(false);
+    ui->pushButton_4->setVisible(false);
+    ui->pushButton_5->setVisible(false);
+    ui->pushButton_6->setVisible(false);
+    ui->pushButton_7->setVisible(false);
+
+    connect(ui->saveProjDataButton, SIGNAL(clicked()), this, SLOT(saveProjData()));
+    connect(ui->resetSlaveProgramButton, SIGNAL(clicked()), this, SLOT(resetSlaveProgram()));
+    connect(ui->terminateSlaveProgramButton, SIGNAL(clicked()), this, SLOT(terminateSlaveProgram()));
 }
 
 Form::~Form()
@@ -59,6 +74,9 @@ Form::~Form()
     delete ui;
     delete iplistmodel;
     delete editinglistmodel;
+
+    if (copywidget != NULL)
+        delete copywidget;
 }
 
 /**
@@ -263,4 +281,29 @@ void Form::createTrayIcon()
 void Form::on_iplistView_clicked(const QModelIndex &index)
 {
     toclientip = index.data().toString();
+}
+
+/**
+ * 存储工程数据
+ */
+void Form::saveProjData()
+{
+    if (copywidget != NULL)
+        delete copywidget;
+
+    copywidget = new CopyAvaliableTunnelWidget();
+    copywidget->show();
+}
+
+/**
+ * 重启从控程序
+ */
+void Form::resetSlaveProgram()
+{
+    ServerProgram::getServerProgramInstance()->resetSlaveProgram();
+}
+
+void Form::terminateSlaveProgram()
+{
+    ServerProgram::getServerProgramInstance()->terminateSlaveProgram();
 }

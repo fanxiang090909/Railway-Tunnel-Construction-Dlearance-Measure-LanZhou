@@ -22,6 +22,7 @@ class CalcuMasterWidget : public CalcuWidget
 
 public:
     explicit CalcuMasterWidget(QWidget *parent = 0);
+
     ~CalcuMasterWidget();
 
 protected slots:
@@ -39,6 +40,10 @@ protected slots:
     virtual void fuse_beginStartAll();
 
     virtual void fuse_beginStartOneTunnel(int tunnelid);
+
+   	virtual void extract_beginStartAll();
+
+    virtual void extract_beginStartOneTunnel(int tunnelid);
 };
 
 #endif // STATUS_CALCU_MASTER_WIDGET_H

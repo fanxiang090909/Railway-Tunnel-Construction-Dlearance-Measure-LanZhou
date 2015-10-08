@@ -110,11 +110,14 @@ MainWidget::MainWidget(bool newsinglewidgetapp, WorkingStatus initstatus, QWidge
         // Tab界面布局
         // ui->gridLayout_5是整个Window的最外层布局Layout。可从.ui文件中找出
         ui->gridLayout_5->addWidget(ui->page, 4, 0);
-        CollectWidget * collectWidget = new CollectWidget(ui->page);
+        CollectWidget * collectWidget = new CollectWidget(ui->page, MasterSetting::getSettingInstance()->getDefaultDistanceMode());
 
         QGridLayout *layout5 = new QGridLayout();
         layout5->addWidget(collectWidget);
         ui->page->setLayout(layout5);
+
+        // 得到帧间隔里程
+        connect(this, SIGNAL(sendproject_file_name(QString)), collectWidget,SLOT(getDistanceMode(QString)));
 
         // 界面信号槽
         connect(this, SIGNAL(changeCameraStatus(QString,HardwareStatus)), collectWidget, SLOT(changeCamera(QString, HardwareStatus)));

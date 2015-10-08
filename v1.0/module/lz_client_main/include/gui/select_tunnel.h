@@ -50,7 +50,7 @@ signals:
     void sendseqno(int);
     void sendstartnumber(int);
     void sendtunnelid(int);
-    void signalSelectedTunnelToEdit(int, QString, bool);
+    void signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long);
 
 private:
     Ui::SelectAvaliableTunnelWidget *ui;
@@ -97,8 +97,8 @@ public:
 
     void loadAvaliableLines();
 
-    void loadCheckedTaskTunnelData();
-    void updateCheckedTaskWidget();
+    bool loadCheckedTaskTunnelData();
+    bool updateCheckedTaskWidget();
 
 private slots:
     void refreshAvalibleLinesData();

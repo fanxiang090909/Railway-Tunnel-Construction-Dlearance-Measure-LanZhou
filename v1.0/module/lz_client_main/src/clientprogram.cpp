@@ -319,7 +319,9 @@ bool ClientProgram::initServerIP()
         isinitserverip = false;
         return false;
     }
-    client = new Client(tmpstr, false); //发送消息类的初始化
+
+    // @author 范翔 @date 20151003修改端口号配置
+    client = new Client(tmpstr, false, 9425, 7778, 8889); //发送消息类的初始化
     // @范翔
     connect(client, SIGNAL(transmitmsg(QString)), this, SLOT(parseMsg(QString)),Qt::DirectConnection);//这个函数主要用于传递从tcpsend得到的信号，在这里进行处理
     isinitserverip = true;

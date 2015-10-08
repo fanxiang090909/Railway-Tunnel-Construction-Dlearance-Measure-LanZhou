@@ -68,6 +68,8 @@ public :
      */
     bool hasLineID(int lineid);
 
+    QString getEndStationName(int lineid);
+
     int getLineTypeStd(int lineid);
 
     int getIsNewLineStd(int lineid);

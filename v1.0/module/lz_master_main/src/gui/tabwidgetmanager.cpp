@@ -43,7 +43,7 @@ TabWidgetManager::TabWidgetManager(QWidget *parent) :
     ui->gridLayout_2->addWidget(ui->page6, 1, 0);
     ui->gridLayout_2->addWidget(ui->page7, 1, 0);
 
-    PlanTaskWidget *widget1 = new PlanTaskWidget(ui->page1);
+    PlanTaskWidget *widget1 = new PlanTaskWidget(ui->page1, MasterSetting::getSettingInstance()->getDefaultDistanceMode());
     HardwareConfigWidget *widget2 = new HardwareConfigWidget(ui->page2);
     CreateProjectWidget *widget3 = new CreateProjectWidget(WorkingStatus::Preparing, ui->page3);
     QWidget *widget4 = new QWidget(ui->page4); // 空白Widget

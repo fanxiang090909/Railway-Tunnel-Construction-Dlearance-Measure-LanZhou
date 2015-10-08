@@ -117,7 +117,7 @@ bool XMLCheckedTaskFileLoader::loadFile(CheckedTaskList & list)
             isdownlink = true;
         TiXmlAttribute *my_tasklistattr13 =my_tasklistattr12->Next();
         temp =my_tasklistattr13->Value();
-        int pulsepermeter1 =atoi(temp);
+        double pulsepermeter1 =atof(temp);
         TiXmlAttribute *my_tasklistattr14 =my_tasklistattr13->Next();
         temp =my_tasklistattr14->Value();
         tmpint = atoi(temp);

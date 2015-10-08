@@ -15,13 +15,13 @@
  * @version 1.0.0
  * @date 2013-11-25
  */
-MultiThreadTcpServer::MultiThreadTcpServer(QObject *parent) : QObject(parent)
+MultiThreadTcpServer::MultiThreadTcpServer(QObject *parent, int msgListenPort, int fileReceivePort, int fileSendPort) : QObject(parent), listenPort(msgListenPort), fileReceivePort(fileReceivePort), fileSendPort(fileSendPort)
 {
     tcpServer = new QTcpServer(this);
 
     numOfThreads = 0;
 
-    if (!tcpServer->listen(QHostAddress::Any, 9424))
+    if (!tcpServer->listen(QHostAddress::Any, this->listenPort))
     {
         qDebug() << QObject::tr("Unable to start the msg server: %1.").arg(tcpServer->errorString());
         //return; //监听任何连上19999端口的ip
@@ -39,7 +39,7 @@ MultiThreadTcpServer::MultiThreadTcpServer(QObject *parent) : QObject(parent)
     connect(fileListSender, SIGNAL(end_transfer(QString, QString, int, int, int)), this, SLOT(fileend(QString, QString, int, int, int)));
 
     // 多文件接收类，多线程并行接收不同主机发来的文件
-    fileReceiverServer = new FileReceiverServer(7777);
+    fileReceiverServer = new FileReceiverServer(this->fileReceivePort);
     connect(fileReceiverServer, SIGNAL(error_openfile(QString, QString, int)), this, SLOT(fileopenError(QString, QString, int)));
     connect(fileReceiverServer, SIGNAL(current_progress(QString, QString, qint64, qint64, int)), this, SLOT(updateClientProgress(QString, QString, qint64, qint64, int)));
     connect(fileReceiverServer, SIGNAL(error_transfer(QString, QString, QString, int)), this, SLOT(fileError(QString, QString, QString, int)));
@@ -299,7 +299,7 @@ void MultiThreadTcpServer::sendFileToOneSlave(QString ipaddress, QString fileNam
     // 添加到发送文件队列
     FileToSend newtask;
     newtask.toip = ipaddress;
-    newtask.toport = 8888;
+    newtask.toport = fileSendPort;
     newtask.filename = fileName;
     bool ret = fileListSender->pushBack(newtask);
     if (ret)

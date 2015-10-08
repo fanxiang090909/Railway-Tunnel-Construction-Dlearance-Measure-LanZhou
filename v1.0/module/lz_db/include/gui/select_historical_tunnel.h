@@ -8,6 +8,8 @@
 #include <QMessageBox>
 #include <QModelIndex>
 
+#include "lz_working_enum.h"
+#include "drawimage.h"
 #include "daoline.h"
 #include "manage_line.h"
 #include "clearance_item.h"
@@ -119,6 +121,15 @@ private:
      */
     ClearanceMultiTunnels & multiTunnelsModel;
 
+    /**
+     * 输出限界图形时的底板限界
+     */
+    OutputClearanceImageType outImageType;
+    /**
+     * 统计超限桥隧数量 限界模板路径
+     */
+    QString templatepath;
+
 signals:
     /**
      * 界面切换信号，在界面切换到输出预览之前（即在本界面）已处理好输出信息（单隧道或多隧道综合结果的直线、左转曲线、右转曲线限界）
@@ -190,6 +201,11 @@ private slots:
      */
     void loadClearanceDataToOutput();
     void clearClearanceDataInfo();
+
+    /**
+     * 区段综合，限界选择
+     */
+    void selectOutputClearanceImageType(int);
 
     /**
      * 点击跳转页面后跳转到OutputWidget页面，同时传参数

@@ -2,8 +2,11 @@
 #define STATUS_COLLECT_WIDGET_H
 
 #include <QWidget>
+
 #include "status.h"
 #include "triggersetting.h"
+
+#include "projectmodel.h"
 
 namespace Ui {
     class CollectWidget;
@@ -21,11 +24,27 @@ class CollectWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit CollectWidget(QWidget *parent = 0);
+    explicit CollectWidget(QWidget *parent = 0, double defualtDistanceMode = 0.5103);
     ~CollectWidget();
 
 private:
     Ui::CollectWidget *ui;
+    
+    /**
+     * 设置具体模式小对话框
+     */
+    TriggerSettingWidget * settingwindow;
+
+    // 当前工程名及工程入口模型
+    // 【注意！】不采用MasterSetting中的ProjectModel的原因是怕在计算备份工程中MasterSetting中的值会改变
+    
+    QString project_filename;
+    ProjectModel currentProjectModel;
+    bool hasinintproject;
+
+    int currentDistanceModeType;
+    double currentDistanceMode;
+    double defaultDistanceMode;
 
 public slots:
     /**
@@ -52,6 +71,13 @@ public slots:
      * 关闭所有提示灯
      */
     void turnOffHardwares();
+
+    /**
+     * 得到计划任务配置的帧间隔里程
+     */
+    void getDistanceMode(QString projectfilename);
+
+    void setDistanceMode(int newCurrentDistanceModeType);
 
 private slots:
 

@@ -106,7 +106,7 @@ public:
      * @param outputtunnelname 输出的隧道名，从数据库中找出
      * @param output 输出的采集时间，从数据库中找出
      */
-    bool getTaskTunnelInfo(_int64 newtasktunnelid, int &outputtunnelid, QString & outputtunnelname, QString & outputdate);
+    bool getTaskTunnelInfo(_int64 newtasktunnelid, int &outputtunnelid, QString & outputtunnelname, QString & outputdate, QString & outputlinename);
 
     /**
      * 是否有该taskTunnelid对应的隧道任务数据库记录
