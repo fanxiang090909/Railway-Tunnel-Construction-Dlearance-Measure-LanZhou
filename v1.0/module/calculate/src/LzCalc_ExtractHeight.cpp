@@ -54,7 +54,7 @@ LzCalculate_ExtractHeight::~LzCalculate_ExtractHeight()
     Item.clear();
 }
 
-bool LzCalculate_ExtractHeight::init(list<int> initHeights, string initfusefile_no_RT, string initQmdat_file, string initRmdat_file, string initsyn_rectify_input_file, string initsyn_output_file)
+bool LzCalculate_ExtractHeight::init(list<int> initHeights, string initfusefile_no_RT, string initQmdat_file, string initRmdat_file, string initsyn_rectify_input_file, string initsyn_output_file, bool userectifyfactor, bool usesafetyfactor)
 {
     if (lzMatFuse)
     {
@@ -83,13 +83,16 @@ bool LzCalculate_ExtractHeight::init(list<int> initHeights, string initfusefile_
     this->fusefile_no_RT = initfusefile_no_RT;
     this->Qmdat_file = initQmdat_file;
     this->Rmdat_file = initRmdat_file;
+    this->userectifyfactor = userectifyfactor;
+    this->usesafetyfactor = usesafetyfactor;
+
     if (Qmdat_file.compare("") == 0 || Rmdat_file.compare("") == 0)
         hasinit_has_RTfile = false;
     else
         hasinit_has_RTfile = true;
 
     this->syn_rectify_input_file = initsyn_rectify_input_file;
-    if (syn_rectify_input_file.compare("") == 0)
+    if (syn_rectify_input_file.compare("") == 0 || !userectifyfactor)
         hasinit_syn_rectify_input_file = false;
     else
     {
@@ -201,6 +204,9 @@ bool LzCalculate_ExtractHeight::loadRectifyData(string filename)
  */
 void LzCalculate_ExtractHeight::rectifyHeight(SectionData & data, bool safetyfactor)
 {
+    if (!hasinit_syn_rectify_input_file || !userectifyfactor)
+        return;
+
     std::map<int,item>::iterator it = data.getMaps().begin();
     int tempkey;
     float leftVal;
@@ -528,7 +534,7 @@ int LzCalculate_ExtractHeight::run()
         // 【Step4】系数校正
         if (hasinit_syn_rectify_input_file)
         {
-            rectifyHeight(Data, false);
+            rectifyHeight(Data, usesafetyfactor);
         }
 
         extra_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！

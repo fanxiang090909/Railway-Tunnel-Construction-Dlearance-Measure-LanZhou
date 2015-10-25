@@ -47,6 +47,8 @@ public:
      */
     int validateUser(QString username, QString password);
 
+    QString getUserNameByID(int id);
+
     /**
      * 得到用户级别
      * @return <0 用户不存在，>= 用户级别

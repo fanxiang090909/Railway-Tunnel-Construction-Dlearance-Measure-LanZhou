@@ -36,13 +36,17 @@ public:
     /**
      * 设置计算模式选择
      */
-    void SelectBackupMode();
+    void SelectBackupMode(int backuptype);
 
 private slots:
 
     void on_startBackupButton_clicked();
 
     void on_stopBackupButton_clicked();
+
+    void on_startMasterBackupButton_clicked();
+
+    void on_stopMasterBackupButton_clicked();
 
 public slots:
 
@@ -94,6 +98,14 @@ public slots:
      * 加载计划任务中的隧道列表
      */
     void updateCheckedTunnelView();
+
+private slots:
+    /**
+     * 重置备份
+     */
+    void resetBackupConfigFile();
+
+    virtual void saveResetFile();
 
 private:
     Ui::BackupWidget *ui;

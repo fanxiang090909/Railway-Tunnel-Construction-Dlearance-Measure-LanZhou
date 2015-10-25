@@ -46,7 +46,7 @@ signals:
      * @param int 类型，0双目全部算，1双目按隧道算 2 fuse全部算，4 fuse按隧道算 
      * @param int tunnelid
      */
-    void startcalcu(int, int);
+    void startcalcu(int, int, bool, bool);
 
 };
 

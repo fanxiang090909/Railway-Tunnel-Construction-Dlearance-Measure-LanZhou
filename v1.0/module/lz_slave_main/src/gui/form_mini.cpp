@@ -45,6 +45,11 @@ FormMini::FormMini(SlaveMiniProgram * cv, QWidget *parent) :
     connect(ui->sendFileButton, SIGNAL(clicked()), this, SLOT(sendFileButton_clicked()));
 
     connect(ui->terminateSlaveButton, SIGNAL(clicked()), this, SLOT(terminateSlave()));
+
+    connect(ui->restartSlaveButton, SIGNAL(clicked()), this, SLOT(restartSlave()));
+
+    connect(ui->shutdownButton, SIGNAL(clicked()), this, SLOT(shutdownSlave()));
+
 }
 
 FormMini::~FormMini()
@@ -92,8 +97,8 @@ void FormMini::setIcon()
     QIcon icon = QIcon(style()->standardIcon(QStyle::SP_MessageBoxInformation));
     trayIcon->setIcon(icon);
     setWindowIcon(icon);
-    trayIcon->setToolTip(tr("铁路隧道建筑限界测量系统--从控机程序"));
-    setWindowTitle(tr("铁路隧道建筑限界测量系统--从控机程序"));
+    trayIcon->setToolTip(tr("铁路隧道建筑限界测量系统--从控控制小程序"));
+    setWindowTitle(tr("铁路隧道建筑限界测量系统--从控控制小程序"));
 }
 //! [3]
 
@@ -169,5 +174,15 @@ void FormMini::sendFileButton_clicked()
 
 void FormMini::terminateSlave()
 {
+    cvice->terminateSlave();
+}
+
+void FormMini::restartSlave()
+{
     cvice->restartSlaveProgram();
+}
+
+void FormMini::shutdownSlave()
+{
+    cvice->shutdown();
 }

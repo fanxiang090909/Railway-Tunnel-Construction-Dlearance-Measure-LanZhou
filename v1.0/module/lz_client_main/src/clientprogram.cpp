@@ -31,6 +31,7 @@ ClientProgram::ClientProgram(QObject *parent) : QObject(parent)
 {
     // 是否连接网络的服务器标志
     isinitconnect = false;
+    isinitserverip = false;
 }
 
 /**

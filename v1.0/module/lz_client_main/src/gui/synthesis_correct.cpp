@@ -38,8 +38,8 @@ SynthesisCorrectWidget::SynthesisCorrectWidget(QWidget *parent) :
     connect(widget_syn,SIGNAL(Sendparametertocorrect_clearance(int,double,int,int)),widget_cor,SLOT(getparameterfromtest(int,double,int,int)));
     
     // 传文件名
-    connect(this, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long)), widget_cor, SLOT(slotSelectedTunnelToEdit(int, QString, bool, bool, long long, long long)));
-    connect(this, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long)), widget_syn, SLOT(slotSelectedTunnelToSynthesis(int, QString, bool, bool, long long, long long)));
+    connect(this, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long)), widget_cor, SLOT(slotSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long)));
+    connect(this, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long)), widget_syn, SLOT(slotSelectedTunnelToSynthesis(int, QString, bool, bool, bool, double, long long, long long)));
 
     // scale同步
     connect(widget_syn, SIGNAL(sendspinBoxvalue(int)),widget_cor,SLOT(correctscale(int)));
@@ -113,12 +113,12 @@ void SynthesisCorrectWidget::sendFrameToChildWidget()
 }
 
 // 界面切换槽函数
-void SynthesisCorrectWidget::slotSelectedTunnelToSynthesis(int tunnelid, QString selectfile, bool carriagedirect, bool isNormal, long long startframeno, long long endframeno)
+void SynthesisCorrectWidget::slotSelectedTunnelToSynthesis(int tunnelid, QString selectfile, bool isDouble, bool carriagedirect, bool isNormal, double distanceMode, long long startframeno, long long endframeno)
 {
     QByteArray ba = selectfile.toLocal8Bit();
     filename = string(ba.constData());
     // 发送给隧道综合、图形修正两个界面
-    emit signalSelectedTunnelToEdit(tunnelid, selectfile, carriagedirect, isNormal, startframeno, endframeno);
+    emit signalSelectedTunnelToEdit(tunnelid, selectfile, isDouble, carriagedirect, isNormal, distanceMode, startframeno, endframeno);
 }
 
 // 界面切换槽函数

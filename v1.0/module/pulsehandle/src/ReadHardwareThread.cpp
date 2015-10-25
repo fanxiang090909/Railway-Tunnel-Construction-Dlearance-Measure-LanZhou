@@ -6,8 +6,14 @@ ReadHardwareThread::ReadHardwareThread()
 	stopped = false;
 	bitsForReading.resize(READ_BIT_COUNT);
 	//bitsForReading[1] = 1;   // default M1 = 1
-	pReadHardware = new ReadHardware(READ_PORT_NUM,READ_BIT_COUNT);
-
+	
+	try {
+		pReadHardware = new ReadHardware(READ_PORT_NUM,READ_BIT_COUNT);
+	} catch(std::exception)
+	{
+		pReadHardware = NULL;
+		qDebug() << "11";
+	}
     // 默认出洞
     last_status = CONFIRM_OUT_;
     last_status_time = QTime::currentTime();
@@ -80,10 +86,8 @@ void ReadHardwareThread::run()
 			checkInOrOutTunnle(bitsForReading[0], bitsForReading[1]);            
             //qDebug()<<"send, mode changed";
 		}
-		//else
-		//	emit sendChange( bitsForReading );     // for test ,need  delete 
-		
-		QThread::msleep(50);  
+				
+		QThread::msleep(10);  
 	}
 }
 
@@ -106,10 +110,14 @@ void ReadHardwareThread::stop()
  *       预进洞        出洞                    \_出洞
  *           \_________/
  *
+ *  输出三个信号：
+ *     1)  预进洞有效（即真正进洞）emit InTunnel(true);
+ *     2)  预进洞无效              emit InTunnel(false);
+ *     3)  出洞                    emit OutTunnel();
  */
 bool ReadHardwareThread::checkInOrOutTunnle(bool p0, bool p1)
 {
-    IN_OUT_Tunnle newstatus;
+    IN_OUT_Tunnel newstatus;
 
     // 如果时间太频繁，不改变状态
     // TODO
@@ -143,12 +151,17 @@ bool ReadHardwareThread::checkInOrOutTunnle(bool p0, bool p1)
     {
         emit InTunnel(false);
     }
-    else
+    else if (last_status == CONFIRM_OUT_ && newstatus == PRE_IN_)
     {
         last_status = newstatus;
+        return true;
+    }
+    else
+    {
+        emit sendReadException(tr("error status %1").arg(newstatus).toLocal8Bit().constData());
         return false;
     }
-        
+
     last_status = newstatus;
     return true;
 }

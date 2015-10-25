@@ -240,7 +240,7 @@ bool LzSlaveCalculate::startNewTwoViewCalc(QString cameragroupindex, int tunneli
 /**
  * 开始融合计算
  */
-bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc)
+bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath, QString railQRcalifile, QString heightsrectifyfile ,bool userectifyfactor, bool usesafetyfactor)
 {
     if (getNumOfCurrentThreads() >= maxnumofthreads)
     {
@@ -360,12 +360,17 @@ bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinte
         inputfilenames.push_back(tmpba.constData());
         tmpba = QString(filename + "_P.mdat").toLocal8Bit();
         inputfilenames.push_back(tmpba.constData());
+        tmpba = QString(filename + "_Q.mdat").toLocal8Bit();
+        inputfilenames.push_back(tmpba.constData());
+        tmpba = QString(filename + "_R.mdat").toLocal8Bit();
+        inputfilenames.push_back(tmpba.constData());
+
         // 车底计算出的 R矩阵文件和T矩阵文件
         tmpba = QString(filename + "_RT.mdat").toLocal8Bit();
         inputfilenames.push_back(tmpba.constData());
 
         // 初始化计算参数
-        athread->init(projectpath, inputfilenames, startnum, endnum, outputf.constData(), outputh.constData(), head, isinterrupt, interruptedfc);
+        athread->init(projectpath, inputfilenames, railQRcalifile.toLocal8Bit().constData(), heightsrectifyfile.toLocal8Bit().constData(), startnum, endnum, outputf.constData(), outputh.constData(), head, isinterrupt, interruptedfc, userectifyfactor, usesafetyfactor);
         // 信号槽，接收到计算结束信号
         QObject::connect(athread, SIGNAL(finish(int, int, int, QString, qint64)), this, SLOT(receiveThreadFinish(int, int, int, QString, qint64)));
         QObject::connect(athread, SIGNAL(statusShow(int, qint64, int, QString)), this, SLOT(receiveStatusShow(int, qint64, int, QString)));
@@ -379,7 +384,7 @@ bool LzSlaveCalculate::startFuseCalc(int tunnelid, QString filename, bool isinte
 /**
  * 开始提取高度+RT校正计算
  */
-bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath)
+bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath, QString railQRcalifile, QString heightsrectifyfile, bool userectifyfactor, bool usesafetyfactor)
 {
     LzCalculate_ExtractHeight calcExtractHeight;
 
@@ -389,14 +394,15 @@ bool LzSlaveCalculate::startExtractHeightCalc(int tunnelid, QString filename, bo
     QString mdat_Q = projectpath + "/mid_calcu/" + filename + ".mdat";
     QString mdat_R = projectpath + "/mid_calcu/" + filename + ".mdat";
 
-    QString syninput = parentpath + "/calcu_calibration/heights.rectify";
+    QString rectifyfile = projectpath + "/calcu_calibration/" + heightsrectifyfile;
+    QString QRcalibfie = projectpath + "/calcu_calibration/" + railQRcalifile;
     QString syndat = projectpath + "/syn_data/" + filename + ".syn";
     
     std::list<int> Item = OutputHeightsList::getOutputHeightsListInstance()->list();
 
     // 初始化计算参数
     calcExtractHeight.init(Item, fdat_nort.toLocal8Bit().constData(), mdat_Q.toLocal8Bit().constData(), mdat_R.toLocal8Bit().constData(),
-                                                    syninput.toLocal8Bit().constData(), syndat.toLocal8Bit().constData());
+                                                    rectifyfile.toLocal8Bit().constData(), syndat.toLocal8Bit().constData(), userectifyfactor, usesafetyfactor);
     
     // 计算
     int ret = calcExtractHeight.run();

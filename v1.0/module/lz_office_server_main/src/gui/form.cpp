@@ -67,6 +67,8 @@ Form::Form(QWidget *parent) :
     connect(ui->saveProjDataButton, SIGNAL(clicked()), this, SLOT(saveProjData()));
     connect(ui->resetSlaveProgramButton, SIGNAL(clicked()), this, SLOT(resetSlaveProgram()));
     connect(ui->terminateSlaveProgramButton, SIGNAL(clicked()), this, SLOT(terminateSlaveProgram()));
+    connect(ui->shutdownAllButton, SIGNAL(clicked()), this, SLOT(shotdownALlSlaves()));
+    connect(ui->updateSlaveExeFileButton, SIGNAL(clicked()), this, SLOT(updateSlaveExeFile()));
 }
 
 Form::~Form()
@@ -300,10 +302,58 @@ void Form::saveProjData()
  */
 void Form::resetSlaveProgram()
 {
-    ServerProgram::getServerProgramInstance()->resetSlaveProgram();
+    int result = QMessageBox::warning(this,tr("警告"), tr("【请慎重！！】重启所有从控程序，是否继续？"),
+        QMessageBox::Yes | QMessageBox::No);
+    if (result == QMessageBox::No)
+        return;
+    if (result == QMessageBox::Yes)
+        ServerProgram::getServerProgramInstance()->resetSlaveProgram();
 }
 
 void Form::terminateSlaveProgram()
 {
-    ServerProgram::getServerProgramInstance()->terminateSlaveProgram();
+    int result = QMessageBox::warning(this,tr("警告"), tr("【请慎重！！】关闭所有从控程序，确认所有从控的当前任务确定已经状态都已保存，是否继续？"),
+        QMessageBox::Yes | QMessageBox::No);
+    if (result == QMessageBox::No)
+        return;
+    if (result == QMessageBox::Yes)
+        ServerProgram::getServerProgramInstance()->terminateSlaveProgram();
+}
+
+void Form::shotdownALlSlaves()
+{
+    int result = QMessageBox::warning(this,tr("警告"), tr("【请慎重！！】关闭全部从控机，确认所有从控的当前任务确定已经状态都已保存，是否继续？"),
+        QMessageBox::Yes | QMessageBox::No);
+    if (result == QMessageBox::No)
+        return;
+    if (result == QMessageBox::Yes)
+        ServerProgram::getServerProgramInstance()->shutdownAllSlaves();
+}
+
+/**
+ * 从控程序更新
+ */
+void Form::updateSlaveExeFile()
+{
+    int ret = QMessageBox::warning(this, tr("提示"), tr("【请慎重！！】更新从控的lz_slave.exe Release版程序之前，请确认准备好Release版的lz_slave.exe程序，且目前所有从控程序都已关闭，确认则继续？"), QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::No)
+        return;
+
+    if (iplistmodel->rowCount() < 9)
+    {
+        int result = QMessageBox::warning(this, tr("提示"), tr("当前链接从控不够九台，是否继续？"), QMessageBox::Yes | QMessageBox::No);
+        if (result == QMessageBox::No)
+            return;
+    }
+
+    QString openFileDir = ServerSetting::getSettingInstance()->getParentPath();
+    QString filename = QFileDialog::getOpenFileName(this, tr("发送兰州从控lz_slave.exe程序文件，注意发送Release版"), openFileDir, "(*.exe)");
+    if (!filename.endsWith("lz_slave.exe"))
+    {
+        QMessageBox::warning(this, tr("提示"), tr("不是兰州从控程序，文件名应该是“lz_slave.exe”，请重新选择文件"));
+        return;
+    }
+
+    for (int j = 0; j < iplist.length(); j++)
+        ServerProgram::getServerProgramInstance()->getMultiThreadTcpServer()->sendFileToOneSlave(iplist.at(j), filename);
 }

@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/refresh.png</file>
+        <file>image/exit.png</file>
+        <file>image/refresh (2).png</file>
+        <file>image/search (2).png</file>
+        <file>image/search.png</file>
+        <file>image/lightblue.png</file>
+        <file>image/lightgreen.png</file>
+        <file>image/lightred.png</file>
+        <file>image/lightyellow.png</file>
+        <file>image/arrow.png</file>
+        <file>image/arrow2.png</file>
+        <file>image/tabbutton1.png</file>
+        <file>image/tabbutton1_up.png</file>
+        <file>image/tabbutton2.png</file>
+        <file>image/tabbutton2_up.png</file>
+        <file>image/Ok.ico</file>
+    </qresource>
+</RCC>

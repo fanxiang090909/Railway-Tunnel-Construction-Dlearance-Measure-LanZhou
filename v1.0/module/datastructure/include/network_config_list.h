@@ -72,6 +72,11 @@ public:
      */
     string getCalibrationFile();
 
+	//@zengwang 2015年10月13日
+	//根据相机号寻找对应的Nas的IP地址
+	QString findNASIPByCamID(QString tmpcamid);
+
+
     void setMasterIP(QString newip)
     {
         this->master_ip = newip;

@@ -60,7 +60,9 @@ private slots:
 
     void sendFileButton_clicked();
     void terminateSlave();
+    void restartSlave();
 
+    void shutdownSlave();
 private:
     Ui::FormMini *ui;
     SlaveMiniProgram * cvice;

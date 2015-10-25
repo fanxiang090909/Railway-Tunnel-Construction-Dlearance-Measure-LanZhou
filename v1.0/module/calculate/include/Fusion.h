@@ -17,6 +17,7 @@
 #include <vector>
 #include <math.h>
 #include "LzSerialStorageMat.h"
+#include "LzSerialStorageRT.h"
 #include "LzSerialStorageSynthesis.h"
 
 #include <QObject>
@@ -51,7 +52,9 @@ public:
 
 	void init(vector<string> load_file);                 //初始化文件载入文件名向量
 	void get_vector();                                   //将17组从机文件放入同一向量vector中
+    void Comput_RT(double Q_a, double Q_b, double R_a, double R_b);
 	void rectify_RT();                                   //对三维点向量进行RT矫正
+    void loadcalib(string path);
 
     /**
      * 融合计算主函数
@@ -66,12 +69,8 @@ public:
      *         2 从A到P相机没有任何数据（一组都没有）。
      *         3 计算结果文件打开不成功（针对暂停计算后继续计算的情况）
      */
-    int fuse(list<int> Item, string out_file, string out_extrac_high, bool isinterruptfile, __int64 start_num, __int64 frame_cunt);
+    int fuse(list<int> Item, string out_file, string out_extrac_high, bool isinterruptfile, __int64 start_num, __int64 frame_cunt, string QRrailcalibfile, string rectifyfile, bool userectifyfactor, bool usesaftyfactor);
 
-    /**
-     * @return 0 正常计算结束，1 高度未初始化
-     */
-    int extrac_height(list<int> Item, LzSerialStorageSynthesis* extrac_high, __int64 frame_num, double mile_count);
 	void init_test();
     LzSerialStorageMat* get_mat(int);                   
     string open_file(int);  
@@ -79,6 +78,7 @@ public:
     bool& get_valid(int);                                //返回文件有效性
     void get_vector(Mat&, int cameragroupid, bool carriagedirection);
     bool & get_point_valid(int);
+
 
 private:
     // @author 范翔，是否终止计算
@@ -89,30 +89,34 @@ private:
 	string A_file,B_file,C_file,D_file;                  //17组从机文件的开启
 	string E_file,F_file,G_file,H_file;
 	string I_file,J_file,K_file,L_file;
-	string M_file,N_file,O_file,P_file;
+	string M_file,N_file,O_file,P_file,Q_file,R_file;
 	string RT_file,out_file;
 	Mat point_A,point_B,point_C,point_D;
 	Mat point_E,point_F,point_G,point_H;
 	Mat point_I,point_J,point_K,point_L;
-	Mat point_M,point_N,point_O,point_P;
+	Mat point_M,point_N,point_O,point_P,point_Q,point_R;
     bool valid_point_A, valid_point_B, valid_point_C, valid_point_D;
     bool valid_point_E, valid_point_F, valid_point_G, valid_point_H;
     bool valid_point_I, valid_point_J, valid_point_K, valid_point_L;
     bool valid_point_M, valid_point_N, valid_point_O, valid_point_P;
+    bool valid_point_Q,valid_point_R;
     LzSerialStorageMat *lzMat_A,*lzMat_B,*lzMat_C,*lzMat_D;
     LzSerialStorageMat *lzMat_E,*lzMat_F,*lzMat_G,*lzMat_H;
     LzSerialStorageMat *lzMat_I,*lzMat_J,*lzMat_K,*lzMat_L;
     LzSerialStorageMat *lzMat_M,*lzMat_N,*lzMat_O,*lzMat_P;
     LzSerialStorageMat *lzMat_RT,*lzMat_Out;
+    LzSerialStorageRT *lzMat_Q,*lzMat_R;
     LzSerialStorageSynthesis* extra_high;
     bool valid_A,valid_B,valid_C,valid_D,valid_E,valid_F;
     bool valid_G,valid_H,valid_I,valid_J,valid_K,valid_L;
-    bool valid_M,valid_N,valid_O,valid_P,valid_RT;
+    bool valid_M,valid_N,valid_O,valid_P,valid_Q,valid_R,valid_RT;
 	Mat RT_point,out_pnts,out_pnts_H;     //out_pnts记录三维点矩阵，out_pnts_H记录提取高度后的三维点矩阵
     bool valid_RT_point;
 	Vector<Point3d> fus_vector;                          //用于记录融合后的三维点
+    Point2d  std_Q,std_R;                                //定义钢轨标准点
+    double rail_dist;                                    //定义钢轨间距
 	int start_num,cunt_num;                              //用于定义融合的起始帧号及总共融合的帧数
-
+    FileStorage fs;                                      //用于加载标定文件（车底QR标定点）
 };
 
 #endif // FUSECALCULTAION_H

@@ -33,30 +33,30 @@ void CalcuStatusNoSlaveWidget::on_stopFuseButton_clicked()
 
 void CalcuStatusNoSlaveWidget::calculate_beginStartAll()
 {
-    emit startcalcu(0, 0);
+    emit startcalcu(0, 0, false, false);
 }
 
 void  CalcuStatusNoSlaveWidget::calculate_beginStartOneTunnel(int tunnelid)
 {
-    emit startcalcu(1, tunnelid);
+    emit startcalcu(1, tunnelid, false, false);
 }
 
 void CalcuStatusNoSlaveWidget::fuse_beginStartAll()
 {
-    emit startcalcu(2, 0);
+    emit startcalcu(2, 0, useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuStatusNoSlaveWidget::fuse_beginStartOneTunnel(int tunnelid)
 {
-    emit startcalcu(3, tunnelid);
+    emit startcalcu(3, tunnelid, useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuStatusNoSlaveWidget::extract_beginStartAll()
 {
-	emit startcalcu(4, 0);
+	emit startcalcu(4, 0, useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuStatusNoSlaveWidget::extract_beginStartOneTunnel(int tunnelid)
 {
-	emit startcalcu(5, tunnelid);
+	emit startcalcu(5, tunnelid, useerrrectifyfactor, usesavetyfactor);
 }

@@ -167,8 +167,8 @@ public slots:
      */
     void calculate_beginStartAll();
     void calculate_beginStartOneTunnel(int tunnelid);
-    void calculate_Fuse_beginOneTunnel(int tunnelid);
-    void calculate_ExtractHeight_beginOneTunnel(int tunnelid);
+    void calculate_Fuse_beginOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor);
+    void calculate_ExtractHeight_beginOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor);
     void calculate_StartOneFile(int slaveid, QString cameragroupindex, QString filename, int tunnelid, bool isinterrupted, qint64 interruptfc);
 
     /**
@@ -182,7 +182,7 @@ public slots:
      * 开始融合计算和提高度计算
      * 前提是在双目及车底RT计算的中间结果文件全部返回之后
      */
-    void calculate_Fuse_beginAll();
+    void calculate_Fuse_beginAll(bool useerrorrectifyfactor, bool usesafetyfactor);
     /**
      * 暂停融合
      */
@@ -248,7 +248,7 @@ private slots:
      * @param int 类型，0双目全部算，1双目按隧道算 2 fuse全部算，4 fuse按隧道算 
      * @param int tunnelid
      */
-    void startcalcu2(int, int);
+    void startcalcu2(int, int, bool, bool);
     /////////////////////
 
     // 关闭所有提示灯

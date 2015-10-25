@@ -133,3 +133,23 @@ void NetworkConfigList::showList()
     for (int i = 0; i < slaveList->length(); i++)
         qDebug() << slaveList->at(i).getHostAddress().c_str();
 }
+
+
+//@zengwang 2015年10月13日
+QString NetworkConfigList::findNASIPByCamID(QString tmpcamid)
+{
+	 if (slaveList->length() == 0)
+    {
+        qDebug() << tr("网络配置文件未加载");
+        return "";
+    }
+
+    for (int i = 0; i < slaveList->length(); i++)
+		if (QString(slaveList->at(i).box1.boxindex).compare(tmpcamid) == 0
+			|| QString(slaveList->at(i).box2.boxindex).compare(tmpcamid) == 0)
+		 {
+				//qDebug() << "find!" << cameraindex;
+				return QString(slaveList->at(i).getBackupNasIP().c_str());
+		 }
+    return "";
+}

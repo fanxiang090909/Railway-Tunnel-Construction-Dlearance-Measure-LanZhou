@@ -78,9 +78,9 @@ private:
 
 
 
-	//@zengwang 2015年10月7号添加
-	//isAccord用来标记采集方向与出表方向是否一致，当isAccord为0时，表示一致，仅出左边数据，当isAccord为1时，表示不一致，出右边数据
-	int isAccord;
+	//@zengwang 2015年10月9号添加
+	//是否正常行驶
+	bool isNormalTravel;
 
 
 

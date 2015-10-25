@@ -38,6 +38,7 @@ OfficeServerThread::~OfficeServerThread()
 
 void OfficeServerThread::initTcpSocket()
 {
+    connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(emitdisconnect()));
     connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readMessageFromSlave()), Qt::DirectConnection);
     connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
                 this, SLOT(displayErrorFromSlave(QAbstractSocket::SocketError)), Qt::DirectConnection);

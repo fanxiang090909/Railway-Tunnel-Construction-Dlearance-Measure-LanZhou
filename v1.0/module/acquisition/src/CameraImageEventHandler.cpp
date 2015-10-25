@@ -5,7 +5,7 @@ namespace Pylon{
 
 	void ImageEventHandler::OnImageGrabbed( CBaslerGigEInstantCamera& camera, const CBaslerGigEGrabResultPtr& ptrGrabResult )
 	{
-
+         
 		boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(mutex);
 
 		if (ptrGrabResult.IsValid())
@@ -25,7 +25,7 @@ namespace Pylon{
 				//当未进入预进洞无效状态或采集状态时，休眠
 				while ( !discarding && !acquisiting )
 				{
-					boost::this_thread::sleep_for( boost::chrono::milliseconds(200) );
+					boost::this_thread::sleep_for( boost::chrono::milliseconds(10) );
 				}
 
 
@@ -64,15 +64,16 @@ namespace Pylon{
 					blockinfo.isvalid  = true;
 
 					///////////////add at 11/22 2014
-					if ( currentframe % SAMPLE_RATE )
+					if ( currentframe % SAMPLE_RATE == 0)
 					{
 						boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(mutex_sample);
 
 						if (ptrGrabResult->GetImageSize() == FRAME_SIZE)
 						{
-						memcpy(readtemp.data, (unsigned char*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetImageSize());
-						remap(readtemp, sampleImg, rotax, rotay, CV_INTER_LINEAR);
+						    memcpy(readtemp.data, (unsigned char*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetImageSize());
+						    remap(readtemp, sampleImg, rotax, rotay, CV_INTER_LINEAR);
 						}
+                        sample_frame = currentframe;
 					}
 					///////////////add at 11/22 2014
 					

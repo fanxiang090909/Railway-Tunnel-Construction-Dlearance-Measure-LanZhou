@@ -81,47 +81,13 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
          <string>限界表格预览</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>桥隧名称</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="tunnelname"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>中心里程km</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="centerMile"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>桥隧长度</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="tunnellength"/>
-           </item>
-          </layout>
-         </item>
          <item>
           <widget class="QTableWidget" name="tableWidget">
            <property name="minimumSize">
@@ -155,7 +121,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lowestVal"/>
+            <widget class="QLineEdit" name="lineEdit_minHeight"/>
            </item>
            <item>
             <spacer name="horizontalSpacer">
@@ -170,7 +136,39 @@
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QPushButton" name="modifyButton">
+             <property name="text">
+              <string>编辑</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../../lz_client_main/resource/icons.qrc">
+               <normaloff>:/image/modify.png</normaloff>:/image/modify.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="saveButton">
+             <property name="text">
+              <string>保存</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../../lz_client_main/resource/icons.qrc">
+               <normaloff>:/image/filesave.png</normaloff>:/image/filesave.png</iconset>
+             </property>
+            </widget>
+           </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="statusArea">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -334,7 +332,7 @@
        <item row="1" column="0" colspan="2">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QGridLayout" name="gridLayout">

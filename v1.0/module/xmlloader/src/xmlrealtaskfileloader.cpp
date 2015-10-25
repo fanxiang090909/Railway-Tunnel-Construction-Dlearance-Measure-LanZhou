@@ -49,8 +49,8 @@ bool XMLRealTaskFileLoader::saveFile(RealTaskList & list)
         taskElement->SetAttribute("collect_time", tmp.datetime.c_str());
         taskElement->SetAttribute("is_valid", tmp.isvalid);
 
-        taskElement->SetAttribute("start_mile", tmp.start_mile);
-        taskElement->SetAttribute("end_mile", tmp.end_mile);
+        taskElement->SetDoubleAttribute("start_mile", tmp.start_mile);
+        taskElement->SetDoubleAttribute("end_mile", tmp.end_mile);
         taskElement->SetAttribute("start_frame_master", tmp.start_frame_master);
         taskElement->SetAttribute("end_frame_master", tmp.end_frame_master);
 

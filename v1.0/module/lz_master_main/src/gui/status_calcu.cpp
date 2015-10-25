@@ -30,12 +30,20 @@ CalcuWidget::CalcuWidget(QWidget *parent) :
     // 初始时未导入工程
     hasinintproject = false;
 
+    usesavetyfactor = false;
+    useerrrectifyfactor = false;
+    ui->safetycheckBox->setVisible(useerrrectifyfactor);
+
     setOptButtonEnable(false);
 	
 	// 范翔定义新按钮，从融合fuse结果计算syn提取高度结果
 	ui->startExtractHeightButton->setVisible(false);
 
     QObject::connect(ui->resetButton, SIGNAL(clicked()), this, SLOT(resetCalcuConfigFile()));
+    QObject::connect(ui->errorCheckBox, SIGNAL(toggled(bool)), this, SLOT(errToggled(bool)));
+    QObject::connect(ui->safetycheckBox, SIGNAL(toggled(bool)), this, SLOT(safetyToggled(bool)));
+    ui->errorCheckBox->setChecked(true);
+    ui->safetycheckBox->setChecked(false);
 }
 
 CalcuWidget::~CalcuWidget()
@@ -43,18 +51,30 @@ CalcuWidget::~CalcuWidget()
     delete ui;
 }
 
+void CalcuWidget::safetyToggled(bool ischeck)
+{
+    usesavetyfactor = ischeck;
+}
+
+void CalcuWidget::errToggled(bool ischeck)
+{
+    useerrrectifyfactor = ischeck;
+    ui->safetycheckBox->setVisible(useerrrectifyfactor);
+}
+
 void CalcuWidget::saveResetFile()
 {
+    QString path = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Calculate);
+    QString filename = path + "/" + currentProjectModel.getCheckedFilename();
 
-    QMessageBox msgBox;
-    msgBox.setText(tr("提示"));
-    msgBox.setInformativeText(tr("我还没写好，敬请期待！"));
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    int ret = msgBox.exec();
+    qDebug() << filename;
+    XMLCheckedTaskFileLoader * checktask = new XMLCheckedTaskFileLoader(tr(filename.toLocal8Bit().data()));
+    bool ret = checktask->saveFile(LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate));//生成listtask
+    delete checktask;
+}
 
-    // void CheckTaskWidget::resetCheckedFile()
-    /*
-
+void CalcuWidget::resetCalcuConfigFile()
+{
     QMessageBox msgBox;
     msgBox.setText(tr("警告！！"));
     msgBox.setInformativeText(tr("【注意！】您要确定重新校正文件%1？一旦重置，原计算的结果文件均不能对应，请【谨慎操作】！是否继续？").arg(currentProjectModel.getCheckedFilename()));
@@ -62,18 +82,17 @@ void CalcuWidget::saveResetFile()
     int ret = msgBox.exec();
     switch (ret)
     {
-    case QMessageBox::No:
-        return;
-    default:break;
-    }*/
-}
+        case QMessageBox::No:
+            return;
+        default:break;
+    }
 
-void CalcuWidget::resetCalcuConfigFile()
-{
     LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).resetCalcuPos();
 
     // 重新覆盖原文件
     saveResetFile();
+
+    updateCheckedTunnelView();
 }
 
 void CalcuWidget::on_startCalcuButton_clicked()
@@ -369,14 +388,7 @@ void CalcuWidget::updateCheckedTaskWidget()
         QMessageBox::information(this,tr("导入工程错误"),tr("该工程下实际采集文件还未校正%1。").arg(filename),QMessageBox::Yes|QMessageBox::No);
         return;
     }
-    XMLRealTaskFileLoader * realtask = new XMLRealTaskFileLoader(tr(realFile.toLocal8Bit().data()));
-    ret = realtask->loadFile(LzProjectAccess::getLzProjectAccessInstance()->getLzRealList(LzProjectClass::Calculate));//生成listtunnelcheck
-    delete realtask;
-    if (realFile.compare("") == 0 || ret == false)
-    {
-        QMessageBox::information(this,tr("导入工程错误"),tr("该工程下实际采集文件还未生成%1。").arg(realFile),QMessageBox::Yes|QMessageBox::No);
-        return;
-    }
+
     // 加载校正任务记录到widget中
     QList<CheckedTunnelTaskModel>::iterator checkedTaskIterator = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).begin();
     while (checkedTaskIterator != LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).end())
@@ -456,7 +468,6 @@ void CalcuWidget::updateCheckedTaskWidget()
 
     ui->actualTasksWidget->resizeColumnsToContents();
     ui->actualTasksWidget->horizontalHeader()->setStretchLastSection(true);
-
 }
 
 void CalcuWidget::setOptButtonEnable(bool initstatus)

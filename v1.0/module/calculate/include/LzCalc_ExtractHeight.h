@@ -29,7 +29,7 @@ public:
      * @param syn_rectify_input_file 校正文件
      * @param syn_output_file 输出的提高度文件名
      */
-    bool init(list<int> initHeights, string fusefile_no_RT, string Qmdat_file, string Rmdat_file, string syn_rectify_input_file, string syn_output_file);
+    bool init(list<int> initHeights, string fusefile_no_RT, string Qmdat_file, string Rmdat_file, string syn_rectify_input_file, string syn_output_file, bool userectifyfactor, bool usesafetyfactor);
 
     int run();
 
@@ -52,6 +52,16 @@ public:
      */
     void rectifyHeight(SectionData & data, bool safetyfactor);
 
+    /**
+     * 对三维点向量进行RT矫正
+     */
+    void rectify_RT();
+
+    /**
+     * 提取高度
+     */
+    int extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height);
+
 signals:
     // @author 范翔改 继承自QObject 可以通过消息槽反馈计算进度
     /**
@@ -63,16 +73,6 @@ signals:
 
 private:
 
-    /**
-     * 对三维点向量进行RT矫正
-     */
-    void rectify_RT();
-
-    /**
-     * 提取高度
-     */
-    int extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height);
-    
     // 初始化参数
     bool hasinit_can_calc;
 
@@ -89,6 +89,9 @@ private:
     string syn_rectify_input_file;
     
     string syn_output_file;
+
+    bool usesafetyfactor;
+    bool userectifyfactor;
 
     // 文件操作类
     // 隧道_日期.fdat

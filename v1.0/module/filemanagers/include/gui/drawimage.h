@@ -7,7 +7,7 @@
 
 #include "multiframecorrect.h"
 #include "clearance_item.h"
-#include "lz_output.h"
+#include "lz_output_enum.h"
 
 #include <opencv2\opencv.hpp>
 #include <opencv\highgui.h>
@@ -519,6 +519,7 @@ public:
      */
     vector<QPointF *>pointsFuseResult;
     bool hasinitfuse;
+    bool isfuse;
     vector<int> fuse_count;
     vector<int> fuse_points_cameragroup;
 

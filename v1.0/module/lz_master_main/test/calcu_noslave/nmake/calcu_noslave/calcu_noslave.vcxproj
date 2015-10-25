@@ -396,6 +396,7 @@
     <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageBase.h" />
     <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageFuse.h" />
     <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageMat.h" />
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageRT.h" />
     <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageSynthesis.h" />
     <ClInclude Include="..\..\..\..\..\lz_exception\include\LzException.h" />
     <CustomBuild Include="..\..\..\..\..\lz_slave_main\include\lz_calc_queue.h">

@@ -46,9 +46,9 @@ bool XMLCheckedTaskFileLoader::loadFile(CheckedTaskList & list)
         mutex.unlock();
         return false;
     }
-    TiXmlElement *my_root =my_tunnelcheck->RootElement();
+    TiXmlElement *my_root = my_tunnelcheck->RootElement();
     // qDebug()<<my_root->Value();
-    TiXmlElement *my_tasklist =my_root->FirstChildElement();
+    TiXmlElement *my_tasklist = my_root->FirstChildElement();
     // qDebug()<<my_tasklist->Value();
     CheckedTunnelTaskModel *checkedTask;
     CheckedItem *tempitem;
@@ -661,7 +661,7 @@ bool XMLCheckedTaskFileLoader::saveFile(CheckedTaskList & list)
         my_taskzi1->SetAttribute("line_type",task.linetype);
         my_taskzi1->SetAttribute("is_double_line",task.doubleline);
         my_taskzi1->SetAttribute("is_downlink",task.downstream);
-        my_taskzi1->SetAttribute("interval_pluse_num",task.pulsepermeter);
+        my_taskzi1->SetDoubleAttribute("interval_pluse_num",task.pulsepermeter);
         my_taskzi1->SetAttribute("is_normal",task.isnormal);
         my_taskzi1->SetAttribute("date",task.datetime.c_str());
 
@@ -685,8 +685,8 @@ bool XMLCheckedTaskFileLoader::saveFile(CheckedTaskList & list)
             my_realfile2->SetAttribute("is_valid", it->isvalid);
 
             // 主控记录的起止帧号
-            my_realfile2->SetAttribute("start_mile", it->start_mile);
-            my_realfile2->SetAttribute("end_mile", it->end_mile);
+            my_realfile2->SetDoubleAttribute("start_mile", it->start_mile);
+            my_realfile2->SetDoubleAttribute("end_mile", it->end_mile);
             my_realfile2->SetAttribute("start_frame_master", it->start_frame_master);
             my_realfile2->SetAttribute("end_frame_master", it->end_frame_master);
 

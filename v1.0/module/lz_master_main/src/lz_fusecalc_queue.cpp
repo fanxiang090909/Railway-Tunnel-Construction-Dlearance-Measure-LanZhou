@@ -83,9 +83,9 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
     {
         switch (msgid)
         {
-            case -30: // 开始融合计算-30,"tunnelid","filename","hascalcu","calcuinterruptfc"
+            case -30: // 开始融合计算-30,"tunnelid","filename","hascalcu","calcuinterruptfc","QRcalibfile","rectifyheightfile"
             {
-                if (strList.length() < 5)
+                if (strList.length() < 8)
                 {
                     qDebug() << tr("解析字符出错") << msg;
                     return false;
@@ -94,11 +94,25 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
                 QString filename = strList.at(2);
                 int hascalcubackup = strList.at(3).toInt();
                 qint64 calinterruptfc = strList.at(4).toLongLong();
+                QString parentpath = strList.at(5);
+                int userectifyfactorint = strList.at(6).toInt();
+                int usesafetyfactorint = strList.at(7).toInt();
+                QString QRcalibfile = strList.at(8);
+                QString rectifyheightfile = strList.at(9);            
+    
+                qDebug() << QRcalibfile << rectifyheightfile;
+
                 bool hasinterrupted = false;
                 if (hascalcubackup == 1)
                     hasinterrupted = true;
+                bool userectifyfactor = false;
+                if (userectifyfactorint == 1)
+                    userectifyfactor = true;
+                bool usesafetyfactor = false;
+                if (usesafetyfactorint == 1)
+                    usesafetyfactor = true;
                 if (checkHasFreeThread())
-                    lzcalc->startFuseCalc(tunnelid, filename, hasinterrupted, calinterruptfc);
+                    lzcalc->startFuseCalc(tunnelid, filename, hasinterrupted, calinterruptfc, parentpath, QRcalibfile, rectifyheightfile, userectifyfactor, usesafetyfactor);
                 else
                     return false;
 
@@ -113,7 +127,7 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
             }
             case -32: // 开始提高度计算-32,"tunnelid","filename","hascalcu","calcuinterruptfc","parentpath"
             {
-                if (strList.length() < 6)
+                if (strList.length() < 8)
                 {
                     qDebug() << tr("解析字符出错") << msg;
                     return false;
@@ -123,11 +137,25 @@ bool LzFuseCalcQueue::parseMsg(QString msg)
                 int hascalcubackup = strList.at(3).toInt();
                 qint64 calinterruptfc = strList.at(4).toLongLong();
                 QString parentpath = strList.at(5);
+                int userectifyfactorint = strList.at(6).toInt();
+                int usesafetyfactorint = strList.at(7).toInt();
+                QString QRcalibfile = strList.at(8);
+                QString rectifyheightfile = strList.at(9);    
+
+                qDebug() << QRcalibfile << rectifyheightfile;
+
                 bool hasinterrupted = false;
                 if (hascalcubackup == 1)
                     hasinterrupted = true;
+                bool userectifyfactor = false;
+                if (userectifyfactorint == 1)
+                    userectifyfactor = true;
+                bool usesafetyfactor = false;
+                if (usesafetyfactorint == 1)
+                    usesafetyfactor = true;
+
                 if (checkHasFreeThread())
-                    lzcalc->startExtractHeightCalc(tunnelid, filename, hasinterrupted, calinterruptfc, parentpath);
+                    lzcalc->startExtractHeightCalc(tunnelid, filename, hasinterrupted, calinterruptfc, parentpath, QRcalibfile, rectifyheightfile, userectifyfactor, usesafetyfactor);
                 else
                     return false;
 

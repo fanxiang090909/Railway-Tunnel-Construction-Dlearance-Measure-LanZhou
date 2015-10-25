@@ -89,7 +89,7 @@ TabWidgetManager::TabWidgetManager(QWidget *parent) :
     // 界面间通信信号槽
     connect(widget7, SIGNAL(updateOutput(SingleOrMultiSelectionMode, CurveType)), widget8, SLOT(updateClearanceTableModel(SingleOrMultiSelectionMode, CurveType)));
     connect(widget2, SIGNAL(signalBridgeToEdit(int, QString)), widget3, SLOT(slotBridgeToEdit(int, QString)));
-    connect(widget4, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long)), widget56, SLOT(slotSelectedTunnelToSynthesis(int, QString, bool, bool, long long, long long)));
+    connect(widget4, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long)), widget56, SLOT(slotSelectedTunnelToSynthesis(int, QString, bool, bool, bool, double, long long, long long)));
 	// 关闭窗口信号槽，告知数据库可能需要备份
     connect(this, SIGNAL(my_close()), widgetbackupdb, SLOT(checkIfExport()));
 
@@ -98,7 +98,7 @@ TabWidgetManager::TabWidgetManager(QWidget *parent) :
     connect(widget2, SIGNAL(signalBridgeToEdit(int, QString)), this, SLOT(button2Clicked()));
     connect(widget8, SIGNAL(backToSelectionSignal()), this, SLOT(button7Clicked()));
     connect(widget3, SIGNAL(signalEndEdit()), this, SLOT(button1Clicked()));
-    connect(widget4, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long)), this, SLOT(button5Clicked()));
+    connect(widget4, SIGNAL(signalSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long)), this, SLOT(button5Clicked()));
     connect(widget56, SIGNAL(toTabCorrect()), this, SLOT(button6Clicked()));
     connect(widget56, SIGNAL(toTabSynthesis()), this, SLOT(button5Clicked()));
     connect(widget56, SIGNAL(finish()), this, SLOT(button4Clicked()));

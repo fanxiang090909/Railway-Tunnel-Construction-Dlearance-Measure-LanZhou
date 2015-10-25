@@ -40,7 +40,7 @@ ClientSetting::ClientSetting(QObject *parent) :
     serverAddress = "";
     dbserverAddress = "";
     parentpath = "./";
-    currentUser = "fanxiang";    ///TODO
+    currentUser = QObject::tr("西工大调试人员"); 
     currentEditingProject = "";
     currentEditingTunnel = "";
 

@@ -23,9 +23,9 @@
 #include <Tlhelp32.h>  
 #include <vector>  
 
-void TerminateProcessByName(PCWSTR name);
+void TerminateProcessByName(const wchar_t * name);
 
-void TerminateProcessByName(PCWSTR name)  
+void TerminateProcessByName(const wchar_t * name)  
 {  
     DWORD pid = 0;  
       
@@ -76,13 +76,15 @@ using namespace std;
  * @version 1.0.0
  * @date 20151003
  */
-SlaveMiniProgram::SlaveMiniProgram(QObject *parent)
+//SlaveMiniProgram::SlaveMiniProgram(QObject *parent) : QObject(parent)
+SlaveMiniProgram::SlaveMiniProgram(QString initslaveexepath, QString initslavestartupbatpath, QObject *parent) : QObject(parent) 
 {
     //issuspend_cal.store(false);
     //qDebug() << tr("构造");
 	firstInitNetwork = true;
 
-    slaveexepath = "D:\\project\\GitHub\\Railway-Tunnel-Construction-Dlearance-Measure-LanZhou\\release\\v1.0\\Debug\\lanzhouclient2013.exe";
+    slaveexepath = initslaveexepath;  
+    slavestartupbatpath = initslavestartupbatpath;
 }
 
 SlaveMiniProgram::~SlaveMiniProgram()
@@ -114,8 +116,10 @@ bool SlaveMiniProgram::networkConnectInit()
     }
 
     // @author 范翔 @date 20151003
-    client = new Client(tmpstr, false, 9425, 7778, 8889); //发送消息类的初始化
-    client->setCurrentSavingPath(SlaveMiniSetting::getSettingInstance()->getParentPath());
+    client = new Client(tmpstr, true, 9425, 7778, 8889); //发送消息类的初始化
+    QFileInfo fileinfo(slaveexepath);
+    qDebug() << "path:\t" << fileinfo.path();
+    client->setCurrentSavingPath(fileinfo.path()); // EXE，更新程序保存路径
 
     // 底层连接错误信号槽
     connect(client, SIGNAL(transmitmsg(QString)), this, SLOT(ParseMsg(QString)),Qt::DirectConnection);//这个函数主要用于传递从tcpsend得到的信号，在这里进行处理
@@ -132,6 +136,7 @@ bool SlaveMiniProgram::networkConnectInit()
 bool SlaveMiniProgram::restartSlaveProgram()
 {
     terminateSlave();
+    
     startSlave();   
 
     return true;
@@ -144,23 +149,40 @@ void SlaveMiniProgram::terminateSlave()
     qDebug() << "filename:\t" << fileinfo.fileName();
     
     QByteArray ba = fileinfo.fileName().toLocal8Bit();
+    //QByteArray ba = fileinfo.fileName().toLocal8Bit();
+
+    wstringstream wss;
+    wss << ba.constData();
+    qDebug() << wss.str().c_str();
 
     // 关闭进程   
-    TerminateProcessByName((LPCTSTR)ba.constData());
+    TerminateProcessByName(wss.str().c_str());
+
 }
 
 void SlaveMiniProgram::startSlave()
 {
-    QFileInfo fileinfo(slaveexepath);
+    QFileInfo fileinfo(slavestartupbatpath);
     qDebug() << "path:\t" << fileinfo.path();
     qDebug() << "filename:\t" << fileinfo.fileName();
 
     // 重新打开程序
+    //QProcess pro1(0);
+    //pro1.setWorkingDirectory(fileinfo.path());
+    //int bret1 = pro1.execute(slavestartupbatpath);
+    //qDebug() << "restartSlaveProgram" << bret1;
+
+    QByteArray ba = slavestartupbatpath.toLocal8Bit();
+    
+    int bret2 = WinExec(ba.constData(), 5);
+    qDebug() << "restartSlaveProgram" << bret2;
+}
+
+void SlaveMiniProgram::shutdown()
+{
     QProcess pro1(0);
     //pro1.setWorkingDirectory(fileinfo.path());
-    int bret1 = pro1.execute(slaveexepath);
-
-    qDebug() << "restartSlaveProgram" << bret1;
+    int bret1 = pro1.execute("shutdown /s /t 1");
 }
 
 /**
@@ -224,7 +246,7 @@ void SlaveMiniProgram::ParseMsg(QString msg){
                     emit signalMsgToGUI(QObject::tr("[客户端] 接收服务器的文件%1成功，文件大小：%2KB，用时%3秒").arg(filename).arg(filesize).arg(timespend));
                 else
                     emit signalMsgToGUI(QObject::tr("[客户端] 发送至服务器的文件%1成功，文件大小：%2KB，用时%3秒").arg(filename).arg(filesize).arg(timespend));
-                 break;
+                break;
             }
             case -10:
             {
@@ -250,26 +272,34 @@ void SlaveMiniProgram::ParseMsg(QString msg){
             }
             case -20: // 关闭+重启
             {
-                emit signalErrorToGUI(QObject::tr("[从控] 接收到主控的重启命令"));
+                emit signalMsgToGUI(QObject::tr("[从控] 接收到主控的重启命令"));
                 restartSlaveProgram();
-                emit signalErrorToGUI(QObject::tr("[从控] 重启成功"));
-                sendParsedMsgToGUI("-20");
+                emit signalMsgToGUI(QObject::tr("[从控] 重启成功"));
+                sendMsgToMaster("-20");
                 break;    
             }
             case -21: // 只关闭
             {
                 emit signalErrorToGUI(QObject::tr("[从控] 接收到主控的关闭程序进程命令"));
+                sendMsgToMaster("-21");
                 terminateSlave();
                 emit signalErrorToGUI(QObject::tr("[从控] 关闭成功"));
-                sendParsedMsgToGUI("-21");
                 break;
             }
             case -22: // 只启动运行
             {
                 emit signalErrorToGUI(QObject::tr("[从控] 接收到主控的运行程序进程命令"));
+                sendMsgToMaster("-22");
                 startSlave();
                 emit signalErrorToGUI(QObject::tr("[从控] 运行程序成功"));
-                sendParsedMsgToGUI("-22");
+                break;
+            }
+            case -30: // 关机
+            {
+                emit signalErrorToGUI(QObject::tr("[从控] 接收到主控的关机指令"));
+                // 
+                sendMsgToMaster("-30");
+                shutdown();
                 break;
             }
             default:;

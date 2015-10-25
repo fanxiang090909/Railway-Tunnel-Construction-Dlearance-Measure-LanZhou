@@ -63,23 +63,31 @@ bool LzAcquizCtrlQueue::parseMsg(QString msg)
                 emit signalParsedMsgToSlave(QObject::tr("[主控]  ***************************************************************预进洞有效**********************************************************"));
                 isAcquizing = true;
                 collect_IntoTunnel(true);
+                // @author范翔 20151010
+                endMsg();
                 break;
             }
             case -21: // 预进洞无效
             {
                 emit signalParsedMsgToSlave(QObject::tr("[主控]  ***************************************************************预进洞无效**********************************************************"));
                 collect_IntoTunnel(false);
+                // @author范翔 20151010
+                endMsg();
                 break;
             }
             case -22: // 出洞
             {
                 emit signalParsedMsgToSlave(QObject::tr("[主控]  *****************************************************************出洞**************************************************************"));
                 collect_OutFromTunnel();
+                // @author范翔 20151010
+                endMsg();
                 break;
             }
             case -23: // 结束采集线路
             {
                 collect_EndCurrentLine();
+                // @author范翔 20151010
+                endMsg();
                 break;
             }
             case -24: // 开始采集线路

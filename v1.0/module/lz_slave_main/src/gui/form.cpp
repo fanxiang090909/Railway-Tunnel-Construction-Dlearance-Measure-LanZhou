@@ -152,6 +152,7 @@ void Form::fcupdate(WorkingStatus status, int threadid, QString camid, long long
 
         unsigned __int64 tmpfc;
         cv::Mat tmpimgmat;
+        bool isacquizing;
 
         for (int i = 0; i < 4; i++)
         {
@@ -164,14 +165,19 @@ void Form::fcupdate(WorkingStatus status, int threadid, QString camid, long long
             }
             if (tmpcamid.compare(camid) == 0) // 相机号对应
             {
-                cvice->getLzAcquizQueue()->retriveImg(tmpcamsn, &tmpfc, tmpimgmat);
+                cvice->getLzAcquizQueue()->retriveImg(tmpcamsn, &tmpfc, tmpimgmat, isacquizing);
+                // 发送控制
+                if (isacquizing)
+                    cvice->getLzAcquizQueue()->collect_feedbackFCToMaster(tmpcamid, tmpfc);
                 
                 // 帧显示
                 // 缩放
                 float scales = 0.3; //缩放比例
                 cv::Size size = cv::Size(tmpimgmat.size().width * scales, tmpimgmat.size().height * scales);
                 cv::resize(tmpimgmat, tmpimgmat, size);
-                QImage qimg = MatToQImage(tmpimgmat);
+                QImage qimg = MatToQImage(tmpimgmat);  
+                
+
                 tmpcamimg->setPixmap(QPixmap::fromImage(qimg));
 
                 tmpcamfc->setText(QString("%1").arg(tmpfc));

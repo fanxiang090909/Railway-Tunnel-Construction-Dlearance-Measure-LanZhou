@@ -37,6 +37,11 @@ BackupWidget::BackupWidget(QWidget *parent) :
     //    ui->label_2->setStyleSheet("color:green");//设置label中文本的颜色
     //    ui->label_2->setStyleSheet("background-color: green");//设置lable的背景颜色
     //    ui->label_3->setStyleSheet("background-color: green");//设置lable的背景颜色
+
+    // TODO暂时主控备份的暂停无效
+    ui->stopMasterBackupButton->setVisible(false);
+
+    connect(ui->resetButton, SIGNAL(clicked()), this, SLOT(resetBackupConfigFile()));
 }
 
 BackupWidget::~BackupWidget()
@@ -44,9 +49,42 @@ BackupWidget::~BackupWidget()
     delete ui;
 }
 
+
+void BackupWidget::saveResetFile()
+{
+    QString path = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Backup);
+    QString filename = path + "/" + currentProjectModel.getCheckedFilename();
+
+    XMLCheckedTaskFileLoader * checktask = new XMLCheckedTaskFileLoader(tr(filename.toLocal8Bit().data()));
+    bool ret = checktask->saveFile(LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Backup));//生成listtask
+    delete checktask;
+}
+
+void BackupWidget::resetBackupConfigFile()
+{
+    QMessageBox msgBox;
+    msgBox.setText(tr("警告！！"));
+    msgBox.setInformativeText(tr("【注意！】您要确定重新校正文件%1？一旦重置，原计算的结果文件均不能对应，请【谨慎操作】！是否继续？").arg(currentProjectModel.getCheckedFilename()));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    int ret = msgBox.exec();
+    switch (ret)
+    {
+        case QMessageBox::No:
+            return;
+        default:break;
+    }
+
+    LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Backup).resetCalcuPos();
+
+    // 重新覆盖原文件
+    saveResetFile();
+
+    updateCheckedTunnelView();
+}
+
 void BackupWidget::on_startBackupButton_clicked()
 {
-    SelectBackupMode();
+    SelectBackupMode(0);
 }
 
 void BackupWidget::on_stopBackupButton_clicked()
@@ -54,25 +92,41 @@ void BackupWidget::on_stopBackupButton_clicked()
     MasterProgram::getMasterProgramInstance()->backup_Stop();
 }
 
+void BackupWidget::on_startMasterBackupButton_clicked()
+{
+    SelectBackupMode(1);
+}
+
+void BackupWidget::on_stopMasterBackupButton_clicked()
+{
+    //MasterProgram::getMasterProgramInstance()->backup_MasterStop();
+}
+
 void BackupWidget::changeSlaveTask(WorkingStatus status, QString index, int threadid, QString msgtask, QString remark)
 {
     int slaveid = index.toInt();
+    QLabel * tmpremark = NULL;
+    QProgressBar * tmpprogressbar = NULL;
+
     if (status == WorkingStatus::Backuping)
     {
         switch (slaveid)
         {
-            case 0: ui->label_back01->setText(msgtask); ui->label_back01_remark->setText(remark); break;// 主控
-            case 1: ui->label_back11->setText(msgtask); ui->label_back11_remark->setText(remark); break;
-            case 2: ui->label_back21->setText(msgtask); ui->label_back21_remark->setText(remark); break;
-            case 3: ui->label_back31->setText(msgtask); ui->label_back31_remark->setText(remark); break;
-            case 4: ui->label_back41->setText(msgtask); ui->label_back41_remark->setText(remark); break;
-            case 5: ui->label_back51->setText(msgtask); ui->label_back51_remark->setText(remark); break;
-            case 6: ui->label_back61->setText(msgtask); ui->label_back61_remark->setText(remark); break;
-            case 7: ui->label_back71->setText(msgtask); ui->label_back71_remark->setText(remark); break;
-            case 8: ui->label_back81->setText(msgtask); ui->label_back81_remark->setText(remark); break;
-            case 9: ui->label_back91->setText(msgtask); ui->label_back91_remark->setText(remark); break;
+            case 0: ui->label_back01->setText(msgtask); tmpremark = ui->label_back01_remark; tmpprogressbar = ui->progressBar_back01; break;// 主控
+            case 1: ui->label_back11->setText(msgtask); tmpremark = ui->label_back11_remark; tmpprogressbar = ui->progressBar_back11; break;
+            case 2: ui->label_back21->setText(msgtask); tmpremark = ui->label_back21_remark; tmpprogressbar = ui->progressBar_back21; break;
+            case 3: ui->label_back31->setText(msgtask); tmpremark = ui->label_back31_remark; tmpprogressbar = ui->progressBar_back31; break;
+            case 4: ui->label_back41->setText(msgtask); tmpremark = ui->label_back41_remark; tmpprogressbar = ui->progressBar_back41; break;
+            case 5: ui->label_back51->setText(msgtask); tmpremark = ui->label_back51_remark; tmpprogressbar = ui->progressBar_back51; break;
+            case 6: ui->label_back61->setText(msgtask); tmpremark = ui->label_back61_remark; tmpprogressbar = ui->progressBar_back61; break;
+            case 7: ui->label_back71->setText(msgtask); tmpremark = ui->label_back71_remark; tmpprogressbar = ui->progressBar_back71; break;
+            case 8: ui->label_back81->setText(msgtask); tmpremark = ui->label_back81_remark; tmpprogressbar = ui->progressBar_back81; break;
+            case 9: ui->label_back91->setText(msgtask); tmpremark = ui->label_back91_remark; tmpprogressbar = ui->progressBar_back91; break;
             default: break;
         }
+        tmpremark->setText(remark);
+        if (remark.compare("ok") == 0)
+            tmpprogressbar->setValue(tmpprogressbar->maximum());
     }
 }
 
@@ -255,14 +309,7 @@ void BackupWidget::updateCheckedTaskWidget()
         QMessageBox::information(this,tr("导入工程错误"),tr("该工程下实际采集文件还未校正%1。").arg(filename),QMessageBox::Yes|QMessageBox::No);
         return;
     }
-    XMLRealTaskFileLoader * realtask = new XMLRealTaskFileLoader(tr(realFile.toLocal8Bit().data()));
-    ret = realtask->loadFile(LzProjectAccess::getLzProjectAccessInstance()->getLzRealList(LzProjectClass::Calculate));//生成listtunnelcheck
-    delete realtask;
-    if (realFile.compare("") == 0 || ret == false)
-    {
-        QMessageBox::information(this,tr("导入工程错误"),tr("该工程下实际采集文件还未生成%1。").arg(realFile),QMessageBox::Yes|QMessageBox::No);
-        return;
-    }
+
     // 加载校正任务记录到widget中
     QList<CheckedTunnelTaskModel>::iterator checkedTaskIterator = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).begin();
     while (checkedTaskIterator != LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).end())
@@ -353,15 +400,19 @@ void BackupWidget::setOptButtonEnable(bool initstatus)
     {
         ui->startBackupButton->setEnabled(true);
         ui->stopBackupButton->setEnabled(false);
+        ui->startMasterBackupButton->setEnabled(true);
+        ui->stopMasterBackupButton->setEnabled(false);
     }
     else
     {
         ui->startBackupButton->setEnabled(false);
         ui->stopBackupButton->setEnabled(false);
+        ui->startMasterBackupButton->setEnabled(false);
+        ui->stopMasterBackupButton->setEnabled(false);
     }
 }
 
-void BackupWidget::SelectBackupMode()
+void BackupWidget::SelectBackupMode(int backuptype)
 {
     bool line = ui->line_radioButton->isChecked();
     bool tunnel = ui->tunnel_radioButton->isChecked();
@@ -374,9 +425,18 @@ void BackupWidget::SelectBackupMode()
     {
         if (line == true) // 按线路
         {
-            MasterProgram::getMasterProgramInstance()->backup_beginStartAll();
-            ui->startBackupButton->setEnabled(false);
-            ui->stopBackupButton->setEnabled(true);
+            if (backuptype == 0)
+            {
+                MasterProgram::getMasterProgramInstance()->backup_beginStartAll();
+                ui->startBackupButton->setEnabled(false);
+                ui->stopBackupButton->setEnabled(true);
+            }
+            else
+            {
+                MasterProgram::getMasterProgramInstance()->backup_Master_beginStartAll();
+                ui->startMasterBackupButton->setEnabled(false);
+                ui->stopMasterBackupButton->setEnabled(true);
+            }
         }
         else // 按某条隧道
         {
@@ -389,12 +449,20 @@ void BackupWidget::SelectBackupMode()
             int i = ui->actualTasksWidget->currentRow();//获得当前行的索引
             // 下面发送至丛控的代码得改，发送到9个丛控应该先计算哪一条隧道
             int tunnelid = ui->actualTasksWidget->item(i, CHECKEDTASK_TUNNELID)->data(Qt::DisplayRole).toInt();
-
-            QString totalseqnostr = ui->actualTasksWidget->item(i, CHECKEDTASK_SEQNO_TOTAL)->data(Qt::DisplayRole).toString();
-            qDebug() << (QString(tr("要求从控备份第%1条隧道，隧道ID为%2，隧道采集序列号范围为%,3")).arg(i).arg(tunnelid).arg(totalseqnostr));
-            MasterProgram::getMasterProgramInstance()->backup_beginStartOneTunnel(tunnelid);
-            ui->startBackupButton->setEnabled(false);
-            ui->stopBackupButton->setEnabled(true);
+            if (backuptype == 0)
+            {
+                QString totalseqnostr = ui->actualTasksWidget->item(i, CHECKEDTASK_SEQNO_TOTAL)->data(Qt::DisplayRole).toString();
+                qDebug() << (QString(tr("要求从控备份第%1条隧道，隧道ID为%2，隧道采集序列号范围为%,3")).arg(i).arg(tunnelid).arg(totalseqnostr));
+                MasterProgram::getMasterProgramInstance()->backup_beginStartOneTunnel(tunnelid);
+                ui->startBackupButton->setEnabled(false);
+                ui->stopBackupButton->setEnabled(true);
+            }
+            else
+            {
+                MasterProgram::getMasterProgramInstance()->backup_Master_beginStartOneTunnel(tunnelid);
+                ui->startMasterBackupButton->setEnabled(false);
+                ui->stopMasterBackupButton->setEnabled(true);
+            }
         }
     }
 }

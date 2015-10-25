@@ -27,7 +27,7 @@
  * ³ö¶´×´Ì¬    10
  * Ô¤Áô×´Ì¬    11
  */
-enum IN_OUT_Tunnle
+enum IN_OUT_Tunnel
 {
     PRE_IN_ = 0,
     CONFIRM_IN_ = 1,
@@ -71,7 +71,7 @@ private:
 	QMutex           mutex;
 	volatile bool    stopped;
 
-    IN_OUT_Tunnle last_status;
+    IN_OUT_Tunnel last_status;
 
     QTime last_status_time;
 

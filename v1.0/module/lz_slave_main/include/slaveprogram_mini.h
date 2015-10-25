@@ -29,7 +29,8 @@ public:
      *                 当前经过实验,不支持连续采集（因为文件的关闭和创建时间间隔过短可能会出现空指针异常），
      *                              只支持硬触发采集
      */
-    SlaveMiniProgram(QObject *parent = 0);
+    explicit SlaveMiniProgram(QString initslaveexepath, QString initslavestartupbatpath, QObject *parent = 0);
+
     ~SlaveMiniProgram();
     
     /**
@@ -41,10 +42,13 @@ public:
      * 重启从控程序
      */
     bool restartSlaveProgram();
-
-private:
     void terminateSlave();
     void startSlave();
+
+    // 关机
+    void shutdown();
+
+private:
 
 public slots:
     
@@ -69,7 +73,10 @@ private:
     QDateTime lastTime;
     int m_time;
 
+    // slave.exe程序的exepath
     QString slaveexepath;
+    // slave从机开机自启动bat程序
+    QString slavestartupbatpath;
 
 public: //TODO发布时应改为private，public因为测试界面form中调用
 

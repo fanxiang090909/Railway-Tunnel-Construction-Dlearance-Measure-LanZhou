@@ -16,6 +16,8 @@ LzCalculateThread::LzCalculateThread(QObject * parent, int initthreadid) : QThre
 
     isfrominterruptfile = false;
     interruptedfc = 0;
+
+	logger = NULL;
 }
 
 LzCalculateThread::~LzCalculateThread()
@@ -396,7 +398,7 @@ void LzCalculateTVRTThread_V2::init(string projectpath, int newtunnelid, std::li
     this->cameragroupid = cameragroupindex;
     this->datahead = outputdatahead;
     this->outputfile = outputfile;
-
+    
     initLogger(outputfile + ".log", "tangshuhang");
 
     this->isfrominterruptfile = isinterrupt;
@@ -449,7 +451,7 @@ void LzCalculateTVRTThread_V2::run()
 
     bool isopen_pnts = false;
 
-    LzSerialStorageMat * lzstore_Pnts_mat = new LzSerialStorageMat();                     //R相机地面三维点存储类
+    LzSerialStorageRT * lzstore_Pnts_mat = new LzSerialStorageRT();                     //R相机地面三维点存储类
     lzstore_Pnts_mat->setting(250, 1024*1024*50, true);
 
     // @author范翔加,如果不是从中断位置继续计算,创建文件
@@ -576,12 +578,30 @@ void LzCalculateTVRTThread_V2::run()
                 ifread2 = lzacqui_R->readFrame(R_mat);
                 if (ifread1 && ifread2)
                 {
-                    Cam_Img.calc(L_mat, R_mat, L_edge, R_edge, 1);
+                    // 判断Q或者R
+                    if (cameragroupid.compare("Q") == 0)
+                    {
+                        Cam_Img.calc(L_mat, R_mat, L_edge, R_edge, 1);
+                    }
+                    else
+                        Cam_Img.calc(L_mat, R_mat, L_edge, R_edge, 2);
                 }
                 else
                     tmp = false;
-                
-                lzstore_Pnts_mat->writeMat(Cam_Img._rect_Pnts3d,Info,true);
+                if(Cam_Img.rail_P.x!=0&&Cam_Img.rail_P.y!=0)
+                {
+                    Info.isvalid = true;
+                } 
+                else
+                    Info.isvalid = false;
+                /*Mat rail_pnts = Mat::zeros(1, 2, Cam_Img._rect_Pnts3d.type());
+                *rail_pnts.ptr<double>(0,0) = Cam_Img.rail_P.x;
+                *rail_pnts.ptr<double>(0,1) = Cam_Img.rail_P.y;
+
+                lzstore_Pnts_mat->writeMat2(rail_pnts,Info,true);*/
+                lzstore_Pnts_mat->writeMatV2( Cam_Img.rail_P.x, Cam_Img.rail_P.y, Cam_Img._rect_Pnts3d, Info, true);
+
+				//lzstore_Pnts_mat->writeMat(Cam_Img._rect_Pnts3d,Info,true);
 
                 // log
                 log(QString("FrameNo %1 readframe1 & readframe2 %2 %3, LzCaculator %4").arg(Info.key).arg(ifread1).arg(ifread2).arg(Cam_Img._rect_Pnts3d.cols));
@@ -909,6 +929,7 @@ void LzCalculateTVRTThread::run()
                 {
                     //Comput_RT(Cam_1.pnts3d,Cam_2.pnts3d,calibed_pnts3d, R, T);
                     //lzstore_T_mat->writeMat(T,Info,true);     
+                    
                     if(Cam_Q.rail_P.x!=0&&Cam_Q.rail_P.y!=0&&Cam_R.rail_P.x!=0&&Cam_R.rail_P.y!=0)
 		            {
 			            Cam_Q.valid_rail_P = Cam_Q.rail_P;
@@ -1052,16 +1073,21 @@ LzCalculateFuseThread::~LzCalculateFuseThread()
  * @param string outputfile输出第x组相机的文件名
  * @param DataHead & outputdatahead 输出文件头
  */
-void LzCalculateFuseThread::init(string projectpath, std::vector<string> inputfilenames, __int64 startnum, __int64 endnum, string outputfile, string outputextractheightsfile, DataHead & outputdatahead, bool isinterrupt, qint64 newinterruptfc)
+void LzCalculateFuseThread::init(string projectpath, std::vector<string> inputfilenames, string QRrailcalibfile, string rectifysyninput, __int64 startnum, __int64 endnum, string outputfile, string outputextractheightsfile, DataHead & outputdatahead, bool isinterrupt, qint64 newinterruptfc, bool userectifyfactor, bool usesafetyfactor)
 {
     this->projectpath = projectpath;
+    this->inputcalibfile = inputcalibfile;
     this->inputfilenames = inputfilenames;
     this->start_num = startnum;
     this->frame_cunt = endnum - startnum + 1;
     this->outputfile = outputfile;
     this->datahead = outputdatahead;
     this->outputextractheightsfile = outputextractheightsfile;
-    
+    this->QRrailcalibfile = QRrailcalibfile;
+    this->rectifysyninput = rectifysyninput;
+    this->userectifyfactor = userectifyfactor;
+    this->usesafetyfactor = usesafetyfactor;
+
     this->isfrominterruptfile = isinterrupt;
     this->interruptedfc = newinterruptfc;
     ifsuspend = false;
@@ -1088,6 +1114,9 @@ void LzCalculateFuseThread::run()
 {
     string heightsfile = projectpath + "/output_heights.xml";
 
+    string QRrailcalibfile_ = projectpath + "/calcu_calibration/" + QRrailcalibfile;
+    string rectifysyninput_ = projectpath + "/calcu_calibration/" + rectifysyninput;
+
     string out_fusefile = projectpath + "/fuse_calcu/" + outputfile;
     string out_extractfile = projectpath + "/syn_data/" + outputextractheightsfile;
 
@@ -1108,7 +1137,8 @@ void LzCalculateFuseThread::run()
     list<int> Item = OutputHeightsList::getOutputHeightsListInstance()->list();
     //f->init_test();               //供测试时使用
     f->init(input_file);
-    int ret1 = f->fuse(Item,out_fusefile,out_extractfile, isfrominterruptfile, start_num, frame_cunt);
+    qDebug() << QRrailcalibfile_.c_str() << " " << rectifysyninput_.c_str();
+    int ret1 = f->fuse(Item,out_fusefile,out_extractfile, isfrominterruptfile, start_num, frame_cunt, QRrailcalibfile_, rectifysyninput_, userectifyfactor, usesafetyfactor);
     if (ret1 == 0 || ret1 == 1)
         emit finish(threadid, 0, -1, QString(this->outputfile.c_str()), currentcalcfc);
     else if (ret1 != -1) // 包括无数据，打不开结果文件等情况

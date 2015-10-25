@@ -54,7 +54,16 @@ public:
     void setHasMasterIP(bool has);
     bool hasMasterIP();
     
+    // WinRAR exe 地址
     QString getRarAddressname();
+
+    // slave.exe程序的exepath
+    QString getSlaveEXEPath();
+    void setSlaveEXEPath(QString newpath);
+
+    // slave从机开机自启动bat程序
+    QString getSlaveStartupBATPath();
+    void setSlaveStartupBATPath(QString newpath);
 
 private:
     explicit SlaveMiniSetting(QObject *parent = 0);
@@ -75,6 +84,11 @@ private:
     //压缩命令Rar.exe存放目录
     QString Rar_address;
 
+    // slave.exe程序的exepath
+    QString slaveEXEPath;
+
+    // slave从机开机自启动bat程序
+    QString slaveStartupBATPath;
 };
 
 #endif // SETTING_SLAVE_MINI_H

@@ -181,6 +181,12 @@ private:
      */
     LzOutputAccess * outputAccess;
 
+    /**
+     * 判断是否进行了编辑
+     */
+    bool hasedit;
+    bool maketable;
+
 signals:
     /**
      * 转换界面信号
@@ -229,6 +235,15 @@ private slots:
      * 当多隧道综合时，批量输出各个隧道的限界图表到EXCEL文件
      */
     void exportAllToExcels();
+
+    /**
+     * 修改限界值的槽函数
+     */
+    void saveItemChanged(QTableWidgetItem* item);
+    void minheightChanged(QString);
+    void canBeModified();
+    void canSave(bool can);
+    void saveChanges();
 };
 
 #endif // OUTPUT_CLEARANCE_H

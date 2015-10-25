@@ -56,7 +56,7 @@ bool XMLTaskFileLoader::saveFile(PlanTaskList & list)
         taskElement->SetAttribute("line_type",task.linetype);
         taskElement->SetAttribute("is_double_line",task.doubleline);
         taskElement->SetAttribute("is_downlink",task.downstream);
-        taskElement->SetAttribute("interval_pulse_num",task.pulsepermeter);
+        taskElement->SetDoubleAttribute("interval_pulse_num",task.pulsepermeter);
         taskElement->SetAttribute("is_normal",task.isnormal);
         taskElement->SetAttribute("date",task.datetime.c_str());
         m_tasks->LinkEndChild(taskElement);

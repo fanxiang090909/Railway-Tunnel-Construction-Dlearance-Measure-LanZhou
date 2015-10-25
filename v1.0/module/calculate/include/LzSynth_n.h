@@ -4,7 +4,7 @@
 #include "clearance_item.h"
 #include "tunneldatamodel.h"
 #include "checkedtask.h"
-#include "lz_output.h"
+#include "lz_output_enum.h"
 
 /**
  * 单隧道隧道综合计算类声明

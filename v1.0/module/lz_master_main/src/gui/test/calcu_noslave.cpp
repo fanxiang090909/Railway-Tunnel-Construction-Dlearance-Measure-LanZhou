@@ -116,7 +116,7 @@ CalcuNoSlaveWidget::CalcuNoSlaveWidget(bool newsinglewidgetapp, WorkingStatus in
 
 
         /////////////NEW
-        connect(calcuWidget, SIGNAL(startcalcu(int, int)), this, SLOT(startcalcu2(int, int)));
+        connect(calcuWidget, SIGNAL(startcalcu(int, int, bool, bool)), this, SLOT(startcalcu2(int, int, bool, bool)));
 
         connect(ui->operationConfigButton, SIGNAL(clicked()), this, SLOT(configCurrentOperation()));
 
@@ -196,20 +196,20 @@ void CalcuNoSlaveWidget::setSelectProject(bool iftrue)
     ui->comboBox->setEnabled(iftrue);
 }
 
-void CalcuNoSlaveWidget::startcalcu2(int type, int tunnelid)
+void CalcuNoSlaveWidget::startcalcu2(int type, int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     if (type == 0)
         calculate_beginStartAll();
     else if (type == 1)
         calculate_beginStartOneTunnel(tunnelid);
     else if (type == 2)
-        calculate_Fuse_beginAll();
+        calculate_Fuse_beginAll(useerrorrectifyfactor, usesafetyfactor);
     else if (type == 3)
-        calculate_Fuse_beginOneTunnel(tunnelid);
+        calculate_Fuse_beginOneTunnel(tunnelid, useerrorrectifyfactor, usesafetyfactor);
 	else if (type == 4)
-		;//calculate_ExtractHeight_betinAll();
+		;//calculate_ExtractHeight_betinAll(useerrorrectifyfactor, usesafetyfactor);
 	else if (type == 5)
-		calculate_ExtractHeight_beginOneTunnel(tunnelid);
+		calculate_ExtractHeight_beginOneTunnel(tunnelid, useerrorrectifyfactor, usesafetyfactor);
 }
 
 
@@ -647,7 +647,7 @@ void CalcuNoSlaveWidget::calculate_Fuse_checkisready()
  * 开始融合计算和提高度计算
  * 前提是在双目及车底RT计算的中间结果文件全部返回之后
  */
-void CalcuNoSlaveWidget::calculate_Fuse_beginAll()
+void CalcuNoSlaveWidget::calculate_Fuse_beginAll(bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Calculate);
     QString date = projectname.right(13).left(8);
@@ -667,11 +667,24 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginAll()
         if (ret2)
         {
             int tunnelid = (*it).planTask.tunnelnum;
+            QString parentpath = SlaveSetting::getSettingInstance()->getParentPath();
             QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+
+            QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
+
+            QString QRrailcalifile = "QRrial.xml";
+            QString rectifyheightfile = "rectify.heights";
+
+            if (tmpsl.size() >= 2)
+            {
+                QRrailcalifile = tmpsl.at(0);
+                rectifyheightfile = tmpsl.at(1);
+            }
+            
             if (tmphasbackup == 1)
-                todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+                todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8.%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
             else
-                todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0);
+                todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
             lzFuseCalcQueue->pushBack(todomsg);
         }
         it++;
@@ -679,7 +692,7 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginAll()
     emit calcubackupProgressingBar(WorkingStatus::Calculating, QString("%1").arg(0), 1, totalhasbackupnum, tmphasbackupnum, false);
 }
 
-void CalcuNoSlaveWidget::calculate_Fuse_beginOneTunnel(int tunnelid)
+void CalcuNoSlaveWidget::calculate_Fuse_beginOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Calculate);
     QString date = projectname.right(13).left(8);
@@ -701,11 +714,23 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginOneTunnel(int tunnelid)
 
             if (tunnelid == (*it).planTask.tunnelnum)
             {
+                QString parentpath = SlaveSetting::getSettingInstance()->getParentPath();
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+
+                QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
+                QString QRrailcalifile = "QRrail.xml";
+                QString rectifyheightfile = "rectify.heights";
+
+                if (tmpsl.size() >= 2)
+                {
+                    QRrailcalifile = tmpsl.at(0);
+                    rectifyheightfile = tmpsl.at(1);
+                }
+
                 if (tmphasbackup == 1)
-                    todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+                    todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8.%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
                 else
-                    todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0);
+                    todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
 
                 lzFuseCalcQueue->pushBack(todomsg);
                 break;
@@ -716,7 +741,7 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginOneTunnel(int tunnelid)
     emit calcubackupProgressingBar(WorkingStatus::Calculating, QString("%1").arg(0), 1, totalhasbackupnum, tmphasbackupnum, false);
 }
 
-void CalcuNoSlaveWidget::calculate_ExtractHeight_beginOneTunnel(int tunnelid)
+void CalcuNoSlaveWidget::calculate_ExtractHeight_beginOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Calculate);
     QString date = projectname.right(13).left(8);
@@ -740,11 +765,22 @@ void CalcuNoSlaveWidget::calculate_ExtractHeight_beginOneTunnel(int tunnelid)
             {
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
                 QString parentpath = SlaveSetting::getSettingInstance()->getParentPath();
+
+                QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
+                QString QRrailcalifile = "QRrail.xml";
+                QString rectifyheightfile = "rectify.heights";
+
+                if (tmpsl.size() >= 2)
+                {
+                    QRrailcalifile = tmpsl.at(0);
+                    rectifyheightfile = tmpsl.at(1);
+                }
+
                 if (tmphasbackup == 1)
-                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
                 else
                 {
-                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
                     QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
 
                     qDebug() << projectpath + "/fuse_calcu/" + filename + ".fdat";

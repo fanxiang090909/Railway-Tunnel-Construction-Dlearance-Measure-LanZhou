@@ -5,6 +5,7 @@
 #include <QPointF>
 #include <QLineF>
 #include <QMenu>
+#include <QDir>
 #include <QPixmap>
 #include <QDebug>
 #include <QMessageBox>
@@ -44,6 +45,13 @@ BaseImage::~BaseImage()
 void BaseImage::saveImage(QString outputimgfilename)
 {
     saveimgpathfilename = outputimgfilename;
+
+    // 先把图片删除
+    QDir toDir;
+    if (toDir.exists(saveimgpathfilename))
+    {
+        toDir.remove(saveimgpathfilename);
+    }
 
     // 记录当前显示参数
     bool tmpishowheightline = isshowheightline;
@@ -1164,6 +1172,7 @@ void SectionImage::initPointsArray(int arraysize, bool iscompared)
  */
 bool SectionImage::MatDataToAccuratePointsArray(Mat & fuse_pnts, bool isFuse, bool isQR, bool ifnotswapleftright)
 {
+    isfuse = isFuse;
     if (hasinitfuse)
     {
         for (int i = 0; i < pointsFuseResult.size(); i++)
@@ -1508,8 +1517,11 @@ void SectionImage::Draw_Fuse(QPainter &pp)
         {
             // 开始画实际的隧道数据
             int groupindex = fuse_points_cameragroup.at(i);
-            if (groupindex < 1 || groupindex > 16)
-                continue;
+            if (isfuse)
+            {
+                if (groupindex < 1 || groupindex > 16)
+                    continue;
+            }
 
             QColor color(0, 0, 255);
             if (groupindex%3 == 0)

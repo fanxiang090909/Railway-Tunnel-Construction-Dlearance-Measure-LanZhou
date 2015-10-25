@@ -46,6 +46,10 @@ int main(int argc, char* argv[])
         SlaveMiniSetting::getSettingInstance()->setParentPath(parentpath);
 		QString myslaveip = pathfile.readLine().trimmed();
 		SlaveMiniSetting::getSettingInstance()->setMySlaveIP(myslaveip);
+        QString slaveminiexepath = pathfile.readLine().trimmed();
+        SlaveMiniSetting::getSettingInstance()->setSlaveEXEPath(slaveminiexepath);
+        QString slavestartbatpath = pathfile.readLine().trimmed();
+        SlaveMiniSetting::getSettingInstance()->setSlaveStartupBATPath(slavestartbatpath);
         pathfile.close();
     }
 
@@ -63,14 +67,16 @@ int main(int argc, char* argv[])
     
     // 从控程序默认为连续采集LzCameraCollectingMode::Lz_Camera_Continus;
     // 当在确认有硬触发设备时才采用外触发采集模式采集
-    SlaveMiniProgram w = SlaveMiniProgram();
+    SlaveMiniProgram * w = new SlaveMiniProgram(SlaveMiniSetting::getSettingInstance()->getSlaveEXEPath(), SlaveMiniSetting::getSettingInstance()->getSlaveStartupBATPath());
+    //SlaveMiniProgram w = SlaveMiniProgram();
+    
     // 配置master_ip和nas_ip
-    w.init_NetworkCameraHardwareFile(network_file);
+    w->init_NetworkCameraHardwareFile(network_file);
 
-    FormMini f(&w);
+    FormMini f(w);
     f.show();
     //fm.setSlave(&w);
-    w.networkConnectInit();
+    w->networkConnectInit();
 
     qDebug() << "endmain!";
 

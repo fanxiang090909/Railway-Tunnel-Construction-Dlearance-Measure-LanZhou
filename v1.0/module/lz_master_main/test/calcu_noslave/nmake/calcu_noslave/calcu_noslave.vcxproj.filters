@@ -522,6 +522,9 @@
     <ClInclude Include="..\..\..\..\..\lz_logger\include\lz_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\resource\gui\image\export.png">

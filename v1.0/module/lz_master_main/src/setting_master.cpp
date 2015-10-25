@@ -118,3 +118,36 @@ QString MasterSetting::getCurrentUser() { return currentUser; }
 double MasterSetting::getDefaultDistanceMode() { return defaultDistanceMode; }
 
 void MasterSetting::setDefaultDistanceMode(double newDefaultDistanceMode) { this->defaultDistanceMode = newDefaultDistanceMode; }
+
+/**
+ * 拷贝目录及目录下文件
+ * @param fromDir 源目录
+ * @param toDir 目标目录
+ * @param bCoverifFileExists true 同名时覆盖，flase，同名时返回false，终止拷贝
+ */
+bool MasterSetting::copyMasterDirectoryFiles(const QDir& fromDir, QStringList & outputfiles)
+{
+    QFileInfoList fileinfolist = fromDir.entryInfoList();
+    foreach (QFileInfo fileinfo, fileinfolist)
+    {
+        if (fileinfo.fileName().compare(".") == 0 || fileinfo.fileName().compare("..") == 0)
+            continue;
+
+        // @author 范翔，除了 collect 和tmp_img文件及子目录不拷贝以外其他全部拷贝
+        if (fileinfo.fileName().compare("collect") == 0 || fileinfo.fileName().compare("tmp_img") == 0)
+            continue;
+
+        // 拷贝子目录
+        if (fileinfo.isDir())
+        {
+            // 递归调用拷贝
+            if (!copyMasterDirectoryFiles(fileinfo.filePath(), outputfiles))
+                return false;
+        }
+        else // 拷贝子文件
+        {
+            outputfiles.append(fileinfo.absoluteFilePath());
+        }
+    }
+    return true;
+};

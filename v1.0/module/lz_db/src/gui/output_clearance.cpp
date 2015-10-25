@@ -9,6 +9,7 @@
 #include "daoclearanceoutput.h"
 #include "setting_client.h"
 
+#include "daotask.h"
 #include "daotasktunnel.h"
 #include "lz_output.h"
 
@@ -44,7 +45,7 @@ OutputClearanceWidget::OutputClearanceWidget(QWidget *parent) :
 
     // 界面上默认的底板是基础隧道限界--电力牵引
     outImageType = OutType_B_DianLi;
-    datatype= AllType;
+    datatype = AllType;
 
     // 单隧道基本信息模型设置为NULL，界面切换过来时再从ClientSetting中加载
     singleTunnelBasicMode = NULL;
@@ -107,6 +108,12 @@ OutputClearanceWidget::OutputClearanceWidget(QWidget *parent) :
     waiguichaogao = "";  
     // 最低接触网高度
     jiechuwanggaodu = "";
+
+    // 关于编辑限界值、保存限界值的信号槽
+    connect(ui->tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(saveItemChanged(QTableWidgetItem*)));
+    connect(ui->lineEdit_minHeight,SIGNAL(textEdited(QString)),this,SLOT(minheightChanged(QString)));
+    connect(ui->modifyButton, SIGNAL(clicked()), this, SLOT(canBeModified()));
+    connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
 }
 
 OutputClearanceWidget::~OutputClearanceWidget()
@@ -233,11 +240,15 @@ void OutputClearanceWidget::clearanceTableHeaderLoad()
 
 void OutputClearanceWidget::clearanceTablePreview()
 {
+    maketable = true;
+
     // 临时变量
-    int hass  =0, hasl = 0, hasr = 0;
+    int hass  = 0, hasl = 0, hasr = 0;
     ClearanceData & datas = singleTunnelModel.getClearanceStraightData();
     ClearanceData & datal = singleTunnelModel.getClearanceLeftData();
     ClearanceData & datar = singleTunnelModel.getClearanceRightData();
+
+    ui->lineEdit_minHeight->setText(QString("%1").arg(datas.getMinCenterHeight()));
 
     // 若是单隧道综合结果输出
     if (singleMultiMode == SingleOrMultiSelectionMode::Single_Mode)
@@ -303,6 +314,8 @@ void OutputClearanceWidget::clearanceTablePreview()
         itr++;
         k++;
     }
+    maketable = false;
+
 }
 
 /**
@@ -311,7 +324,7 @@ void OutputClearanceWidget::clearanceTablePreview()
 void OutputClearanceWidget::clearanceImagePreview()
 {
     // 临时变量
-    int hass  =0, hasl = 0, hasr = 0;
+    int hass  = 0, hasl = 0, hasr = 0;
     ClearanceData & datas = singleTunnelModel.getClearanceStraightData();
     ClearanceData & datal = singleTunnelModel.getClearanceLeftData();
     ClearanceData & datar = singleTunnelModel.getClearanceRightData();
@@ -358,6 +371,8 @@ void OutputClearanceWidget::clearanceImagePreview()
     }
     // 即更新绘图
     syntunnelcorrect->update();
+
+    canSave(false);
 }
 
 void OutputClearanceWidget::selectOutputClearanceImageType(int index)
@@ -781,4 +796,133 @@ void OutputClearanceWidget::statusShow(QString outfilename, int retval, bool isa
         ui->status->append(statusstr);
     else
         ui->status->setText(statusstr);
+}
+
+
+void OutputClearanceWidget::minheightChanged(QString a)
+{
+    if (maketable)
+    {
+        return;
+    }
+    hasedit = true;
+}
+
+void OutputClearanceWidget::saveItemChanged(QTableWidgetItem* item)
+{
+    /* 如果正在建表, 不执行槽函数 */
+    if (maketable)
+    {
+        return;
+    }
+
+    int row = item->row();
+    int column = item->column();
+    
+    int key = ui->tableWidget->verticalHeaderItem(row)->data(Qt::DisplayRole).toInt();
+    int value = item->text().toInt();
+    if (value == 0)
+    {
+        QMessageBox::StandardButton rb = QMessageBox::question(NULL,tr("警告"),tr("您输入的是无效数字，应输入>0的整数"),QMessageBox::Yes | QMessageBox::No);
+
+        if (rb == QMessageBox::Yes || rb == QMessageBox::No)        
+            return;
+    }
+    //
+    //qDebug() << "row:" << row << ", verticalHeaderItem:" << ui->tableWidget->verticalHeaderItem(row)->data(Qt::DisplayRole).toString();
+    //qDebug() << "column:" << column << ", horizontalHeaderItem:" << ui->tableWidget->horizontalHeaderItem(column)->data(Qt::DisplayRole).toString();
+    //qDebug() << item->text().toInt() << " " << item->text();
+
+    switch (column)
+    {
+        case Straight_Left_Val - 1:        singleTunnelModel.getClearanceStraightData().getMaps().at(key).leftval = value;    break;
+        case Straight_Right_Val - 1:       singleTunnelModel.getClearanceStraightData().getMaps().at(key).rightval = value;   break;  
+        case Straight_Left_Pos - 1:        singleTunnelModel.getClearanceStraightData().getMaps().at(key).leftpos = value;    break; 
+        case Straight_Right_Pos - 1:       singleTunnelModel.getClearanceStraightData().getMaps().at(key).rightpos = value;   break; 
+        case LeftCurve_Left_Val - 1:       singleTunnelModel.getClearanceLeftData().getMaps().at(key).leftval = value;    break;
+        case LeftCurve_Right_Val - 1:      singleTunnelModel.getClearanceLeftData().getMaps().at(key).rightval = value;   break;  
+        case LeftCurve_Left_Radius - 1:    singleTunnelModel.getClearanceLeftData().getMaps().at(key).leftradius = value; break;
+        case LeftCurve_Right_Radius - 1:   singleTunnelModel.getClearanceLeftData().getMaps().at(key).rightradius = value;break;
+        case LeftCurve_Left_Pos - 1:       singleTunnelModel.getClearanceLeftData().getMaps().at(key).leftpos = value;    break; 
+        case LeftCurve_Right_Pos - 1:      singleTunnelModel.getClearanceLeftData().getMaps().at(key).rightpos = value;   break; 
+        case RightCurve_Left_Val - 1:      singleTunnelModel.getClearanceRightData().getMaps().at(key).leftval = value;    break;
+        case RightCurve_Right_Val - 1:     singleTunnelModel.getClearanceRightData().getMaps().at(key).rightval = value;   break;  
+        case RightCurve_Left_Radius - 1:   singleTunnelModel.getClearanceRightData().getMaps().at(key).leftradius = value; break;
+        case RightCurve_Right_Radius - 1:  singleTunnelModel.getClearanceRightData().getMaps().at(key).rightradius = value;break;
+        case RightCurve_Left_Pos - 1:      singleTunnelModel.getClearanceRightData().getMaps().at(key).leftpos = value;    break; 
+        case RightCurve_Right_Pos - 1:     singleTunnelModel.getClearanceRightData().getMaps().at(key).rightpos = value;   break; 
+        default: break;
+    }
+    hasedit = true;
+}
+
+void OutputClearanceWidget::canBeModified()
+{
+    hasedit = false;
+    canSave(true);
+}
+
+void OutputClearanceWidget::canSave(bool can)
+{
+    if (can)
+    {
+        ui->tableWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
+        ui->lineEdit_minHeight->setEnabled(true);
+    }
+    else
+    {
+        ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->lineEdit_minHeight->setEnabled(false);
+    }
+    ui->modifyButton->setEnabled(!can);
+    ui->saveButton->setEnabled(can);
+}
+
+void OutputClearanceWidget::saveChanges()
+{
+    QString currentcollectdate = ui->lineEdit_collectdate->text();
+    long long tasktunnelid = singleTunnelModel.getTaskTunnelid();
+    QString tunnelname = ui->lineEdit_name->text();
+    int tunnelid = singleTunnelModel.getTunnelid();
+    __int64 taskid = TaskDAO::getTaskDAOInstance()->getTaskID(tunnelid, currentcollectdate);
+
+    qDebug() << "collectdate:" << currentcollectdate << ", tunnelid:" << tunnelid << ", tunnelname:" << tunnelname << ", taskid:" << taskid << ", tasktunnelid:" << tasktunnelid;
+
+    ClearanceData & datas = singleTunnelModel.getClearanceStraightData();
+    ClearanceData & datal = singleTunnelModel.getClearanceLeftData();
+    ClearanceData & datar = singleTunnelModel.getClearanceRightData();
+
+
+    if (tasktunnelid <= 0)
+    {
+        return;
+    }
+    
+    if (tasktunnelid > 0)
+    {
+        int height = ui->lineEdit_minHeight->text().toInt();
+        datas.setMinCenterHeight(height);
+        datal.setMinCenterHeight(height);
+        datar.setMinCenterHeight(height);
+        int ret1 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(datas, tasktunnelid, ClearanceType::Straight_Smallest);
+        int ret2 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(datal, tasktunnelid, ClearanceType::LeftCurve_Smallest);
+        int ret3 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(datar, tasktunnelid, ClearanceType::RightCurve_Smallest);
+
+        qDebug() << "clearanceDataToDBData" << ret1 << ret2 << ret3;
+        //straightdata.showMaps();
+
+        ui->statusArea->append(QObject::tr("重新保存隧道采集任务%1并添加到数据库完成").arg(tunnelname));
+    }
+    else 
+    {
+        ui->statusArea->append(QObject::tr("重新保存隧道采集任务%1失败，隧道采集任务（工程中的隧道任务）找不到ID为%2的tasktunnel").arg(tunnelname).arg(tasktunnelid));
+    }
+
+    ui->saveButton->setEnabled(false);
+    ui->modifyButton->setEnabled(true);
+    hasedit = false;
+    canSave(false);
+
+    // 更新限界图
+    clearanceImagePreview();
 }

@@ -13,34 +13,13 @@
 #include "clearance_tunnels.h"
 #include "daotunnel.h"
 
+#include "lz_output_enum.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 
 using namespace std;
-
-/**
- * 限界表的列头枚举类型
- */
-enum LzOutputTableColumn {
-    Height = 0,
-    Straight_Left_Val = 1,
-    Straight_Right_Val = 2,
-    Straight_Left_Pos = 3,
-    Straight_Right_Pos = 4,
-    LeftCurve_Left_Val = 5,
-    LeftCurve_Right_Val = 6,
-    LeftCurve_Left_Radius = 7,
-    LeftCurve_Right_Radius = 8,        
-    LeftCurve_Left_Pos = 9,
-    LeftCurve_Right_Pos = 10,
-    RightCurve_Left_Val = 11,
-    RightCurve_Right_Val = 12,
-    RightCurve_Left_Radius = 13,
-    RightCurve_Right_Radius = 14,        
-    RightCurve_Left_Pos = 15,
-    RightCurve_Right_Pos = 16,
-};
 
 /**
  * 兰州项目限界数据图表输出

@@ -88,6 +88,17 @@ int AdminDAO::validateUser(QString username, QString password)
     return 1;
 }
 
+QString AdminDAO::getUserNameByID(int id)
+{
+    QSqlQuery query;
+    query.exec(QString("SELECT a.username FROM admin a WHERE a.id = %1 ").arg(id));
+    while (query.next()) {
+        QString pw = query.value(0).toString();
+        return pw;        
+    }
+    return "";
+}
+
 /**
  * 得到用户级别
  * @return <0 用户不存在，>= 用户级别

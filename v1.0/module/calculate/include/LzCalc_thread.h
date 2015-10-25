@@ -84,6 +84,9 @@ protected:
 
     string projectpath;
 
+    // 输入标定配置文件（QR），20151025加
+    string inputcalibfile;
+
     string outputfile; 
 
     DataHead datahead;
@@ -284,6 +287,26 @@ private:
     vector<string> inputfilenames;
 
     string outputextractheightsfile;
+    /**
+     * 钢轨QR标定文件
+     */
+    string QRrailcalibfile;
+
+    /**
+     * 校正文件
+     */
+    string rectifysyninput;
+
+    /**
+     * 是否使用校正文件
+     */
+    bool userectifyfactor;
+
+    /**
+     * 是否使用校正文件中的 安全系数因子
+     */
+    bool usesafetyfactor;
+
     __int64 start_num;
     __int64 frame_cunt;
 public:
@@ -299,8 +322,8 @@ public:
      * @param string outputfile输出第x组相机的文件名
      * @param DataHead & outputdatahead 输出文件头
      */
-    void init(string projectpath, std::vector<string> inputfilenames, __int64 startnum, __int64 endnum, string outputfusefile, string outputextractheightsfile, DataHead & outputdatahead, 
-              bool isinterrupt, qint64 interruptfc);
+    void init(string projectpath, std::vector<string> inputfilenames, string QRrailcalibfile, string rectifysyninput, __int64 startnum, __int64 endnum, string outputfusefile, string outputextractheightsfile, DataHead & outputdatahead, 
+              bool isinterrupt, qint64 interruptfc, bool userectifyfactor, bool usesafetyfactor);
 
     /**
      * 中断线程、外部调用

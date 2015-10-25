@@ -5,6 +5,7 @@
 #include <QObject>
 #include "clearance_item.h"
 #include "lz_working_enum.h"
+#include "lz_output_enum.h"
 #include <list>
 
 using namespace std;

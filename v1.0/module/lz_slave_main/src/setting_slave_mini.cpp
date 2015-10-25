@@ -56,6 +56,10 @@ SlaveMiniSetting::SlaveMiniSetting(QObject *parent) :
 
     // Windows版 rar程序文件路径
     Rar_address = "C:/Program Files/WinRAR/Rar.exe";
+
+    slaveEXEPath = "C:\\Users\\Administrator\\Desktop\\SLAVE_RELEASE_DLL\\lz_slave.exe";
+
+    slaveStartupBATPath = "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\startslave.bat";
 }
 
 SlaveMiniSetting::~SlaveMiniSetting()
@@ -99,4 +103,10 @@ void SlaveMiniSetting::setMasterIP(QString ip) { masterip = ip; hasmip = true; }
 void SlaveMiniSetting::setHasMasterIP(bool has) { hasmip = has; }
 bool SlaveMiniSetting::hasMasterIP() { return hasmip; }
 
-QString SlaveMiniSetting::getRarAddressname() {return Rar_address; }
+QString SlaveMiniSetting::getRarAddressname() { return Rar_address; }
+
+QString SlaveMiniSetting::getSlaveEXEPath() { return this->slaveEXEPath; }
+void SlaveMiniSetting::setSlaveEXEPath(QString newpath) { this->slaveEXEPath = newpath; }
+
+QString SlaveMiniSetting::getSlaveStartupBATPath() { return this->slaveStartupBATPath; }
+void SlaveMiniSetting::setSlaveStartupBATPath(QString newpath) { this->slaveStartupBATPath = newpath; }

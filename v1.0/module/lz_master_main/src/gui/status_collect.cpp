@@ -63,6 +63,8 @@ CollectWidget::CollectWidget(QWidget *parent, double defualtDistanceMode) :
     ui->endCollectLineButton->setEnabled(false);
     ui->softwareTriggerOneFrameButton->setEnabled(true);
     ui->softwareTriggerOneFrameButton->setVisible(false);
+
+    ui->collectResetButton->setVisible(false);
 }
 
 CollectWidget::~CollectWidget()
@@ -306,6 +308,7 @@ void CollectWidget::changeCamera(QString cameraindex, HardwareStatus status)
         ui->R1Label_work->setPixmap(QPixmap(img));
     else if (cameraindex.compare("R2") == 0)
         ui->R2Label_work->setPixmap(QPixmap(img));
+    this->update();
 }
 
 void CollectWidget::changeCameraFC(QString cameraindex, qint64 newfc)
@@ -384,6 +387,7 @@ void CollectWidget::changeCameraFC(QString cameraindex, qint64 newfc)
         ui->R1Label_status->setText(QString("%1").arg(newfc));
     else if (cameraindex.compare("R2") == 0)
         ui->R2Label_status->setText(QString("%1").arg(newfc));
+    this->update();
 }
 
 void CollectWidget::changeCameraTask(WorkingStatus status, QString cameraindex, int threadid, QString newtask, QString remark)
@@ -462,6 +466,7 @@ void CollectWidget::changeCameraTask(WorkingStatus status, QString cameraindex, 
         ui->R1Label_task->setText(newtask);
     else if (cameraindex.compare("R2") == 0)
         ui->R2Label_task->setText(newtask);
+    this->update();
 }
 
 // 改变激光器提示灯
@@ -647,10 +652,11 @@ void CollectWidget::setDistanceMode(int newCurrentDistanceModeType)
     QString filename = path + "/" + currentProjectModel.getPlanFilename();
     
     // 动态添加行
-    for (int i = 0; i < LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->length(); i++)
+    QList<PlanTask>::iterator it = LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).begin();
+    while (it != LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).end())
     {
-        PlanTask tmp = LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Collect).list()->at(i);
-        tmp.pulsepermeter = currentDistanceMode;
+       (*it).pulsepermeter = currentDistanceMode;
+       it++;
     }
 
     XMLTaskFileLoader *newtask = new XMLTaskFileLoader(tr(filename.toLocal8Bit().data()));

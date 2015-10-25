@@ -1035,7 +1035,7 @@ bool Status::addToCollectList(int slaveid, int tunnelid, QString tunnelname, int
     {
         if (((*it).returnnum) > MasterSetting::getSettingInstance()->getMaxSalveNum())
         {
-            qDebug() << tr("已达到最大数量SlALE_MAX:%1,请检查").arg(MasterSetting::getSettingInstance()->getMaxSalveNum());
+            //qDebug() << tr("已达到最大数量SlALE_MAX:%1,请检查").arg(MasterSetting::getSettingInstance()->getMaxSalveNum());
             return false;
         }
         (*it).returnnum++;

@@ -58,7 +58,7 @@ bool LzBackupCalcQueue::parseMsg(QString msg)
                     qDebug() << tr("解析字符出错") << msg;
                     return false;
                 }
-                QString filename = strList.at(1).mid(9);
+                QString filename = strList.at(1);
                 int hasbackup = strList.at(2).toInt();
                 __int64 backupinterruptpos = strList.at(3).toLongLong();
 
@@ -101,10 +101,10 @@ int LzBackupCalcQueue::backup_start(QString filename)
     QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Backup);
     QString projectfilename = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Backup);
     // 任务源文件路径
-    current_sourcefile_dir = MasterSetting::getSettingInstance()->getParentPath() +  "\\" + projectfilename.left(projectfilename.size() - 5) + "\\mid_calcu\\";
+    current_sourcefile_dir = MasterSetting::getSettingInstance()->getParentPath() +  "\\" + projectfilename.left(projectfilename.size() - 5) + "\\";
     QString sendfile = current_sourcefile_dir + filename;
     // 加入目标NAS的存储路径
-    current_directionfile_dir = QString("\\\\%1\\LanZhou\\").arg(nasserverip) +  "\\" + projectfilename.left(projectfilename.size() - 5) + "\\mid_calcu\\";
+    current_directionfile_dir = QString("\\\\%1\\LanZhou\\").arg(nasserverip) +  "\\" + projectfilename.left(projectfilename.size() - 5) + "\\";
     QString todir = current_directionfile_dir + filename;
 
     // 开启备份线程
@@ -128,7 +128,7 @@ int LzBackupCalcQueue::backup_start(QString filename)
 
 void LzBackupCalcQueue::receiveThreadFinish(int isok, QString filename, qint64 suspendfilepos)
 {
-    qDebug() << "NAS backup_start file " << filename << isok;
+    qDebug() << "NAS backup_start file " << filename << isok << current_sourcefile_dir;
 
     if (isok <= 0)
     {

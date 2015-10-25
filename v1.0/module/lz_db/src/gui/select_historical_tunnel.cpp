@@ -304,6 +304,10 @@ void SelectHistoricalTunnelDataWidget::updateTunnelsView(const QModelIndex &inde
             ui->lineEdit_lineType->clear();
             ui->lineEdit_isDoubleLine->clear();
             ui->lineEdit_isDownLink->clear();
+	 
+//			ui->lineEdit_isNormalTravel->clear();
+
+
             // 如果没有指定tunnel，清楚curveWidget中的数据
             // 先去掉原来的内容
             ui->lineEdit_leftCurvesNum->clear();
@@ -427,6 +431,8 @@ void SelectHistoricalTunnelDataWidget::setCurrentMapper(int currentRow)
         int lineType = tunnelDataModel->getLineType();
         bool isDoubleLine = tunnelDataModel->getIsDoubleLine();
         bool isDownLink = tunnelDataModel->getIsDownlink();
+
+		//bool isNormalTravel = tunnelDataModel->getIsNormalTravel();
         //qDebug() << "isNewLine:" << isNewLine << ", lineType:" << lineType << ", isDoubleLine:" << isDoubleLine << ", isDownLink:" << isDownLink;
 
         if (isNewLine == 1) // 新线
@@ -456,6 +462,20 @@ void SelectHistoricalTunnelDataWidget::setCurrentMapper(int currentRow)
             ui->lineEdit_isDownLink->setText(tr("上行"));
         else
             ui->lineEdit_isDownLink->setText(tr(""));
+
+	
+
+		/*
+		if(isNormalTravel == true)
+			ui->lineEdit_isNormalTravel->setText(tr("正常行驶"));
+		else if(isNormalTravel == false)
+			ui->lineEdit_isNormalTravel->setText(tr("非正常行驶"));
+		else
+			ui->lineEdit_isNormalTravel->setText(tr(""));
+		*/
+
+
+
     }
     else
     {

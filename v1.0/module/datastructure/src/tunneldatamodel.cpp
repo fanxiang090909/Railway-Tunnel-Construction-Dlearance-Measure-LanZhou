@@ -85,9 +85,9 @@ bool TunnelDataModel::loadTunnelData()
             case Tunnel_is_downlink:
                 {
                     if (temp.toInt() == 0)
-                        isDoubleLine = false;
+                        isDownlink = false;
                     else
-                        isDoubleLine = true;
+                        isDownlink = true;
                     break;
                 }
             case Tunnel_line_ID: lineid = temp.toInt();break;

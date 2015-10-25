@@ -349,6 +349,12 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
 
 	bool isNormal = true;
 
+	//2015年10月12日
+	bool isDouble = true;
+
+    // @author 范翔
+    double distanceMode = 0.5103;
+
     CheckedTunnelTaskModel & tmp = clist.getCheckedTunnelModel(tunnelid, traindirection);
 
     if (traindirection)
@@ -361,7 +367,12 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
 	else
 		isNormal = true;   //默认为正常行驶
 
+	if(isDouble)
+		isDouble = tmp.planTask.doubleline;
+	else
+		isDouble = true;    //默认双线
 
+    distanceMode = tmp.planTask.pulsepermeter;
 
     // 设置可编辑的基础隧道信息到全局空间
     bool ret = ClientSetting::getSettingInstance()->setCorrectTunnelDataModel(tunnelid);
@@ -378,7 +389,7 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
 
     QString signalfilename = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/syn_data/" + filename;
 
-    emit signalSelectedTunnelToEdit(tunnelid, signalfilename, traindirection, isNormal, startframeno, endframeno);
+    emit signalSelectedTunnelToEdit(tunnelid, signalfilename, isDouble, traindirection, isNormal, distanceMode, startframeno, endframeno);
 }
 
 /** 

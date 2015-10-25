@@ -878,9 +878,13 @@ void CorrectClearanceWidget::moreImage3D()
     image3d = new ImageViewer3DTwoViewWidget();
 
     QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main);
+	QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Main);
+	
     QString tmpimg_projectpath = ClientSetting::getSettingInstance()->getClientTmpLocalParentPath();
-    qDebug() << projectpath << tmpimg_projectpath;
-    image3d->setInfo(projectpath, tmpimg_projectpath, currenttunnelid, currenttunnelname);
+	bool isTwoNasMode = image3d->getNasMode();
+
+	qDebug() << projectpath << tmpimg_projectpath << projectname.left(projectname.size() - 5);
+    image3d->setInfo(isTwoNasMode, projectpath, projectname.left(projectname.size() - 5), tmpimg_projectpath, currenttunnelid, currenttunnelname);
     image3d->setCurrentFCs(framecounter);
     image3d->show();
 }
@@ -1184,7 +1188,7 @@ void CorrectClearanceWidget::slotSetCarriageDirection(bool newdirect)
 }
 
 // 从上一步接收文件名参数界面切换槽函数
-void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir, bool isNormal, long long startframeno, long long endframeno)
+void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool isDouble, bool carriagedir, bool isNormal, double distanceMode, long long startframeno, long long endframeno)
 {
     if (isfileopen_syn)
     {
@@ -1201,6 +1205,11 @@ void CorrectClearanceWidget::slotSelectedTunnelToEdit(int tunnelid, QString sign
     currenttunneldate = QStringList(logname.split("_")).at(1);
     currentCarriageDirection = carriagedir;
 
+	isNormalTravel = isNormal;
+
+	isDoubleLine = isDouble;
+
+    interframe_mile = distanceMode;
 
     mile = 0;
     framecounter = 0;

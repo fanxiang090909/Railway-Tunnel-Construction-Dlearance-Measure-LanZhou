@@ -255,12 +255,6 @@
     <CustomBuild Include="..\..\..\..\..\filemanagers\src\gui\openglpoints\show_3dpoints.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\..\include\gui\imageviewer_3dtv.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\..\src\gui\imageviewer_3dtv.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\..\..\datastructure\include\network_config_list.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -277,6 +271,15 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\..\src\gui\correct_clearance_batchoutput.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\resource\users.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\filemanagers\include\gui\imageviewer_3dtv.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\filemanagers\src\gui\imageviewer_3dtv.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -833,15 +836,6 @@
     <ClCompile Include="..\..\..\..\..\filemanagers\src\gui\openglpoints\show_3dpoints.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_imageviewer_3dtv.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_imageviewer_3dtv.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\gui\imageviewer_3dtv.cpp">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\xmlloader\src\xmlnetworkfileloader.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
@@ -879,6 +873,18 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\gui\correct_clearance_batchoutput.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_users.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_imageviewer_3dtv.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_imageviewer_3dtv.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\filemanagers\src\gui\imageviewer_3dtv.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1063,9 +1069,6 @@
     <ClInclude Include="GeneratedFiles\ui_show_3dpoints.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_imageviewer_3dtv.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\xmlloader\include\xmlnetworkfileloader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1079,6 +1082,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_correct_clearance_batchoutput.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\datastructure\include\lz_output_enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_imageviewer_3dtv.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1315,6 +1324,24 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\..\..\lz_output\resource\images\win\zoomout.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\0.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\1.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\3.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\4.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\resource\users\5.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -38,9 +38,7 @@ using namespace std;
 #pragma comment(lib, "opencv_calib3d249.lib")
 #endif
 
-#define RAIL_PNTS_Min 600          //用于定义寻找轨点时搜索的最小起始范围
-#define RAIL_PNTS_Max 900          //用于定义寻找轨点时搜索的最大结束范围
-#define RAIL_H_Max  1050
+
 // image amplify 
 
 
@@ -52,7 +50,10 @@ public:
 	int rxlt, rylt, rxrb, ryrb;
 	Mat R,T;
 	Mat R1,R2,P1,P2;
-	Mat standard_P;      //标准三维点
+	Mat standard_P;                //标准三维点
+    double RAIL_PNTS_Min;          //用于载入寻找轨点时搜索的最小起始范围
+    double RAIL_PNTS_Max;          //用于载入寻找轨点时搜索的最大结束范围
+    double RAIL_H_Max;
 	void loadcali(string path){
 
         bool ret = fs.open(path, FileStorage::READ);
@@ -75,10 +76,14 @@ public:
 		fs["P1"] >> P1;
 		fs["P2"] >> P2;
 		fs["standard_point"] >> standard_P;
+        fs["RAIL_PNTS_Min"] >> RAIL_PNTS_Min;
+        fs["RAIL_PNTS_Max"] >> RAIL_PNTS_Max;
+        fs["RAIL_H_Max"] >> RAIL_H_Max;
 		fs["R"] >> R;
 		fs["T"] >> T;
 		fs["recsizewid"] >> rctfsize.width;
 		fs["recsizehei"] >> rctfsize.height;
+
 
 	}	//exception?
 	void calcRemap(){
@@ -132,9 +137,13 @@ public:
 	}
 	inline void rctfimgs(Mat &_left, Mat &_right, Mat &img_L, Mat &img_R){
 
-		Mat full_left = Mat::zeros(1280, 512, _left.type());
+		/*Mat full_left = Mat::zeros(1280, 512, _left.type());
 		Mat full_right = Mat::zeros(1280, 512, _right.type());
 		_left.copyTo(full_left.colRange(0,512));
+		_right.copyTo(full_right.colRange(0,512));*/
+		Mat full_left = Mat::zeros(1280, 1024, _left.type());
+		Mat full_right = Mat::zeros(1280, 1024, _right.type());
+		_left.copyTo(full_left.colRange(512,1024));
 		_right.copyTo(full_right.colRange(0,512));
 
 		// remap
@@ -151,8 +160,10 @@ public:
 		_right = rctf_full_right;
 
 	};
-	inline Size lsize() { return Size(800,1600); }
-	inline Size rsize() { return Size(800,1600); }
+	//inline Size lsize() { return Size(800,1600); }
+	//inline Size rsize() { return Size(800,1600); }
+	inline Size lsize() { return Size(1200,1500); }
+	inline Size rsize() { return Size(1200,1500); }
 private:
 	//load 
 	Mat Distort1,Distort2;

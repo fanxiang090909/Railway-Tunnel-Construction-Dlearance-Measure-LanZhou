@@ -58,12 +58,15 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
 	scrollArea->setWidget(syntunnelcorrect);
 	ui->verticalLayout->addWidget(scrollArea);
 
-	//@author 9月2号
+	//@zengwang 2015年9月2日
 	connect(ui->submitWidthButton,SIGNAL(clicked()),this,SLOT(setNewWidth()));
 	connect(ui->submitHeightButton,SIGNAL(clicked()),this,SLOT(setNewCenterHeight()));
 	connect(ui->setDirectionValComboBox, SIGNAL(currentIndexChanged(int)),this, SLOT(setDirectionVal()));
 
-	//@author 9月2号
+	//@zengwang 2015年9月2日
+
+	//@zengwang 2015年10月12日
+	//connect(ui->confirmButton, SIGNAL(clicked()), this, SLOT(manualSelectData()));
 
 	// 实时获得画图界面的鼠标位置
     connect(syntunnelcorrect, SIGNAL(sendMousePos(int, int)), this, SLOT(getMousePos(int, int)));
@@ -109,6 +112,10 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
 
     TopLeftPoint = QPointF(0,0);
     BottomRightPoint = QPointF(0,0);
+
+
+	isNormalTravel = true;
+
 }
 
 SynthesisTunnelWidget::~SynthesisTunnelWidget()
@@ -181,6 +188,13 @@ void SynthesisTunnelWidget::initProgressBar(long long start, long long end)
 	//@zengwang 2015年10月7日
 	ui->leftRightValidComboBox->setEnabled(false);
 
+	//@zengwang 2015年10月11日
+	ui->setDirectionValComboBox->setEnabled(false);
+//	ui->confirmButton->setEnabled(false);
+	ui->submitWidthButton->setEnabled(false);
+	ui->submitHeightButton->setEnabled(false);
+
+
     update();
 }
 
@@ -205,6 +219,12 @@ void SynthesisTunnelWidget::endProgressBar()
 	//@zengwang 2015年10月7日
 	ui->leftRightValidComboBox->setEnabled(true);
 
+	//@zengwang 2015年10月11日
+	ui->setDirectionValComboBox->setEnabled(true);
+	//ui->confirmButton->setEnabled(true);
+	ui->submitWidthButton->setEnabled(true);
+	ui->submitHeightButton->setEnabled(true);
+
     update();
 }
 
@@ -225,6 +245,8 @@ void SynthesisTunnelWidget::carriageDirectionChanged(int index)
     }
 
 	//@zengwang 2015年10月7日添加
+	/*
+
 	bool ret;
     TunnelDataModel *tunnelDataModel = ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret);
 	ClearanceData & straightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceStraightData();
@@ -259,8 +281,13 @@ void SynthesisTunnelWidget::carriageDirectionChanged(int index)
 			return;
 		}
 	}
-
-
+	else
+	{
+			straightdata.swapLeftAndRight();
+			leftdata.swapLeftAndRight();
+			rightdata.swapLeftAndRight();
+	}
+	*/
 
 
 
@@ -319,6 +346,16 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
     else
         ui->carriageDirectionComboBox->setCurrentIndex(1);
     carriagedirectionlock = false;
+
+
+
+	if(isNormalTravel == true)
+		ui->lineEdit_isNormalTravel->setText(tr("正常行驶"));
+	else if(isNormalTravel == false)
+		ui->lineEdit_isNormalTravel->setText(tr("非正常行驶"));
+	else
+		ui->lineEdit_isNormalTravel->setText(tr(""));
+
 	
     bool ret;
     TunnelDataModel *tunnelDataModel = ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret);
@@ -336,7 +373,12 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
         int lineType = tunnelDataModel->getLineType();
         bool isDoubleLine = tunnelDataModel->getIsDoubleLine();
         bool isDownLink = tunnelDataModel->getIsDownlink();
+
+
+		//bool isNormalTravel = tunnelDataModel->getIsNormalTravel();
         //qDebug() << "isNewLine:" << isNewLine << ", lineType:" << lineType << ", isDoubleLine:" << isDoubleLine << ", isDownLink:" << isDownLink;
+
+        qDebug() << "isNewLine:" << isNewLine << ", lineType:" << lineType << ", isDoubleLine:" << isDoubleLine << ", isDownLink:" << isDownLink;
 
         if (isNewLine == 1) // 新线
             ui->lineEdit_isNew->setText(tr("新线"));
@@ -374,6 +416,8 @@ void SynthesisTunnelWidget::loadBasicTunnelData()
             ui->lineEdit_isDownLink->setText(tr("上行"));
         else
             ui->lineEdit_isDownLink->setText(tr(""));
+
+
     }
     ui->calcuProgress->setVisible(false);
 }
@@ -440,7 +484,7 @@ void SynthesisTunnelWidget::calculateSynthesisData()
     {
         m->loadTunnelData();
         qDebug() << "id" << m->getId() << "name" << QString::fromLocal8Bit(m->getName().c_str()) << "idstd" << m->getIdStd().c_str()
-                 << "isdouble" << m->getIsDoubleLine() << "isdownlink" << m->getIsDownlink() << "isnew" << m->getIsNew()
+			<< "isdouble" << m->getIsDoubleLine() << "isdownlink" << m->getIsDownlink() << "isnormal" << m->getIsNormalTravel() << "isnew" << m->getIsNew()
                  << "linetype" << m->getLineType() << "endpoint" << m->getEndPoint() << "startpoint" << m->getStartPoint()
                  << "lineid" << m->getLineid() << "linename" << QString::fromLocal8Bit(m->getLinename().c_str());
         qDebug() << "list size:" << m->getCurveList().size() << m->getNumberOfLeftCurves() << m->getNumberOfRightCurves() << m->getNumberOfStrights();
@@ -503,14 +547,16 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             // 信号槽
             connect(&lzsyn, SIGNAL(initfc(long long, long long)), this, SLOT(initProgressBar(long long, long long)));
             connect(&lzsyn, SIGNAL(currentfc(long long)), this, SLOT(updateProgressBar(long long)));
-            
+				
 			// 左右侧有效
 			int leftrightvalid = ui->leftRightValidComboBox->currentIndex();
 
+
             // @TODO 系数0.5103应改为外部配置文件输入
-			lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection, this->current_startframeno, this->current_endframeno, leftrightvalid);
-            bool hasstraight = false, hasleft = false, hasright = false;
-            lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
+			//lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection, this->current_startframeno, this->current_endframeno, leftrightvalid);
+            lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, true, this->current_startframeno, this->current_endframeno, leftrightvalid);
+			bool hasstraight = false, hasleft = false, hasright = false;
+			lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
 
             int ret1 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(straightdata, tasktunnelid, ClearanceType::Straight_Smallest);
             int ret2 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(leftdata, tasktunnelid, ClearanceType::LeftCurve_Smallest);
@@ -519,6 +565,8 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             qDebug() << "clearanceDataToDBData" << ret1 << ret2 << ret3;
             //straightdata.showMaps();
 
+							
+			
             ui->statusArea->append(QObject::tr("重新综合计算文件%1并添加到数据库完成").arg(QObject::tr(tunnelheightssynname.c_str())));
         }
         else 
@@ -556,8 +604,6 @@ void SynthesisTunnelWidget::loadGaugeImage(ClearanceData& data, CurveType newtyp
     ui->green_label->setPixmap(QPixmap(ClientSetting::getSettingInstance()->getParentPath() + "/system/black.jpg"));
     ui->blue_label->setPixmap(QPixmap(ClientSetting::getSettingInstance()->getParentPath() + "/system/blue.jpg"));
 	*/
-
-
 
 }
 
@@ -796,20 +842,109 @@ void SynthesisTunnelWidget::on_finishButton_clicked()
     emit finish();
 }
 
-void SynthesisTunnelWidget::slotSelectedTunnelToSynthesis(int newtunnelid, QString signalfilename, bool carriagedirect, bool isNormal, long long startframeno, long long endframeno)
+void SynthesisTunnelWidget::slotSelectedTunnelToSynthesis(int newtunnelid, QString signalfilename, bool isDouble, bool carriagedirect, bool isNormal, double distanceMode, long long startframeno, long long endframeno)
 {
     tunnelid = newtunnelid;
     username = ClientSetting::getSettingInstance()->getCurrentUser();
     projectname =  ClientSetting::getSettingInstance()->getCurrentEditingProject();
     tunnelname = ClientSetting::getSettingInstance()->getCurrentEditingTunnel();
     currentcarriagedirection = carriagedirect;
+    
+	isNormalTravel = isNormal;
+
+	isDoubleLine = isDouble;
+
+    // @author 范翔
+    interframe_mile = distanceMode;
 
 	this->current_startframeno = startframeno;
 	this->current_endframeno = endframeno;
 
+
+	//@zengwang 2015年10月8号
+	//isNormalTravel = m->getIsNormalTravel();
+	//isNormalTravel = tmp.planTask.isnormal;
+
+	ClearanceData & straightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceStraightData();
+    ClearanceData & leftdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceLeftData();
+    ClearanceData & rightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceRightData();
+
+	if(isNormalTravel)         //判断是否正常行驶   正常行驶
+	{
+		if(isDoubleLine)      //判断是否为双线    双线
+		{
+			if(currentcarriagedirection)    //判断采集方向与出表方向是否一致     一致
+			{
+				//如果采集方向与出表方向一致时，数据保持不变，只显示左边数据,其中当currentcarriagedirection为true时，显示左边数据
+				//leftdata.resetLeftOrRight(currentcarriagedirection);
+				//rightdata.resetLeftOrRight(currentcarriagedirection);
+
+				ui->leftRightValidComboBox->setCurrentIndex(1);
+			}
+			else      //采集方向与出表方向不一致
+			{
+				//如果采集方向与出表方向不一致时，先将左右数据进行对调，再显示左边数据（右边数据不显示）
+				straightdata.swapLeftAndRight();
+				leftdata.swapLeftAndRight();
+				rightdata.swapLeftAndRight();
+				//straightdata.resetLeftOrRight(!currentcarriagedirection);
+				//leftdata.resetLeftOrRight(!currentcarriagedirection);
+				//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+				ui->leftRightValidComboBox->setCurrentIndex(1);
+			}
+		}
+		else       //单线
+		{
+			if(currentcarriagedirection)     //采集与出表方向一致时，数据保持不变
+				ui->leftRightValidComboBox->setCurrentIndex(0);
+			else                            //采集与出表方向不一致时，将左右数据对调后进行显示
+			{
+				straightdata.swapLeftAndRight();
+				leftdata.swapLeftAndRight();
+				rightdata.swapLeftAndRight();
+
+				ui->leftRightValidComboBox->setCurrentIndex(0);
+
+			}
+
+		}
+	}
+	else         //非正常行驶
+	{
+		if(isDoubleLine)            //如果是双线
+		{
+			if(currentcarriagedirection)   //采集与出表数据一致时，出右边数据
+			{
+				//straightdata.resetLeftOrRight(!currentcarriagedirection);
+				//leftdata.resetLeftOrRight(!currentcarriagedirection);
+				//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+				ui->leftRightValidComboBox->setCurrentIndex(2);
+			}
+			else              //采集与出表数据不一致时，左右数据对调，出左边数据
+			{
+				straightdata.swapLeftAndRight();
+				leftdata.swapLeftAndRight();
+				rightdata.swapLeftAndRight();
+				//straightdata.resetLeftOrRight(!currentcarriagedirection);
+				//leftdata.resetLeftOrRight(!currentcarriagedirection);
+				//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+				ui->leftRightValidComboBox->setCurrentIndex(1);
+			}
+		}
+		else           //单线不存在非正常行驶这种情况,不做任何处理
+			ui->leftRightValidComboBox->setCurrentIndex(0);
+	}
+
+
+
+
     // QDateTime time = QDateTime::fromString(currentProjectModel.getCreateDate(), "yyyy-MM-dd hh:mm:ss");  
     // currentcollectdate = time.toString("yyyyMMdd");
     currentcollectdate = projectname.right(8);
+	qDebug() << projectname; 
     //qDebug() << "tunnelid = " << tunnelid << ", username = " << username << ", tunnelname = " << tunnelname << ", projectname = " << projectname << ", currentcollectdate = " << currentcollectdate;
 
     loadBasicTunnelData();
@@ -964,8 +1099,12 @@ void SynthesisTunnelWidget::setNewCenterHeight()
         qDebug() << "closeSynthesisDataFile exception:" << ex.what(); 
     }
 
+
     // 进度条
     endProgressBar();
+
+	//重新显示
+	loadSynthesisData();
 
 }
 
@@ -1153,8 +1292,12 @@ void SynthesisTunnelWidget::setNewWidth()
         qDebug() << "closeSynthesisDataFile exception:" << ex.what(); 
     }
 
+
     // 进度条
     endProgressBar();
+
+	//重新显示
+	loadSynthesisData();
 }
 
 
@@ -1168,6 +1311,88 @@ void SynthesisTunnelWidget::setDirectionVal()
 		ui->setDirectionValComboBox->setCurrentIndex(1);
 
 }
+
+/*
+//@zengwang  2015年10月12日
+void  SynthesisTunnelWidget::manualSelectData()
+{
+	// 左右侧有效
+	int leftrightvalid = ui->leftRightValidComboBox->currentIndex();
+	//bool isleft = true;
+
+
+	// 隧道综合
+    QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main);
+    QByteArray tmpba = projectpath.toLocal8Bit();
+    string projectpathstd(tmpba.constData());
+    ProjectModel currentProjectModel = LzProjectAccess::getLzProjectAccessInstance()->getProjectModel(LzProjectClass::Main);
+    bool ret;
+    TunnelDataModel * m = ClientSetting::getSettingInstance()->getCorrectTunnelDataModel(ret); 
+
+    ret = loadCheckedTaskTunnelData();
+    if (ret)
+    {
+        CheckedTunnelTaskModel tmp = CheckedTunnelTaskModel();
+        LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main).getCheckedTunnelModel(tunnelid, tmp);
+        
+        // 打开文件名
+        string tunnelheightssynname = filename;
+        qDebug() << "currentcollectdate:" << currentcollectdate;
+
+        __int64 tasktunnelid = TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelID(tunnelid, currentcollectdate);
+        __int64 taskid = TaskDAO::getTaskDAOInstance()->getTaskID(tunnelid, currentcollectdate);
+    
+        if (tasktunnelid >= 0)
+        {
+            int ret0 = TaskTunnelDAO::getTaskTunnelDAOInstance()->updateTaskTunnel(tasktunnelid, taskid, tunnelid, interframe_mile, true, tmp.planTask.isnormal, 0);
+
+            ClearanceData & straightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceStraightData();
+            ClearanceData & leftdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceLeftData();
+            ClearanceData & rightdata = ClientSetting::getSettingInstance()->getSingleTunnelModel().getClearanceRightData();
+
+            LzSynthesis lzsyn;
+
+            // 信号槽
+            connect(&lzsyn, SIGNAL(initfc(long long, long long)), this, SLOT(initProgressBar(long long, long long)));
+            connect(&lzsyn, SIGNAL(currentfc(long long)), this, SLOT(updateProgressBar(long long)));
+            
+
+            // @TODO 系数0.5103应改为外部配置文件输入
+			lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, true, this->current_startframeno, this->current_endframeno, leftrightvalid);
+            bool hasstraight = false, hasleft = false, hasright = false;
+			lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
+			
+			/*
+			if(leftrightvalid == 1)       //左侧有效
+			{
+				straightdata.resetLeftOrRight(isleft);
+				leftdata.resetLeftOrRight(isleft);
+				rightdata.resetLeftOrRight(isleft);
+			}
+			else if(leftrightvalid == 2)     //右侧有效
+			{
+				straightdata.resetLeftOrRight(!isleft);
+				leftdata.resetLeftOrRight(!isleft);
+				rightdata.resetLeftOrRight(!isleft);
+			}
+			else
+				;            //leftrightvalid = 0,全部有效
+
+        }
+        
+
+        // 进度条
+        endProgressBar();
+
+        // 重新显示
+        loadSynthesisData();
+    }
+    else
+        ;
+
+}
+*/
+
 
 
 // 得到鼠标坐标

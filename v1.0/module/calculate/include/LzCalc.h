@@ -56,12 +56,12 @@ public:
     /**
      * 开始融合计算
      */
-    bool startFuseCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc);
+    bool startFuseCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath, QString railQRcalifile, QString heightsrectifyfile ,bool userectifyfactor, bool usesafetyfactor);
 
     /**
      * 开始提取高度+RT校正计算
      */
-    bool startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath);
+    bool startExtractHeightCalc(int tunnelid, QString filename, bool isinterrupt, qint64 interruptedfc, QString parentpath, QString railQRcalifile, QString heightsrectifyfile, bool userectifyfactor, bool usesafetyfactor);
 
     /**
      * 当前所有线程暂停计算

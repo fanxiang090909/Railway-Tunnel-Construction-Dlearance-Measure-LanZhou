@@ -50,7 +50,7 @@ signals:
     void sendseqno(int);
     void sendstartnumber(int);
     void sendtunnelid(int);
-    void signalSelectedTunnelToEdit(int, QString, bool, bool, long long, long long);
+    void signalSelectedTunnelToEdit(int, QString, bool, bool, bool, double, long long, long long);
 
 private:
     Ui::SelectAvaliableTunnelWidget *ui;
@@ -116,7 +116,6 @@ private slots:
     void opensetvalidframes();
 
     void getframesfromsetvalidframes(long long  newstartframes, long long newendframes);
-
 
 };
 

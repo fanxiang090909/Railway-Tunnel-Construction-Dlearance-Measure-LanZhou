@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>铁路隧道建筑限界测量系统-从控程序</string>
+   <string>铁路隧道建筑限界测量系统-从控控制小程序</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -107,7 +107,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="restartSlaveButton">
           <property name="text">
            <string>开启程序</string>
           </property>
@@ -125,6 +125,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="shutdownButton">
+          <property name="text">
+           <string>关机</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

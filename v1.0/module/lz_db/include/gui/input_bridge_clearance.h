@@ -59,13 +59,21 @@ private:
     /**
      * 桥梁限界数据
      */
-    ClearanceData data;
+    ClearanceData datas;
+    ClearanceData datal;
+    ClearanceData datar;
+    int hass, hasl, hasr;
 
     /**
      * 加载桥梁限界数据
      */
     void loadBridgeClearanceData();
     
+    /**
+     * 初始化，清零
+     */
+    void initBridgeClearanceData();
+
     /**
      * 更新桥梁限界数据（只更新内部数据，不修改表头）
      */
@@ -90,7 +98,9 @@ private slots:
      * 修改限界值的槽函数
      */
     void saveItemChanged(QTableWidgetItem* item);
+    void minheightChanged(QString);
     void canBeModified();
+    void canSave(bool can);
     void saveChanges();
 
 signals:

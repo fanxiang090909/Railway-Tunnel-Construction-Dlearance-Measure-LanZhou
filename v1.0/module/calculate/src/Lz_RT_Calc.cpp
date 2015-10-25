@@ -545,17 +545,18 @@ void Lz_RT_Clac::rail_pnts_detect(int flag)
 	{
 		if(1==flag)
 		{
-            if(!inital_start&&*_rect_Pnts3d.ptr<float>(1,i)<=RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+
+            if(!inital_start&&*_rect_Pnts3d.ptr<float>(1,i)<=-_calibparas.RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			   rail_start = i;
 			   inital_start = true;
 		    }
-		    if(!inital_end&&*_rect_Pnts3d.ptr<float>(1,i)<=RAIL_PNTS_Min&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+		    if(!inital_end&&*_rect_Pnts3d.ptr<float>(1,i)>=-_calibparas.RAIL_PNTS_Min&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			   rail_end = i;
 			   inital_end = true;
 		    }
-		    if(RAIL_PNTS_Min<=*_rect_Pnts3d.ptr<float>(1,i)&&*_rect_Pnts3d.ptr<float>(1,i)<=RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+		    if(-_calibparas.RAIL_PNTS_Min<=*_rect_Pnts3d.ptr<float>(1,i)&&*_rect_Pnts3d.ptr<float>(1,i)<=-_calibparas.RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			    if(*_rect_Pnts3d.ptr<float>(0,i)>height_max)
 				   height_max = *_rect_Pnts3d.ptr<float>(0,i);
@@ -563,17 +564,17 @@ void Lz_RT_Clac::rail_pnts_detect(int flag)
 	   }
 	   else
 	   {
-		   	if(!inital_start&&*_rect_Pnts3d.ptr<float>(1,i)>=-RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+		   	if(!inital_start&&*_rect_Pnts3d.ptr<float>(1,i)>=_calibparas.RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			   rail_start = i;
 			   inital_start = true;
 		    }
-		    if(!inital_end&&*_rect_Pnts3d.ptr<float>(1,i)>=-RAIL_PNTS_Min&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+		    if(!inital_end&&*_rect_Pnts3d.ptr<float>(1,i)<=_calibparas.RAIL_PNTS_Min&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			   rail_end = i;
 			   inital_end = true;
 		    }
-		    if(-RAIL_PNTS_Min>=*_rect_Pnts3d.ptr<float>(1,i)&&*_rect_Pnts3d.ptr<float>(1,i)>=-RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<RAIL_H_Max)
+		    if(_calibparas.RAIL_PNTS_Min>=*_rect_Pnts3d.ptr<float>(1,i)&&*_rect_Pnts3d.ptr<float>(1,i)>=_calibparas.RAIL_PNTS_Max&&*_rect_Pnts3d.ptr<float>(0,i)<_calibparas.RAIL_H_Max)
 		    {
 			    if(*_rect_Pnts3d.ptr<float>(0,i)>height_max)
 				   height_max = *_rect_Pnts3d.ptr<float>(0,i);

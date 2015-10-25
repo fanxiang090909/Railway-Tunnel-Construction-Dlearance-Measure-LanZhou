@@ -158,3 +158,22 @@ int ClearanceSingleTunnel::getMinHeight()
 
     return minheight;
 }
+
+int ClearanceSingleTunnel::getTunnelid()
+{
+    if (!hasinit)
+        return -1;
+
+    QString tunnelname, date, linename;
+    int tunnelid;
+    TaskTunnelDAO::getTaskTunnelDAOInstance()->getTaskTunnelInfo(tasktunnelid, tunnelid, tunnelname, date, linename);
+    return tunnelid;
+}
+
+long long ClearanceSingleTunnel::getTaskTunnelid()
+{
+    if (!hasinit)
+        return -1;
+
+    return tasktunnelid;
+}

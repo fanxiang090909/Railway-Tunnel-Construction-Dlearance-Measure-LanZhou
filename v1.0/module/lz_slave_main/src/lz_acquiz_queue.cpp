@@ -24,7 +24,7 @@ LzAcquizQueue::LzAcquizQueue(QObject * parent) : LzSlaveMsgQueue(parent)
 
     // 采集监控从控显示
     timer = new QTimer();
-    timer->setInterval(10000);
+    timer->setInterval(20000);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     timer->start();
 }
@@ -265,6 +265,9 @@ void LzAcquizQueue::setTriggerModeAndExposureTime(LzCameraCollectingMode newtrig
 {
     this->collectionMode = newtriggermode;
     this->exposureTime = newexposuretime;
+    // add 08.22
+    this->collectionMode = Lz_Camera_HardwareTrigger;
+    // add
 }
 
 /**
@@ -800,10 +803,11 @@ bool LzAcquizQueue::collect_slave_reset()
 /**
  * 从控程序得到缓存图片
  */
-void LzAcquizQueue::retriveImg(QString tmpsn, unsigned __int64 * tmpfc, Mat & tmpimg)
+void LzAcquizQueue::retriveImg(QString tmpsn, unsigned __int64 * tmpfc, Mat & tmpimg, bool & isacquiz)
 {
     QByteArray tmpba = tmpsn.toLocal8Bit();
     lzacqui->retriveSample(tmpba.constData(), tmpfc, tmpimg);
+    isacquiz = isAcquizing;
 }
 
 /**
@@ -1002,7 +1006,7 @@ void LzAcquizQueue::end_OutFromTunnel(QString camera1, qint64 c1beg, qint64 c1en
 /**
  * 从控界面定时监控显示计时器槽函数
  */
-void  LzAcquizQueue::onTimeOut()
+void LzAcquizQueue::onTimeOut()
 {
     // 取数据的条件
     if (hasCamerainit && hasInitSlaveModel())
@@ -1012,4 +1016,10 @@ void  LzAcquizQueue::onTimeOut()
         emit fcupdate(Collecting, 0, slaveModel.box2.camera_ref.c_str(), 0);
         emit fcupdate(Collecting, 0, slaveModel.box2.camera.c_str(), 0);
     }
+}
+
+void LzAcquizQueue::collect_feedbackFCToMaster(QString cameraid, long long currentfc)
+{
+    if (hasCamerainit && hasInitSlaveModel())
+        emit signalMsgToMaster(QString("1108,cameraindex=%1,currentframe=%2").arg(cameraid).arg(currentfc));
 }

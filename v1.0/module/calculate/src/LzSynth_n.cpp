@@ -2,6 +2,7 @@
 #include "output_heights_list.h"
 #include "daoclearanceoutput.h"
 #include "daotasktunnel.h"
+#include "daotunnel.h"
 #include <QDebug>
 #include <QFileDialog>
 

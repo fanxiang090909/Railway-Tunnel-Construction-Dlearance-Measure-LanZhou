@@ -46,6 +46,11 @@ private slots:
     void on_pushButton_7_clicked();
 
     /**
+     * 从控程序更新
+     */
+    void updateSlaveExeFile();
+
+    /**
      * 存储工程数据
      */
     void saveProjData();
@@ -55,6 +60,11 @@ private slots:
      */
     void resetSlaveProgram();
     void terminateSlaveProgram();
+
+    /**
+     * 从控关机
+     */
+    void shotdownALlSlaves();
 
     /**
      * 更新当前连接IP列表

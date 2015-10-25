@@ -283,8 +283,8 @@ public:
      * 开始融合计算和提高度计算
      * 前提是在双目及车底RT计算的中间结果文件全部返回之后
      */
-    void calculate_Fuse_beginStartAll();
-    void calculate_Fuse_beginStartOneTunnel(int tunnelid);
+    void calculate_Fuse_beginStartAll(bool useerrorrectifyfactor, bool usesafetyfactor);
+    void calculate_Fuse_beginStartOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor);
     /**
      * 暂停融合
      */
@@ -294,8 +294,8 @@ public:
      * 开始做提高度计算
      * 前提是已经融合好
      */
-   	void calculate_ExtractHeight_beginStartAll();
-    void calculate_ExtractHeight_beginStartOneTunnel(int tunnelid);
+   	void calculate_ExtractHeight_beginStartAll(bool useerrorrectifyfactor, bool usesafetyfactor);
+    void calculate_ExtractHeight_beginStartOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor);
 
     /*****************关于备份 *********************/
     /**
@@ -324,8 +324,9 @@ public:
     /**
      * 主控上的备份
      */
-    void backup_Master_begin();
-
+    void backup_Master_beginStartAll();
+    void backup_Master_beginStartOneTunnel(int tunnelid);
+    void backup_Master_StartOneTunnel(int tunnelid, QString tunnelfilenameprefix, int tmphasbackup, __int64 tmpbackupfc);
     /*****************关于文件校正*********************/
     /**
      * 希望查看原始图像

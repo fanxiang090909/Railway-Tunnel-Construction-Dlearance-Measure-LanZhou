@@ -257,6 +257,9 @@
     <CustomBuild Include="..\..\..\..\..\calculate\include\LzCalc_ExtractHeight.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\lz_client_main\resource\users.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_about.cpp">
@@ -886,6 +889,9 @@
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_ExtractHeight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_users.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\xmlloader\include\tinyxml\tinystr.h">
@@ -1293,6 +1299,24 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\..\resource\player\player_end_down.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\0.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\1.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\3.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\4.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\lz_client_main\resource\users\5.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

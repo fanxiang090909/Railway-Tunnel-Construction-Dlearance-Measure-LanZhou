@@ -106,18 +106,4 @@ enum LzCollectHardwareTriggerNoDistanceMode
 };
 
 
-/**
- * 输出限界图形时的底板限界
- * 输出形式 会在限界图中不同。@see \\10.13.29.236\Public Resource\0.科研项目\Lz兰州铁路2012\相关铁路标准\铁路桥隧建筑标准限界
- * DianLi电力牵引，与NeiRan内燃牵引为隧道属性
- * B与D（双层集装箱）为选择属性，可选择B或D输出表格
- */
-enum OutputClearanceImageType
-{
-    OutType_B_NeiRan = 1,  // 隧道建筑限界，内燃牵引
-    OutType_B_DianLi = 2,  // 隧道建筑限界，电力牵引
-    OutType_D_NeiRan = 3,  // 双层集装箱桥隧建筑限界，内燃牵引
-    OutType_D_DianLi = 4,  // 双层集装箱桥隧建筑限界，电力牵引
-};
-
 #endif // LZ_WORKING_EUM_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1612</width>
+    <width>1620</width>
     <height>627</height>
    </rect>
   </property>
@@ -116,6 +116,20 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="errorCheckBox">
+          <property name="text">
+           <string>误差校正</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="safetycheckBox">
+          <property name="text">
+           <string>安全系数</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <spacer name="horizontalSpacer_7">
           <property name="orientation">

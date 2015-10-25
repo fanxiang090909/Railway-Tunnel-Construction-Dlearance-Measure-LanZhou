@@ -20,6 +20,8 @@
 #include <opencv2\core\core.hpp>
 #include <sstream>
 
+#include "LzCalc_ExtractHeight.h"
+
 // @author 范翔改 继承自QObject 可以通过消息槽反馈计算进度
 Fusion::Fusion(QObject* obj) : QObject(obj)
 {
@@ -55,6 +57,11 @@ Fusion::Fusion(QObject* obj) : QObject(obj)
     lzMat_O->setting(250, 1024*1024*50, true);
     lzMat_P = new LzSerialStorageMat();
     lzMat_P->setting(250, 1024*1024*50, true);
+    lzMat_Q = new LzSerialStorageRT();
+    lzMat_Q->setting(250, 1024*1024*50, true);
+    lzMat_R = new LzSerialStorageRT();
+    lzMat_R->setting(250, 1024*1024*50, true);
+
     lzMat_RT = new LzSerialStorageMat();           //RT矩阵流式存储类   RT矩阵前两为平移向量，第三位旋转角度！
     lzMat_RT->setting(250, 1024*1024*50, true);
     lzMat_Out = new LzSerialStorageMat();          //Out输出流式存储类Mat类型
@@ -82,7 +89,8 @@ Fusion::~Fusion()
     delete lzMat_N;
     delete lzMat_O;
     delete lzMat_P;
-    delete lzMat_RT;
+    delete lzMat_Q;
+    delete lzMat_R;
     delete lzMat_Out;
     delete extra_high;
 }
@@ -104,7 +112,8 @@ void Fusion::init(vector<string> load_file)
 	N_file = load_file.at(13);
 	O_file = load_file.at(14);
 	P_file = load_file.at(15);
-	RT_file = load_file.at(16);
+    Q_file = load_file.at(16);
+    R_file = load_file.at(17);
 }
 
 LzSerialStorageMat* Fusion::get_mat(int index)
@@ -160,7 +169,10 @@ LzSerialStorageMat* Fusion::get_mat(int index)
              return lzMat_P;
              break;
          case 17:
-             return lzMat_RT;
+             return lzMat_Q;
+             break;
+         case 18:
+             return lzMat_R;
              break;
          default:
              break;
@@ -221,8 +233,11 @@ string Fusion::open_file(int index)
          return P_file;
          break;
      case 17:
-         return RT_file;
-         break; 
+         return Q_file;
+         break;
+     case 18:
+         return R_file;
+         break;
      default:
          break;
      }
@@ -282,7 +297,10 @@ Mat& Fusion::get_point(int index)
         return point_P;
         break;
     case 17:
-        return RT_point;
+        return point_Q;
+        break;
+    case 18:
+        return point_R;
         break;
     default:
         break;
@@ -478,7 +496,10 @@ bool& Fusion::get_valid(int index)
          return valid_P;
          break;
      case 17:
-         return valid_RT;
+         return valid_Q;
+         break;
+     case 18:
+         return valid_R;
          break;
      }
 }
@@ -536,7 +557,10 @@ bool & Fusion::get_point_valid(int index)
             return valid_point_P;
             break;
         case 17:
-            return valid_RT_point;
+            return valid_point_Q;
+            break;
+        case 18:
+            return valid_point_R;
             break;
     }
 }
@@ -550,8 +574,8 @@ void Fusion::rectify_RT()                                                 //对三
 	 for(Vector<Point3d>::iterator it= fus_vector.begin(); it!=fus_vector.end(); it++)
 	 {
 		 std::cout<<"原点： " <<"  x: "<<(*it).x<< "  y: " << (*it).y <<endl;
-		 *out_pnts.ptr<float>(0,i) = (*it).x*cos(*RT_point.ptr<double>(0,2)/180*3.14159265)-(*it).y*sin(*RT_point.ptr<double>(0,2)/180*3.14159265)+(*RT_point.ptr<double>(0,1));
-		 *out_pnts.ptr<float>(1,i) = (*it).y*cos(*RT_point.ptr<double>(0,2)/180*3.14159265)+(*it).x*sin(*RT_point.ptr<double>(0,2)/180*3.14159265)+(*RT_point.ptr<double>(0,0));
+		 *out_pnts.ptr<float>(0,i) = (*it).x*cos(*RT_point.ptr<float>(0,2)/180*3.14159265)-(*it).y*sin(*RT_point.ptr<float>(0,2)/180*3.14159265)+(*RT_point.ptr<float>(0,1));
+		 *out_pnts.ptr<float>(1,i) = (*it).y*cos(*RT_point.ptr<float>(0,2)/180*3.14159265)+(*it).x*sin(*RT_point.ptr<float>(0,2)/180*3.14159265)+(*RT_point.ptr<float>(0,0));
 		 *out_pnts.ptr<float>(2,i) = (*it).z;
 		 (*it).x = *out_pnts.ptr<float>(0,i);
 		 (*it).y = *out_pnts.ptr<float>(1,i);
@@ -560,6 +584,43 @@ void Fusion::rectify_RT()                                                 //对三
 		 std::cout<<endl;
 		 i++;
 	 }
+}
+
+void Fusion::loadcalib(string path)
+{
+
+
+    bool ret = fs.open(path, FileStorage::READ);
+
+    if ( !fs.isOpened() )
+    {
+        // throw exception;
+        std::cout<<"Can't open the Calib_file!";
+        return;
+    }
+
+    // exception~
+    // try catch
+    fs["stand_pnt_QX"] >> std_Q.x;
+    fs["stand_pnt_QY"] >> std_Q.y;
+    fs["stand_pnt_RX"] >> std_R.x;
+    fs["stand_pnt_RY"] >> std_R.y;
+    fs["rail_dist"]   >> rail_dist;                       //定义钢轨间距
+    fs.release();
+}
+
+void Fusion::Comput_RT(double Q_a, double Q_b, double R_a, double R_b)
+{
+
+    double cur_angle,std_angle;                    //定义当前角度和标准角度
+    double theta = 0;
+    cur_angle = atan2((Q_a-R_a),rail_dist)*180/3.14159265;
+    std_angle = atan2((std_Q.x-std_R.x),rail_dist)*180/3.14159265;
+    theta = cur_angle - std_angle; 
+    *RT_point.ptr<float>(0,0) = std_R.y - R_b;         //以左轨R作为旋转平移标准
+    *RT_point.ptr<float>(0,1) = (R_b/rail_dist)*(Q_a-R_a) - (std_Q.x - std_R.x)/2;
+    *RT_point.ptr<float>(0,2) = theta;
+    std::cout<<theta<<endl;
 }
 
 void Fusion::init_test()
@@ -580,154 +641,14 @@ void Fusion::init_test()
 	init(load_file);
 }
 
-int Fusion::extrac_height(list<int> Item,LzSerialStorageSynthesis* extr_high, __int64 frame_num, double mile_count)
+int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool isinterruptfile, __int64 start_num, __int64 frame_cunt, string QRrailcalibfile, string rectifyfile, bool userectifyfactor, bool usesaftyfactor)
 {
-	int blank_step = 75;
 
-	BlockInfo tmpblockinfo;
-    tmpblockinfo.isvalid = true;
-    tmpblockinfo.key = frame_num;
+    LzCalculate_ExtractHeight * extract = new LzCalculate_ExtractHeight();
+    extract->init(Item, "", "", "", rectifyfile, out_extra_high, userectifyfactor, usesaftyfactor);
 
-	SectionData Data;
-	bool ret = Data.initMaps();
-    if (!ret)
-        return 1;
-
-    float center_height = -1, center_height_HI = -1, minx = 10000;
-	for(list<int>::iterator it = Item.begin(); it != Item.end() ;it++)                      //对List进行遍历获取点
-	{
-		bool flag = false;
-		vector<Point2d> around_H;                                                           //在指定点没有高度的情况下用附近数据拟合高度
-	    vector<Point2d> result;
-	    Point2d Pts;
-	    Point2d mean_1,mean_2;                                                              //当无指定高度的情况下计算平均高度
-	    bool postive = false;                                                               //用于指明有无指定高度数据
-	    bool mean_2_init = false;
-	    bool mean_1_init = false;
-		for(Vector<Point3d>::iterator point = fus_vector.begin(); point != fus_vector.end(); point++)
-	    {
-            // 中心顶部净高
-            if ((*point).x > center_height)
-                center_height = (*point).x;
-            /*if ((*point).x < minx)
-                minx = (*point).x;*/
-            if ((*point).z >= 7.5 && (*point).z <= 9.5)
-            {
-                if ((*point).x > center_height_HI)
-                    center_height_HI = (*point).x;
-            }
-
-		    if((*point).x==*it)
-		    {
-			    Pts.x = (*point).x;
-			    Pts.y = (*point).y;
-			    result.push_back(Pts);
-			    if(result.size()==2)
-			       break;
-		    }
-			else if (abs((*point).x-*it)<blank_step)
-		    {
-			   Pts.x = (*point).x;
-			   Pts.y = (*point).y;
-			   around_H.push_back(Pts);
-		    }
-	   }
-	   if(around_H.size()!=0&&result.size()!=2) 
-	   {
-	        mean_1.x = 0;
-	        mean_1.y = 0;
-		    mean_2.x = 0;
-		    mean_2.y = 0;
-		    if(0<=around_H.at(0).y)
-			     postive = true;
-		    for(vector<Point2d>::iterator point = around_H.begin(); point != around_H.end(); point++)
-	        {
-			    if(postive&&(*point).y>0||!postive&&(*point).y>0) 
-		        {
-                    mean_1.y += (*point).y;
-                    mean_1.x++;
-				    mean_1_init = true;
-		        }
-		        else
-		        {
-                    mean_2.y += (*point).y;
-                    mean_2.x++;
-			        mean_2_init = true;
- 		        }
-
-	      }
-		  if(result.size()==0)
-		  {
-			  if(mean_1_init==true)
-			  {
-                  Pts.x = *it;
-	              Pts.y = mean_1.y/mean_1.x;
-		          result.push_back(Pts);
-			  }
-		      if(mean_2_init==true)
-		      {
-		          Pts.x = *it;
-				  Pts.y = mean_2.y/mean_2.x;
-		          result.push_back(Pts);
-		      }
-		  }
-		  else if(result.size()==1)
-		  {
-			   if(mean_1_init==true&&blank_step<abs(result.at(0).x-(mean_1.y/mean_1.x)))
-			   {
-	              Pts.x = *it;
-	              Pts.y = mean_1.y/mean_1.x;
-		          result.push_back(Pts);
-			   }
-			   if(mean_2_init==true&&blank_step<abs(result.at(0).x-(mean_2.y/mean_2.x)))
-			   {
-	              Pts.x = *it;
-	              Pts.y = mean_2.y/mean_2.x;
-		          result.push_back(Pts);
-			   }
-			
-            }
-
-	    }
-	    if(result.size()==0)
-	    {
-		    Data.updateToMapVals(*it,float(0),float(0));
-        }
-	    else
-	    {	
-		    for(int i=0;i<result.size();i++)
-	        {
-                if(result.at(i).y<0)                                 //小于0为左侧距离
-	                Data.updateToMapVals(*it,(-1)*result.at(i).y,true);
-                else
-	                Data.updateToMapVals(*it,result.at(i).y,false);  //大于0为右侧高度
-	        }
-	    }
-    }
-    // 大于最高和最低的赋零，暂时弃用，画图时做判断
-    /*std::map<int,item>::iterator it = Data.getMaps().begin();
-    int tempkey;
-    while (it != Data.getMaps().end())
-    {
-        std::pair<int,item> pair = (*it);
-        tempkey = pair.first;
-        if (tempkey > center_height || tempkey < minx)
-        {
-	         Data.updateToMapVals(tempkey,0,true);
-   	         Data.updateToMapVals(tempkey,0,false);
-        }
-        it++;
-    }*/
-    extr_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！
-    // Data.showMaps();     用于显示数据map
-    std::cout<<"\nOk"<<std::endl;
-    return 0;
-}
-
-int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool isinterruptfile, __int64 start_num, __int64 frame_cunt )
-{
     ifsuspend = false;
-
+    loadcalib(QRrailcalibfile);
     int ret;
     if (!isinterruptfile)
     {
@@ -738,6 +659,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
     bool flag2 = extra_high->openFile(out_extra_high.c_str());
     if (!is_open || !flag2)
     {
+        delete extract;
         return 5;
     }
 
@@ -750,9 +672,15 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
     DataHead towritedatahead;
     // @author 范翔添加
     carriagedirect = true;
-    for(int i=1;i<=17;i++)
+    for(int i=1;i<=18;i++)
     {
-        get_valid(i) = get_mat(i)->openFile(open_file(i).c_str());
+        if (i <= 18)
+            get_valid(i) = get_mat(i)->openFile(open_file(i).c_str());    
+        /*else if (i == 17)
+            get_valid(i) = ((LzSerialStorageRT*)get_mat(i))->openFile(open_file(i).c_str());    
+        else if (i == 18)
+            get_valid(i) = ((LzSerialStorageRT*)get_mat(i))->openFile(open_file(i).c_str());    */
+
         if (get_valid(i) && !hasdata)
         {
             get_mat(i)->readHead((char*)&towritedatahead);
@@ -771,8 +699,10 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
         extra_high->writeHead(&towritedatahead);
     }
     else
+    {
+        delete extract;
         return 6; // 没有任何数据
-
+    }
     /*	lzMat_A->openFile(A_file.c_str());                                  //打开文件
 	lzMat_B->openFile(B_file.c_str());
 	lzMat_C->openFile(C_file.c_str());
@@ -791,7 +721,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
 	lzMat_P->openFile(P_file.c_str());
 	lzMat_R->openFile(R_file.c_str());
 	lzMat_T->openFile(T_file.c_str());*/
-    for(int i=1;i<=17;i++)
+    for(int i=1;i<=18;i++)
     {
         if(get_valid(i))
         {
@@ -818,14 +748,24 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
 	lzMat_T->retrieveBlock(start_num);*/
     // TODO TODELETE
     double mile_count = 0;
+    RT_point = Mat::zeros(1 ,3 , CV_64FC4);
+    
+    double Q_a, Q_b, R_a, R_b;
+
 	for(int frame_num = start_num; frame_num < start_num+frame_cunt; frame_num++, mile_count+=1)  // mile_count++ TODO TODELETE
     {
-        for(int j = 1; j <= 17; j++)
+        for(int j = 1; j <= 18; j++)
         {
             if (get_valid(j))
             {
-                get_point_valid(j) = get_mat(j)->readMat(get_point(j));
-/*				if(j<17)
+                if (j <= 16)
+                    get_point_valid(j) = get_mat(j)->readMat(get_point(j));
+                else if (j == 17)
+                    get_point_valid(j) = ((LzSerialStorageRT*)get_mat(j))->readMatV2(Q_a, Q_b, get_point(j));
+                else if (j == 18)
+                    get_point_valid(j) = ((LzSerialStorageRT*)get_mat(j))->readMatV2(R_a, R_b, get_point(j));
+
+                /*				if(j<17)
                 for(int i = 0;i<get_point(j).cols;i++)
                 {
 					 std::cout<<"高度： "<<*get_point(j).ptr<float>(0,i)<<endl;
@@ -861,8 +801,9 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             }
         }
 //		get_vector();                                                  //将17组从机vector放入一个vector中
-        if(valid_RT)
+        if(lzMat_Q->getCurrentBlockInfo().isvalid&&lzMat_R->getCurrentBlockInfo().isvalid)              //当前帧左右轨点有效
         {
+            Comput_RT(Q_a, Q_b, R_a, R_b);
 		    rectify_RT();                                                  //对vector进行rt矫正
         }
         out_pnts = Mat(3,fus_vector.size(),CV_64FC4);                     //需改正
@@ -884,7 +825,23 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
 	    }*/
 
         lzMat_Out->writeMat(out_pnts,Info);                               //将out_pointMat写入
-		ret = extrac_height(Item,extra_high,frame_num, mile_count);
+
+       	BlockInfo tmpblockinfo;
+        tmpblockinfo.isvalid = true;
+        tmpblockinfo.key = frame_num;
+
+        SectionData Data;
+	    bool retb = Data.initMaps();
+        float center_height = -1;
+
+        // 【Step3】提取高度
+		ret = extract->extract_height(fus_vector, Data, center_height);
+        
+        // 【Step4】系数校正
+        if (userectifyfactor)
+            extract->rectifyHeight(Data, usesaftyfactor);  
+                
+		extra_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！
         fus_vector.clear();
         ret = 0;
         if (ret != 0)
@@ -892,6 +849,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             // 终止计算
             lzMat_Out->closeFile();
             extra_high->closeFile();
+            delete extract;
             return ret;
         }
         qDebug() << "fuse " << Info.key;
@@ -912,6 +870,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             }
             lzMat_Out->closeFile();
             extra_high->closeFile();
+            delete extract;
             return -1; // 暂停计算返回
         }
 
@@ -929,5 +888,6 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
     lzMat_Out->closeFile();
     extra_high->closeFile();
 	//system("pause");
+    delete extract;
     return ret;
 }

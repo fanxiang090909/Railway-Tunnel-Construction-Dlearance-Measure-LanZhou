@@ -86,6 +86,7 @@ public:
      * @author 范翔
      */
     void collect_CameraStatusFeedback(QString cameraindex, int working, QString errortype);
+
     /**
      * 采集某一隧道完成
      * @param ifdelete bool 是否删除这些文件
@@ -139,7 +140,7 @@ public:
     /**
      * 从控程序得到缓存图片
      */
-    void retriveImg(QString tmpsn, unsigned __int64 * tmpfc, Mat & tmpimg);
+    void retriveImg(QString tmpsn, unsigned __int64 * tmpfc, Mat & tmpimg, bool & isacquiz);
 
 private:
 
@@ -162,6 +163,12 @@ private:
      * 从控界面定时监控显示计时器
      */
     QTimer* timer;
+
+public slots:
+    /**
+     * 帧号反馈
+     */
+    void collect_feedbackFCToMaster(QString cameraid, long long currentfc);
 
 private slots:
     

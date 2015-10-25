@@ -19,40 +19,34 @@ class LzSerialStorageRT : public LzSerialStorageMat
 {
 public:
 
-	bool createFile(const char* filename) {
-		return LzSerialStorageBase::createFile(filename, sizeof(DataHead));
-	}
+    void writeMatV2(double a, double b, cv::Mat m) {
+        size_t szcount = 0;
+        // 给mapbuffer和szcount赋值
+        memcpy(blockinfo.reservebit, &a, sizeof(double));
+        memcpy(blockinfo.reservebit+sizeof(double), &b, sizeof(double));
 
-	void setAcquiHead( DataHead* _acquihead ) 
-	{
-		memcpy(&head, _acquihead, sizeof(DataHead) );
-	}
-	void fillAcquiHead( )
-	{ }
+        writeMat(m);
+    }
 
-	void writeHead( DataHead *fh ) {
-		LzSerialStorageBase::writeHead((char*)fh);
-	}
-	void readHead( DataHead *fh ) {
-		LzSerialStorageBase::readHead((char*)fh);
-	}
+    void writeMatV2(double a, double b, cv::Mat &m, BlockInfo &blockinfo, bool specifykey = true ) {
+        memcpy(blockinfo.reservebit, &a, sizeof(double));
+        memcpy(blockinfo.reservebit+sizeof(double), &b, sizeof(double));
 
-	//vector<BLOCK_KEY> readKeys()
+        LzSerialStorageMat::writeMat(m, blockinfo, specifykey);
+    }
 
-protected:
-	virtual BLOCK_KEY generateKey(char* block, size_t size)
-	{
-		if (specifykey)
-		{
-			specifykey = false;
-			return blockinfo.key;
-		}
-		else
-			return info.blocknumbers;
-	}
 
-private:
-	DataHead head;
+    bool readMatV2(double& a, double& b, cv::Mat & m) 
+    {
+        if ( !LzSerialStorageMat::readMat(m) )
+            return false;
+
+        // fan: memcpy 某种意义上可理解为赋值号“=”，尤其适用大数据块的赋值
+        // fan: 与strcpy()不同的是,memcpy()会完整的复制n个字节,不会因为遇到字符串结束'\0'而结束
+        memcpy(&a, blockinfo.reservebit, sizeof(double));
+        memcpy(&b, blockinfo.reservebit+sizeof(double), sizeof(double));
+        return true;
+    }
 };
 
 #endif

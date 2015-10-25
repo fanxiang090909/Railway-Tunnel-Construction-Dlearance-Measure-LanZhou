@@ -90,6 +90,9 @@ public:
      */
     int getMinHeight();
 
+    int getTunnelid();
+    long long getTaskTunnelid();
+
 private:
 
     _int64 tasktunnelid;

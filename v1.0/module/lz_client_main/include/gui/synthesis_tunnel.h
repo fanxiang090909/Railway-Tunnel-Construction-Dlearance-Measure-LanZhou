@@ -58,7 +58,7 @@ public slots:
     /**
      * 界面之间消息传递槽函数
      */
-    void slotSelectedTunnelToSynthesis(int newtunnelid, QString, bool, bool, long long, long long);
+    void slotSelectedTunnelToSynthesis(int newtunnelid, QString, bool, bool, bool, double, long long, long long);
     void activatecombox();
     void setLineType(int,int,int);
 
@@ -127,6 +127,12 @@ private:
     bool currentcarriagedirection;
     bool carriagedirectionlock;
 
+
+	//是否正常行驶
+	bool isNormalTravel;
+
+	//是否为双线
+	bool isDoubleLine;
 
 	long long current_startframeno;
 	long long current_endframeno;
@@ -224,11 +230,14 @@ private slots:
     void endProgressBar();
 
 
-	//9月2号添加
+	//2015年9月2号添加
 	void setNewWidth();
 	void setNewCenterHeight();
 	void setDirectionVal();
-	//9月2号添加
+	//2015年9月2号添加
+
+	//@zengwang  2015年10月12日
+	//void manualSelectData();
 
 	void getMousePos(int newx1, int newy1);
 

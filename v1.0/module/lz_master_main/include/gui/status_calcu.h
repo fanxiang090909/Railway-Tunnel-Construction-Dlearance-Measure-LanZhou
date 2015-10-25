@@ -72,6 +72,12 @@ protected slots:
 
 	virtual void extract_beginStartOneTunnel(int tunnelid) = 0;
 
+private slots:
+
+    void errToggled(bool ischeck);
+
+    void safetyToggled(bool ischeck);
+
 public slots:
 
     /**
@@ -149,6 +155,9 @@ protected:
     bool hasinintproject;
 
     bool isincalculatebackupstatus;
+
+    bool usesavetyfactor;
+    bool useerrrectifyfactor;
 };
 
 #endif // STATUS_CALCU_WIDGET_H

@@ -725,7 +725,8 @@ void MasterProgram::parseMsg(QString msg)
                 Status::getStatusInstance()->master_status_mutex.unlock();
                 if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads() * 4)
                 {
-                    lzAcquizCtrlQueue->endCurrentMsg();
+                    // @author范翔 20151010
+                    //lzAcquizCtrlQueue->endCurrentMsg();
                     // saveCollectInfo
                     this->saveCollectedInfo();
                 }
@@ -806,8 +807,12 @@ void MasterProgram::parseMsg(QString msg)
                     Status::getStatusInstance()->master_status_mutex.lock();
                     numofreceived = ++Status::getStatusInstance()->num_master_collect_status;
                     Status::getStatusInstance()->master_status_mutex.unlock();
-                    if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads() * 4)
-                        lzAcquizCtrlQueue->endCurrentMsg();
+                    //if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads() * 4)
+                    {
+                        // @author范翔 20151010
+                        //lzAcquizCtrlQueue->endCurrentMsg();
+                    }
+
                     /*if (tmpModel.box1.camera_ref.compare(cameraindex.toStdString()) == 0) // 参考相机
                     {
                         slavefcrec.startfc_box1cameraref = end_fa;
@@ -832,8 +837,11 @@ void MasterProgram::parseMsg(QString msg)
                     Status::getStatusInstance()->master_status_mutex.lock();
                     numofreceived = ++Status::getStatusInstance()->num_master_collect_status;
                     Status::getStatusInstance()->master_status_mutex.unlock();
-                    if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads() * 4)
-                        lzAcquizCtrlQueue->endCurrentMsg();
+                    //if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads() * 4)
+                    {
+                        // @author范翔 20151010
+                        //lzAcquizCtrlQueue->endCurrentMsg();
+                    }
 
                     if (tmpModel.box1.camera_ref.compare(cameraindex.toStdString()) == 0) // 参考相机
                     {
@@ -858,6 +866,13 @@ void MasterProgram::parseMsg(QString msg)
 
                 break;
             }
+            /*case 1108: // 帧号反馈 1108,cameraindex=xx,currentframe=xx
+            {
+                QString cameraindex = strList.value(2).mid(12);
+                long long currentfc = strList.value(3).mid(13).toLongLong();
+                emit signalToCameraFC(cameraindex, currentfc);
+                break;
+            }*/
             case 1302:
             {
                 QString returnVal = strList.value(2).mid(7);
@@ -881,7 +896,8 @@ void MasterProgram::parseMsg(QString msg)
                 //@author 范翔 定西 -> 怕采集之中一个计算机断开连接。。。 无法保存文件了就
                 if (numofreceived >= getMultiThreadTcpServer()->getNumOfThreads())
                 {
-                    lzAcquizCtrlQueue->endCurrentMsg();
+                    // @author范翔 20151010
+                    //lzAcquizCtrlQueue->endCurrentMsg();
                     // saveCollectInfo
                     this->saveCollectedInfo();
                     emit msgToGUIShowCProjectCTRL(Collecting, false);
@@ -1950,7 +1966,7 @@ void MasterProgram::calculate_Fuse_checkisready()
  * 开始融合计算和提高度计算
  * 前提是在双目及车底RT计算的中间结果文件全部返回之后
  */
-void MasterProgram::calculate_Fuse_beginStartAll()
+void MasterProgram::calculate_Fuse_beginStartAll(bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     bool ret = true;
     bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
@@ -1977,8 +1993,24 @@ void MasterProgram::calculate_Fuse_beginStartAll()
             if (tmphasbackup < 1)
             {
                 int tunnelid = (*it).planTask.tunnelnum;
+                QString parentpath = MasterSetting::getSettingInstance()->getParentPath();
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
-                todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+
+                QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
+
+                QString QRrailcalifile = "QRrial.xml";
+                QString rectifyheightfile = "rectify.heights";
+
+                if (tmpsl.size() >= 2)
+                {
+                    QRrailcalifile = tmpsl.at(0);
+                    rectifyheightfile = tmpsl.at(1);
+                }
+
+                if (tmphasbackup == 1)
+                    todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8.%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
+                else
+                    todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
                 lzFuseCalcQueue->pushBack(todomsg);
             }
             else
@@ -1994,7 +2026,7 @@ void MasterProgram::calculate_Fuse_beginStartAll()
 
 }
 
-void MasterProgram::calculate_Fuse_beginStartOneTunnel(int tunnelid)
+void MasterProgram::calculate_Fuse_beginStartOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     bool ret = true;
     bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
@@ -2022,8 +2054,24 @@ void MasterProgram::calculate_Fuse_beginStartOneTunnel(int tunnelid)
             {
                 if (tunnelid == (*it).planTask.tunnelnum)
                 {
+                    QString parentpath = MasterSetting::getSettingInstance()->getParentPath();
                     QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
-                    todomsg.msg = QString("-30,%1,%2,%3,%4").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc);
+
+                    QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
+                    QString QRrailcalifile = "QRrail.xml";
+                    QString rectifyheightfile = "rectify.heights";
+
+                    if (tmpsl.size() >= 2)
+                    {
+                        QRrailcalifile = tmpsl.at(0);
+                        rectifyheightfile = tmpsl.at(1);
+                    }
+
+                    if (tmphasbackup == 1)
+                        todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8.%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
+                    else
+                        todomsg.msg = QString("-30,%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor).arg(QRrailcalifile).arg(rectifyheightfile);
+
                     lzFuseCalcQueue->pushBack(todomsg);
                     break;
                 }
@@ -2045,7 +2093,7 @@ void MasterProgram::calculate_Fuse_stop()
     lzFuseCalcQueue->suspend();
 }
 
-void MasterProgram::calculate_ExtractHeight_beginStartAll()
+void MasterProgram::calculate_ExtractHeight_beginStartAll(bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     bool ret = true;
     bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
@@ -2055,7 +2103,7 @@ void MasterProgram::calculate_ExtractHeight_beginStartAll()
     // TODO
 }
 
-void MasterProgram::calculate_ExtractHeight_beginStartOneTunnel(int tunnelid)
+void MasterProgram::calculate_ExtractHeight_beginStartOneTunnel(int tunnelid, bool useerrorrectifyfactor, bool usesafetyfactor)
 {
     bool ret = true;
     bool ret1 = Status::getStatusInstance()->setWorkingStatus(Calculating_Backuping);
@@ -2085,10 +2133,10 @@ void MasterProgram::calculate_ExtractHeight_beginStartOneTunnel(int tunnelid)
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
                 QString parentpath = MasterSetting::getSettingInstance()->getParentPath();
                 if (tmphasbackup == 1)
-                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5,%6,%7").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(tmpinterruptfc).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor);
                 else
                 {
-                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath);
+                    todomsg.msg = QString("-32,%1,%2,%3,%4,%5,%6,%7").arg(tunnelid).arg(filename).arg(tmphasbackup).arg(0).arg(parentpath).arg(useerrorrectifyfactor).arg(usesafetyfactor);
                     QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(Calculate);
 
                     qDebug() << projectpath + "/fuse_calcu/" + filename + ".fdat";
@@ -2342,7 +2390,7 @@ void MasterProgram::backup_Stop()
  * 开始融合计算和提高度计算
  * 前提是在双目及车底RT计算的中间结果文件全部返回之后
  */
-void MasterProgram::backup_Master_begin()
+void MasterProgram::backup_Master_beginStartAll()
 {
     QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Backup);
     QString date = projectname.right(13).left(8);
@@ -2365,8 +2413,7 @@ void MasterProgram::backup_Master_begin()
             {
                 int tunnelid = (*it).planTask.tunnelnum;
                 QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
-                todomsg.msg = QString("-40,%1,%2,%3").arg(filename).arg(tmphasbackup).arg(tmpbackupfc);
-                lzBackupCalcQueue->pushBack(todomsg);
+                backup_Master_StartOneTunnel(tunnelid, filename, tmphasbackup, tmpbackupfc);
             }
             else
                 tmphasbackupnum++;
@@ -2374,6 +2421,63 @@ void MasterProgram::backup_Master_begin()
         it++;
     }
     emit calcubackupProgressingBar(WorkingStatus::Calculating, QString("%1").arg(0), 1, totalhasbackupnum, tmphasbackupnum, false);
+}
+
+void MasterProgram::backup_Master_beginStartOneTunnel(int tobackuptunnelid)
+{
+    QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Backup);
+    QString date = projectname.right(13).left(8);
+    ToDoMsg todomsg;
+
+    int tmphasbackup;
+    __int64 tmpbackupfc;
+    int tmphasbackupnum = 0;
+    int totalhasbackupnum = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Backup).list()->size();
+
+    bool ret = false, ret2 = false;
+    QList<CheckedTunnelTaskModel>::iterator it = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Backup).begin();
+    while (it != LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Backup).end())
+    {
+        ret = false;
+        CheckedTunnelTaskModel tmpmodel;
+        ret = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Calculate).getCheckedTunnelModel(tobackuptunnelid, tmpmodel);
+
+        if (ret)
+        {
+            ret2 = (*it).calcuItem.getHasBackupCalc("fuse", tmphasbackup, tmpbackupfc);
+            if (ret2)
+            {
+                if (tmphasbackup < 2)
+                {
+                    int tunnelid = (*it).planTask.tunnelnum;
+                    QString filename = QObject::tr((*it).planTask.tunnelname.c_str()) + "_" + date;
+                    backup_Master_StartOneTunnel(tunnelid, filename, tmphasbackup, tmpbackupfc);
+                }
+                else
+                    tmphasbackupnum++;
+            }
+            break;
+        }
+        it++;
+    }
+    emit calcubackupProgressingBar(WorkingStatus::Calculating, QString("%1").arg(0), 1, totalhasbackupnum, tmphasbackupnum, false);
+}
+
+void MasterProgram::backup_Master_StartOneTunnel(int tunnelid, QString tunnelfilenameprefix, int tmphasbackup, __int64 tmpbackupfc)
+{
+    QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Backup);
+    qDebug() << projectpath;
+    QStringList outpulist;
+    
+    MasterSetting::getSettingInstance()->copyMasterDirectoryFiles(projectpath, outpulist);
+    ToDoMsg todomsg;
+    for (int i = 0; i < outpulist.size(); i++)
+    {
+        QString filename = outpulist.at(i).mid(projectpath.size());
+        qDebug() << filename;
+        todomsg.msg = QString("-40,%1,%2,%3").arg(filename).arg(tmphasbackup).arg(tmpbackupfc);
+        lzBackupCalcQueue->pushBack(todomsg);
+    }
 }
 
 void MasterProgram::backup_FeedbackPerTunnel_CameraGroup_R(QString filename, int slaveid, int type, int seqno, QString index, bool isinterrupt, __int64 interruptfc)

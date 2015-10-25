@@ -82,6 +82,14 @@ public:
     double getDefaultDistanceMode();
     void setDefaultDistanceMode(double newDefaultDistanceMode);
 
+    /**
+     * 拷贝目录及目录下文件
+     * @param fromDir 源目录
+     * @param toDir 目标目录
+     * @param bCoverifFileExists true 同名时覆盖，flase，同名时返回false，终止拷贝
+     */
+    bool copyMasterDirectoryFiles(const QDir& fromDir, QStringList & outputfiles);
+
 private:
     explicit MasterSetting(QObject *parent = 0);
 

@@ -200,6 +200,11 @@ void ServerProgram::parseMsg(QString msg)
                 emit signalMsgToGUI(QObject::tr("[客户端%1] 启动从控程序成功").arg(clientip));
                 break;
             }
+            case -30:
+            {
+                emit signalMsgToGUI(QObject::tr("[客户端%1] 从控确认关机").arg(clientip));
+                break;
+            }
             default:;
         }
     }
@@ -256,14 +261,14 @@ void ServerProgram::parseMsg(QString msg)
                 if (appOp.compare("true") == 0)
                 {
                     op = true;
-                    emit signalMsgToGUI(QObject::tr("[客户端%1] 用户%2申请修正采集工程%3的隧道%4").arg(clientip).arg(username).arg(projectname1).arg(tunnelname1));
+                    emit signalMsgToGUI(QObject::tr("[客户端%1] 用户【%2】申请修正采集工程%3的隧道%4").arg(clientip).arg(username).arg(projectname1).arg(tunnelname1));
                     // 检查是否正在被别人修改
                     checkIfModiiedByOther(clientip, item);
                 }
                 else
                 {
                     op = false;
-                    emit signalMsgToGUI(QObject::tr("[客户端%1] 用户%2完成修正采集工程%3的隧道%4").arg(clientip).arg(username).arg(projectname1).arg(tunnelname1));
+                    emit signalMsgToGUI(QObject::tr("[客户端%1] 用户【%2】完成修正采集工程%3的隧道%4").arg(clientip).arg(username).arg(projectname1).arg(tunnelname1));
                     //if (EditingList::getEditingListInstance()->exist(item, currentUser))
                     {
                         EditingList::getEditingListInstance()->remove(item);
@@ -364,4 +369,13 @@ void ServerProgram::terminateSlaveProgram()
 {
     getMultiThreadTcpServer()->sendMessageToSlaves(QObject::tr("-21"));
     emit signalMsgToGUI(QObject::tr("[服务器] 发送从控程序关闭命令"));
+}
+
+/**
+ * 从控关机
+ */
+void ServerProgram::shutdownAllSlaves()
+{
+    getMultiThreadTcpServer()->sendMessageToSlaves(QObject::tr("-30"));
+    emit signalMsgToGUI(QObject::tr("[服务器] 发送从控机关机命令"));
 }

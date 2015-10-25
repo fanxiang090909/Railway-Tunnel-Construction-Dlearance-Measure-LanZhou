@@ -84,6 +84,11 @@ private:
     void resetSlaveProgram();
     void terminateSlaveProgram();
 
+    /**
+     * 从控关机
+     */
+    void shutdownAllSlaves();
+
 private:
     explicit ServerProgram(QObject *parent = 0);
 

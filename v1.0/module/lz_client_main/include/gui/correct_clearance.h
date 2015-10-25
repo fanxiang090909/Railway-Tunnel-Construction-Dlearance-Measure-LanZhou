@@ -110,6 +110,14 @@ private:
      */
     bool currentCarriageDirection;
 
+	//@zengwang 2015年10月9日添加
+	//当前是否在正常行驶
+	bool isNormalTravel;
+
+	//当前是否双线
+	bool isDoubleLine;
+
+
 	long long current_startframeno;
 	long long current_endframeno;
 
@@ -340,7 +348,7 @@ private slots:
 
 public slots:
     // 从上一步接收文件名参数界面切换槽函数
-    void slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool carriagedir, bool isNormal, long long startframeno, long long endframeno);
+    void slotSelectedTunnelToEdit(int tunnelid, QString signalfilename, bool isDouble, bool carriagedir, bool isNormal, double distanceMode, long long startframeno, long long endframeno);
     
     // 设置车厢正反
     void slotSetCarriageDirection(bool newdirect);

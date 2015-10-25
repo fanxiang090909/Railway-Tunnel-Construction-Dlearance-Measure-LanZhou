@@ -50,20 +50,20 @@ void CalcuMasterWidget::calculate_beginStartOneTunnel(int tunnelid)
 
 void CalcuMasterWidget::fuse_beginStartAll()
 {
-    MasterProgram::getMasterProgramInstance()->calculate_Fuse_beginStartAll();
+    MasterProgram::getMasterProgramInstance()->calculate_Fuse_beginStartAll(useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuMasterWidget::fuse_beginStartOneTunnel(int tunnelid)
 {
-    MasterProgram::getMasterProgramInstance()->calculate_Fuse_beginStartOneTunnel(tunnelid);
+    MasterProgram::getMasterProgramInstance()->calculate_Fuse_beginStartOneTunnel(tunnelid, useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuMasterWidget::extract_beginStartAll()
 {
-    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartAll();
+    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartAll(useerrrectifyfactor, usesavetyfactor);
 }
 
 void CalcuMasterWidget::extract_beginStartOneTunnel(int tunnelid)
 {
-    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartOneTunnel(tunnelid);
+    MasterProgram::getMasterProgramInstance()->calculate_ExtractHeight_beginStartOneTunnel(tunnelid, useerrrectifyfactor, usesavetyfactor);
 }
