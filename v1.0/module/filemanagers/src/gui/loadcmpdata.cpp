@@ -130,21 +130,28 @@ void LoadCompareDataWidget::updateAllView()
         ui->tableWidget_3->insertRow(0);
         ui->tableWidget_3->setItem(0, 0, new QTableWidgetItem(QString("%1").arg(pair1.first)));
         QTableWidgetItem * tmp1 = new QTableWidgetItem(QString("%1").arg((int)pair1.second.left - (int)pair2.second.left));
-        if (abs(pair1.second.left - pair2.second.left) > 40)
-            tmp1->setBackgroundColor(Qt::red);
+        if (abs(pair1.second.left - pair2.second.left) > 40 && abs(pair1.second.left - pair2.second.left) < 500)
+            tmp1->setBackgroundColor(QColor(255,114,101));
+        else if (abs(pair1.second.left - pair2.second.left) >= 500)
+            tmp1->setBackgroundColor(QColor(70,130,180));
         else
             tmp1->setBackgroundColor(Qt::white);
         ui->tableWidget_3->setItem(0, 1, tmp1);
+
         QTableWidgetItem * tmp2 = new QTableWidgetItem(QString("%1").arg((int)pair1.second.right - (int)pair2.second.right));
-        if (abs(pair1.second.right - pair2.second.right) > 40)
-            tmp2->setBackgroundColor(Qt::red);
+        if (abs(pair1.second.right - pair2.second.right) > 40 && abs(pair1.second.right - pair2.second.right) < 500)
+            tmp2->setBackgroundColor(QColor(255,114,101));
+        else if (abs(pair1.second.right - pair2.second.right) >= 500)
+            tmp2->setBackgroundColor(QColor(70,130,180));
         else
             tmp2->setBackgroundColor(Qt::white);
         ui->tableWidget_3->setItem(0, 2, tmp2);
  
         QTableWidgetItem * tmp3 = new QTableWidgetItem(QString("%1").arg((int)((pair1.second.left + pair1.second.right) - (pair2.second.left + pair2.second.right))));
-        if (abs((pair1.second.left + pair1.second.right) - (pair2.second.left + pair2.second.right)) > 100)
-            tmp3->setBackgroundColor(Qt::red);
+        if (abs((pair1.second.left + pair1.second.right) - (pair2.second.left + pair2.second.right)) > 100 && abs((pair1.second.left + pair1.second.right) - (pair2.second.left + pair2.second.right)) < 1000)
+            tmp3->setBackgroundColor(QColor(255,114,101));
+        else if (abs((pair1.second.left + pair1.second.right) - (pair2.second.left + pair2.second.right)) >= 1000)
+            tmp3->setBackgroundColor(QColor(70,130,180));
         else
             tmp3->setBackgroundColor(Qt::white);
 

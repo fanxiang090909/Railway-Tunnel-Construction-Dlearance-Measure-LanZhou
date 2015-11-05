@@ -1411,6 +1411,7 @@ void CheckTaskWidget::separateTaskTunnel()//分离
 
     // 引用赋值
     CheckedTaskList & clist = LzProjectAccess::getLzProjectAccessInstance()->getLzCheckedList(LzProjectClass::Main);
+    PlanTask tmpplan;
 
     // Step1 往currentRow为编号的CheckedTaskList的元素后中是否包含num帧号
     QList<CheckedTunnelTaskModel>::iterator it1 = clist.begin();
@@ -1418,7 +1419,14 @@ void CheckTaskWidget::separateTaskTunnel()//分离
     while (it1 != clist.end())
     {
         if (k == currentRow)
+        {
+            tmpplan = it1->planTask;
+            if (currentRow+1 < ui->planTasksView->model()->rowCount() && currentRow == ui->actualTasksWidget->rowCount() - 1)
+            {
+                tmpplan = LzProjectAccess::getLzProjectAccessInstance()->getLzPlanList(LzProjectClass::Main).list()->at(currentRow+1);
+            }
             break;
+        }
         it1++;
         k++;
     }
@@ -1527,7 +1535,7 @@ void CheckTaskWidget::separateTaskTunnel()//分离
     }
     if (find)
     {
-        inserttmp->setPlanTask(it1->planTask);
+        inserttmp->setPlanTask(tmpplan);
         CalcuFileItem calcuitem;
         calcuitem.cal_filename_prefix = inserttmp->planTask.tunnelname + "_" + inserttmp->planTask.datetime;
         calcuitem.cal_framecounter_begin = -1;

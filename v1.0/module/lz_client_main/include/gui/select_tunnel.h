@@ -28,7 +28,8 @@ class SelectAvaliableTunnelWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SelectAvaliableTunnelWidget(QWidget *parent = 0);
+    // 默认链接数据库
+    explicit SelectAvaliableTunnelWidget(bool initisconnectingdb = true, QWidget *parent = 0);
     ~SelectAvaliableTunnelWidget();
 
     // 刷新可编辑隧道
@@ -91,6 +92,12 @@ private:
         CHECKEDTASK_APPLYEDIT = 9,
         CHECKEDTASK_CHECKVALIDFRAMES = 10
     };
+
+    /**
+     * @author 范翔 20151103 为兼容3d查看小工具添加
+     * 是否初始链接数据库
+     */
+    bool isconnectingdb;
 
 public:
     //添加实际隧道文件

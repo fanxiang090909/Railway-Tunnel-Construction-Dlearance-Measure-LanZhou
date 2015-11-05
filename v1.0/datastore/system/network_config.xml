@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="gb2312" standalone="yes" ?>
-<network_config calibration_file="all.xml" master_ip="192.168.200.1" master_backup_nasip="192.168.200.102" db_server_ip="localhost">
-    <slave slaveid="1" ip="192.168.200.12" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="A" camera_calib_file="Lz_Cali_20141203_A.xml" fenzhong_calib_file="FZCalibration_A_20141030.xml">
+<network_config calibration_file="QRrail.xml,heights.rectify" master_ip="192.168.200.1" master_backup_nasip="192.168.200.102" db_server_ip="localhost">
+    <slave slaveid="1" ip="192.168.200.12" port="1111" is_rt_slave="0" backup_nasip="192.168.200.101">
+        <camera_pair index="A" camera_calib_file="Lz_Cali_A_20151027.xml" fenzhong_calib_file="FZCalibration_A_20141030.xml">
             <camera_ref cameraid="A2" sn="21395107" paramfile="A2.xml" />
             <camera cameraid="A1" sn="21395136" paramfile="A1.xml" />
         </camera_pair>
-        <camera_pair index="B" camera_calib_file="Lz_Cali_20141203_B.xml" fenzhong_calib_file="FZCalibration_B_20141030.xml">
+        <camera_pair index="B" camera_calib_file="Lz_Cali_B_20151027.xml" fenzhong_calib_file="FZCalibration_B_20141030.xml">
             <camera_ref cameraid="B2" sn="21384727" paramfile="B2.xml" />
             <camera cameraid="B1" sn="21384728" paramfile="B1.xml" />
         </camera_pair>
     </slave>
-    <slave slaveid="2" ip="192.168.200.22" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="C" camera_calib_file="Lz_Cali_20150306_C.xml" fenzhong_calib_file="FZCalibration_C_20141030.xml">
+    <slave slaveid="2" ip="192.168.200.22" port="1111" is_rt_slave="0"  backup_nasip="192.168.200.101">
+        <camera_pair index="C" camera_calib_file="Lz_Cali_C_20151027.xml" fenzhong_calib_file="FZCalibration_C_20141030.xml">
             <camera_ref cameraid="C2" sn="21395140" paramfile="C2.xml" />
             <camera cameraid="C1" sn="21384764" paramfile="C1.xml" />
         </camera_pair>__
-        <camera_pair index="D" camera_calib_file="Lz_Cali_20141203_D.xml" fenzhong_calib_file="FZCalibration_D_20141030.xml">
+        <camera_pair index="D" camera_calib_file="Lz_Cali_D_20151027.xml" fenzhong_calib_file="FZCalibration_D_20141030.xml">
             <camera_ref cameraid="D2" sn="21395145" paramfile="D2.xml" />
             <camera cameraid="D1" sn="21395138" paramfile="D1.xml" />
         </camera_pair>
     </slave>
-    <slave slaveid="3" ip="192.168.200.32" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="E" camera_calib_file="Lz_Cali_20141203_E.xml" fenzhong_calib_file="FZCalibration_E_20141030.xml">
+    <slave slaveid="3" ip="192.168.200.32" port="1111" is_rt_slave="0" backup_nasip="192.168.200.101">
+        <camera_pair index="E" camera_calib_file="Lz_Cali_E_20151027.xml" fenzhong_calib_file="FZCalibration_E_20141030.xml">
             <camera_ref cameraid="E2" sn="21395152" paramfile="E2.xml" />
             <camera cameraid="E1" sn="21395121" paramfile="E1.xml" />
         </camera_pair>
-        <camera_pair index="F" camera_calib_file="Lz_Cali_20141203_F.xml" fenzhong_calib_file="FZCalibration_F_20141030.xml">
+        <camera_pair index="F" camera_calib_file="Lz_Cali_F_20151027.xml" fenzhong_calib_file="FZCalibration_F_20141030.xml">
             <camera_ref cameraid="F2" sn="21384758" paramfile="F2.xml" />
             <camera cameraid="F1" sn="21395133" paramfile="F1.xml" />
         </camera_pair>
     </slave>
-    <slave slaveid="4" ip="192.168.200.42" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="G" camera_calib_file="Lz_Cali_20150306_G.xml" fenzhong_calib_file="FZCalibration_G_20141030.xml">
+    <slave slaveid="4" ip="192.168.200.42" port="1111" is_rt_slave="0" backup_nasip="192.168.200.101">
+        <camera_pair index="G" camera_calib_file="Lz_Cali_G_20151027.xml" fenzhong_calib_file="FZCalibration_G_20141030.xml">
             <camera_ref cameraid="G2" sn="21395146" paramfile="G2.xml" />
             <camera cameraid="G1" sn="21395118" paramfile="G1.xml" />
         </camera_pair>
-        <camera_pair index="H" camera_calib_file="Lz_Cali_20141204_H.xml" fenzhong_calib_file="FZCalibration_H_20141030.xml">
+        <camera_pair index="H" camera_calib_file="Lz_Cali_H_20151027.xml" fenzhong_calib_file="FZCalibration_H_20141030.xml">
             <camera_ref cameraid="H2" sn="21395144" paramfile="H2.xml" />
             <camera cameraid="H1" sn="21395114" paramfile="H1.xml" />
         </camera_pair>
     </slave>
     <slave slaveid="5" ip="192.168.200.52" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="I" camera_calib_file="Lz_Cali_20141205_I.xml" fenzhong_calib_file="FZCalibration_I_20141030.xml">
+        <camera_pair index="I" camera_calib_file="Lz_Cali_I_20151027.xml" fenzhong_calib_file="FZCalibration_I_20141030.xml">
             <camera_ref cameraid="I1" sn="21395134" paramfile="I1.xml" />
             <camera cameraid="I2" sn="21395141" paramfile="I2.xml" />
         </camera_pair>
-        <camera_pair index="J" camera_calib_file="Lz_Cali_20150306_J.xml" fenzhong_calib_file="FZCalibration_J_20141030.xml">
+        <camera_pair index="J" camera_calib_file="Lz_Cali_J_20151027.xml" fenzhong_calib_file="FZCalibration_J_20141030.xml">
             <camera_ref cameraid="J1" sn="21384747" paramfile="J1.xml" />
             <camera cameraid="J2" sn="21395108" paramfile="J2.xml" />
         </camera_pair>
     </slave>
     <slave slaveid="6" ip="192.168.200.62" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="K" camera_calib_file="Lz_Cali_20150306_K.xml" fenzhong_calib_file="FZCalibration_K_20141030.xml">
+        <camera_pair index="K" camera_calib_file="Lz_Cali_K_20151027.xml" fenzhong_calib_file="FZCalibration_K_20141030.xml">
             <camera_ref cameraid="K1" sn="21395116" paramfile="K1.xml" />
             <camera cameraid="K2" sn="21395137" paramfile="K2.xml" />
         </camera_pair>
-        <camera_pair index="L" camera_calib_file="Lz_Cali_20150306_L.xml" fenzhong_calib_file="FZCalibration_L_20141030.xml">
+        <camera_pair index="L" camera_calib_file="Lz_Cali_L_20151027.xml" fenzhong_calib_file="FZCalibration_L_20141030.xml">
             <camera_ref cameraid="L1" sn="21395110" paramfile="L1.xml" />
             <camera cameraid="L2" sn="21395117" paramfile="L2.xml" />
         </camera_pair>
     </slave>
     <slave slaveid="7" ip="192.168.200.72" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="M" camera_calib_file="Lz_Cali_20150306_M.xml" fenzhong_calib_file="FZCalibration_M_20141030.xml">
+        <camera_pair index="M" camera_calib_file="Lz_Cali_M_20151027.xml" fenzhong_calib_file="FZCalibration_M_20141030.xml">
             <camera_ref cameraid="M1" sn="21384730" paramfile="M1.xml" />
             <camera cameraid="M2" sn="21395132" paramfile="M2.xml" />
         </camera_pair>
-        <camera_pair index="N" camera_calib_file="Lz_Cali_20150306_N.xml" fenzhong_calib_file="FZCalibration_N_20141030.xml">
+        <camera_pair index="N" camera_calib_file="Lz_Cali_N_20151027.xml" fenzhong_calib_file="FZCalibration_N_20141030.xml">
             <camera_ref cameraid="N1" sn="21384735" paramfile="N1.xml" />
             <camera cameraid="N2" sn="21395128" paramfile="N2.xml" />
         </camera_pair>
     </slave>
     <slave slaveid="8" ip="192.168.200.82" port="1111" is_rt_slave="0" backup_nasip="192.168.200.102">
-        <camera_pair index="O" camera_calib_file="Lz_Cali_20150117_O.xml" fenzhong_calib_file="FZCalibration_O_20141030.xml">
+        <camera_pair index="O" camera_calib_file="Lz_Cali_O_20151027.xml" fenzhong_calib_file="FZCalibration_O_20141030.xml">
             <camera_ref cameraid="O1" sn="21395129" paramfile="O1.xml" />
             <camera cameraid="O2" sn="21395120" paramfile="O2.xml" />
         </camera_pair>
-        <camera_pair index="P" camera_calib_file="Lz_Cali_20150117_P.xml" fenzhong_calib_file="FZCalibration_P_20141030.xml">
+        <camera_pair index="P" camera_calib_file="Lz_Cali_P_20151027.xml" fenzhong_calib_file="FZCalibration_P_20141030.xml">
             <camera_ref cameraid="P1" sn="21395126" paramfile="P1.xml" />
             <camera cameraid="P2" sn="21395112" paramfile="P2.xml" />
         </camera_pair>
     </slave>
     <slave slaveid="9" ip="192.168.200.91" port="1111" is_rt_slave="1" backup_nasip="192.168.200.102">
-        <camera_pair index="Q" camera_calib_file="Lz_Cali_Q_20150425.xml" fenzhong_calib_file="FZCalibration_Q_20141030.xml">
+        <camera_pair index="Q" camera_calib_file="Lz_Cali_Q_20151021.xml" fenzhong_calib_file="FZCalibration_Q_20141030.xml">
             <camera_ref cameraid="Q1" sn="21395122" paramfile="Q1.xml" />
             <camera cameraid="Q2" sn="21395149" paramfile="Q2.xml" />
         </camera_pair>
-        <camera_pair index="R" camera_calib_file="Lz_Cali_R_20150425.xml" fenzhong_calib_file="FZCalibration_R_20141030.xml">
+        <camera_pair index="R" camera_calib_file="Lz_Cali_R_20151021.xml" fenzhong_calib_file="FZCalibration_R_20141030.xml">
             <camera_ref cameraid="R2" sn="21395111" paramfile="R2.xml" />
             <camera cameraid="R1" sn="21384738" paramfile="R1.xml" />
         </camera_pair>

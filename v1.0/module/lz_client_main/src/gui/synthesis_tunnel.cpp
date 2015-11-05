@@ -10,6 +10,8 @@
 #include "checkedtask.h"
 #include "checkedtask_list.h"
 
+#include "clearance_edit_record.h"
+
 #include "LzSynth.h"
 #include "daoclearanceoutput.h"
 #include "daotasktunnel.h"
@@ -76,9 +78,11 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
     connect(syntunnelcorrect, SIGNAL(LineTypeCount(int,int,int)), this,SLOT(setLineType(int,int,int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(activatecombox()));
 
-    ui->horizontalSlider->setRange(10, 150);
-    ui->spinBox->setRange(10, 150);
-    ui->spinBox->setValue(40);
+    ui->horizontalSlider->setRange(5, 150);
+    ui->spinBox->setRange(5, 150);
+    ui->spinBox->setValue(80);
+    ui->spinBox->setVisible(false);
+
     connect(ui->spinBox,SIGNAL(valueChanged(int)),ui->horizontalSlider,SLOT(setValue(int)));
     connect(ui->horizontalSlider,SIGNAL(valueChanged(int)),ui->spinBox,SLOT(setValue(int)));
     //当spinBox的值改变时,发送信号到DrawImage界面
@@ -87,6 +91,8 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
     connect(this,SIGNAL(sendspinBoxvalue(int)),syntunnelcorrect,SLOT(UpdateScaleRelativeParameter(int)));
     // 当widget大小改变时，告知外层界面容器，更新scrollbar信号槽
     //connect(testsix, SIGNAL(resizeWidget()), this, SLOT(resizeGraphWidget()));
+
+    getspinBoxvalue(80);
 
     connect(ui->carriageDirectionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(carriageDirectionChanged(int)));
     carriagedirectionlock = false;
@@ -466,6 +472,11 @@ void SynthesisTunnelWidget::loadSynthesisData()
         syntunnelcorrect->initPointsArray(rightdata.getMaps().size(), Curve_Right);
         loadGaugeImage(rightdata, Curve_Right);
     }
+
+    if (hasstraight || hasleft || hasright)
+        syntunnelcorrect->setPointsArrayVisible(true);
+    else
+        syntunnelcorrect->setPointsArrayVisible(false);
 }
 
 /**
@@ -549,9 +560,78 @@ void SynthesisTunnelWidget::calculateSynthesisData()
             connect(&lzsyn, SIGNAL(currentfc(long long)), this, SLOT(updateProgressBar(long long)));
 				
 			// 左右侧有效
+
+			if(isNormalTravel)         //判断是否正常行驶   正常行驶
+			{
+				if(isDoubleLine)      //判断是否为双线    双线
+				{
+					if(currentcarriagedirection)    //判断采集方向与出表方向是否一致     一致
+					{
+						//如果采集方向与出表方向一致时，数据保持不变，只显示左边数据,其中当currentcarriagedirection为true时，显示左边数据
+						//leftdata.resetLeftOrRight(currentcarriagedirection);
+						//rightdata.resetLeftOrRight(currentcarriagedirection);
+
+						ui->leftRightValidComboBox->setCurrentIndex(1);
+					}
+					else      //采集方向与出表方向不一致
+					{
+						//如果采集方向与出表方向不一致时，先将左右数据进行对调，再显示左边数据（右边数据不显示）
+						straightdata.swapLeftAndRight();
+						leftdata.swapLeftAndRight();
+						rightdata.swapLeftAndRight();
+						//straightdata.resetLeftOrRight(!currentcarriagedirection);
+						//leftdata.resetLeftOrRight(!currentcarriagedirection);
+						//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+						ui->leftRightValidComboBox->setCurrentIndex(1);
+					}
+				}
+				else       //单线
+				{
+					if(currentcarriagedirection)     //采集与出表方向一致时，数据保持不变
+						ui->leftRightValidComboBox->setCurrentIndex(0);
+					else                            //采集与出表方向不一致时，将左右数据对调后进行显示
+					{
+						straightdata.swapLeftAndRight();
+						leftdata.swapLeftAndRight();
+						rightdata.swapLeftAndRight();
+
+						ui->leftRightValidComboBox->setCurrentIndex(0);
+					}
+
+				}
+			}
+			else         //非正常行驶
+			{
+				if(isDoubleLine)            //如果是双线
+				{
+					if(currentcarriagedirection)   //采集与出表数据一致时，出右边数据
+					{
+						//straightdata.resetLeftOrRight(!currentcarriagedirection);
+						//leftdata.resetLeftOrRight(!currentcarriagedirection);
+						//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+						ui->leftRightValidComboBox->setCurrentIndex(2);
+					}
+					else              //采集与出表数据不一致时，左右数据对调，出左边数据
+					{
+						straightdata.swapLeftAndRight();
+						leftdata.swapLeftAndRight();
+						rightdata.swapLeftAndRight();
+						//straightdata.resetLeftOrRight(!currentcarriagedirection);
+						//leftdata.resetLeftOrRight(!currentcarriagedirection);
+						//rightdata.resetLeftOrRight(!currentcarriagedirection);
+
+						ui->leftRightValidComboBox->setCurrentIndex(1);
+					}
+				}
+				else           //单线不存在非正常行驶这种情况,不做任何处理
+					ui->leftRightValidComboBox->setCurrentIndex(0);
+			}
+
+
+
 			int leftrightvalid = ui->leftRightValidComboBox->currentIndex();
-
-
             // @TODO 系数0.5103应改为外部配置文件输入
 			//lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection, this->current_startframeno, this->current_endframeno, leftrightvalid);
             lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, true, this->current_startframeno, this->current_endframeno, leftrightvalid);
@@ -592,11 +672,7 @@ void SynthesisTunnelWidget::loadGaugeImage(ClearanceData& data, CurveType newtyp
 
     bool ret1= syntunnelcorrect->ClearanceDataToPointsArray(data, newtype);
 
-    if(ret1)
-        syntunnelcorrect->update();//即更新绘图
-  
-
-
+    syntunnelcorrect->update();//即更新绘图
 
 	//@zengwang  2015年10月6日修改
 	/*
@@ -970,6 +1046,12 @@ void SynthesisTunnelWidget::turnToEditWidget()
 void SynthesisTunnelWidget::setNewCenterHeight()
 {
 	newCenterHeight = ui->labelEdit_newCenterHeight->text().toInt();
+	if(newCenterHeight <= 0)
+	{
+		ui->statusArea->append(tr("请输入合理的中心高度进行批量限高！"));
+		return;
+	}
+		
 	qDebug() <<"currentcarriagedirection = " << currentcarriagedirection <<  " ui->setDirectionValComboBox->currentIndex() = " <<ui->setDirectionValComboBox->currentIndex() << endl;
 	if (hasinitheightsval == false)
     {
@@ -1106,6 +1188,44 @@ void SynthesisTunnelWidget::setNewCenterHeight()
 	//重新显示
 	loadSynthesisData();
 
+	//@zengwang 2015年10月18日添加
+	//将批量修改中心高度操作记录加载到记录文件里
+	EditRecordStack * editingrecord;
+	editingrecord = new EditRecordStack();
+
+    QByteArray ba = ClientSetting::getSettingInstance()->getCurrentUser().toLocal8Bit();
+    string currentuser(ba.constData());
+
+	QString currentPath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/syn_data/";
+	qDebug() << currentPath;
+	
+	QString projectname = ClientSetting::getSettingInstance()->getCurrentEditingProject();
+    QStringList strlist = projectname.split("_");
+    int tmpsize = strlist.length();
+    QString collectDate = strlist.at(tmpsize - 1).left( strlist.at(tmpsize - 1).length());
+	QString currentTunnel = ClientSetting::getSettingInstance()->getCurrentEditingTunnel();
+	qDebug() << "editing projectname :" << projectname << ", collectdate:" << collectDate << ", currentTunnel" << currentTunnel;     
+	
+	QString logfilename1 = currentPath + "__" + currentTunnel +  collectDate + "_correct.log";
+	qDebug() << "currentClientPath = " << currentPath << " currentTunnel = " << currentTunnel << " logfilename1 = " << logfilename1;
+	ba = logfilename1.toLocal8Bit();
+    string logfilename = string(ba.constData());
+    bool ret_height = editingrecord->initLogger(logfilename, currentuser);
+	bool hasinitlogfile;
+	if (!ret_height)
+    {
+		 QMessageBox::warning(this, tr("提示"), tr("修正日志文件未加载%1").arg(logfilename.c_str()));
+         hasinitlogfile = false;
+	}
+    else
+    {
+         hasinitlogfile = true;
+    }
+	QByteArray tmpba = (QString("********批量修改%1到%2帧的中心高度到%3以上").arg(startfc).arg(endfc).arg(newCenterHeight)).toLocal8Bit();
+	qDebug() << "tmpba.constData() = " << tmpba.constData();
+	editingrecord->getLogger()->log(tmpba.constData());
+	editingrecord->getLogger()->close();
+
 }
 
 
@@ -1118,6 +1238,13 @@ void SynthesisTunnelWidget::setNewWidth()
 	//@zengwang 2015年10月7号
 	//isValidHeight用来检查输入的高度值是不是正确的高度值，若是，则能正确地限定宽度；若不是，则应该在状态栏中提示用户，输入正确的高度再进行批量限宽
 	bool isValidHeight = false;
+
+	
+	//@zengwang 2015年10月19日
+	//limitWidth为newHeight高度上的限界宽度
+	QString leftorright;
+	int limitWidth = ui->labelEdit_newWidthVal->text().toInt();
+
 	list<int>::iterator it = OutputHeightsList::getOutputHeightsListInstance()->heightsBegin();
     while (it != OutputHeightsList::getOutputHeightsListInstance()->heightsEnd())
     {
@@ -1139,13 +1266,15 @@ void SynthesisTunnelWidget::setNewWidth()
 	{
 		if(ui->setDirectionValComboBox->currentIndex() == 0)
 		{
-			newLeftVal = ui->labelEdit_newWidthVal->text().toInt();
+			newLeftVal = limitWidth;
 			newRightVal = 0;
+			leftorright = QObject::tr("左");
 		}
 		else
 		{
-			newRightVal = ui->labelEdit_newWidthVal->text().toInt();
+			newRightVal = limitWidth;
 			newLeftVal = 0;
+			leftorright = QObject::tr("右");
 		}
 			
 	}
@@ -1153,13 +1282,15 @@ void SynthesisTunnelWidget::setNewWidth()
 	{
 		if(ui->setDirectionValComboBox->currentIndex() == 0)
 		{
-			newRightVal = ui->labelEdit_newWidthVal->text().toInt();
+			newRightVal = limitWidth;
 			newLeftVal = 0;
+			leftorright = QObject::tr("右");
 		}
 		else
 		{
-			newLeftVal = ui->labelEdit_newWidthVal->text().toInt();
+			newLeftVal = limitWidth;
 			newRightVal = 0;
+			leftorright = QObject::tr("左");
 		}
 			
 	}
@@ -1298,6 +1429,46 @@ void SynthesisTunnelWidget::setNewWidth()
 
 	//重新显示
 	loadSynthesisData();
+
+
+	//@zengwang 2015年10月18日添加
+	//将批量修改宽度操作记录加载到记录文件里
+	EditRecordStack * editingrecord;
+	editingrecord = new EditRecordStack();
+
+    QByteArray ba = ClientSetting::getSettingInstance()->getCurrentUser().toLocal8Bit();
+    string currentuser(ba.constData());
+
+	QString currentPath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main) + "/syn_data/";
+	qDebug() << currentPath;
+	
+	QString projectname = ClientSetting::getSettingInstance()->getCurrentEditingProject();
+    QStringList strlist = projectname.split("_");
+    int tmpsize = strlist.length();
+    QString collectDate = strlist.at(tmpsize - 1).left( strlist.at(tmpsize - 1).length());
+	QString currentTunnel = ClientSetting::getSettingInstance()->getCurrentEditingTunnel();
+	qDebug() << "editing projectname :" << projectname << ", collectdate:" << collectDate << ", currentTunnel" << currentTunnel;     
+	
+	QString logfilename1 = currentPath + "________" + currentTunnel +  collectDate + "_correct.log";
+	qDebug() << "currentClientPath = " << currentPath << " currentTunnel = " << currentTunnel << " logfilename1 = " << logfilename1;
+	ba = logfilename1.toLocal8Bit();
+    string logfilename = string(ba.constData());
+    bool ret_height = editingrecord->initLogger(logfilename, currentuser);
+	bool hasinitlogfile;
+	if (!ret_height)
+    {
+		 QMessageBox::warning(this, tr("提示"), tr("修正日志文件未加载%1").arg(logfilename.c_str()));
+         hasinitlogfile = false;
+	}
+    else
+    {
+         hasinitlogfile = true;
+    }
+	QByteArray tmpba = (QString("********批量修改%1到%2帧的高度为%3的%4测的宽度到%5").arg(startfc).arg(endfc).arg(newHeight).arg(leftorright).arg(limitWidth)).toLocal8Bit();
+	qDebug() << "tmpba.constData() = " << tmpba.constData();
+	editingrecord->getLogger()->log(tmpba.constData());
+	editingrecord->getLogger()->close();
+
 }
 
 

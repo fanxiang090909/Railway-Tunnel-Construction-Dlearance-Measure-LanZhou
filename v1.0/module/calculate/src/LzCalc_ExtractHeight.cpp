@@ -202,10 +202,10 @@ bool LzCalculate_ExtractHeight::loadRectifyData(string filename)
 /**
  * 加校正系数校正提高度结果
  */
-void LzCalculate_ExtractHeight::rectifyHeight(SectionData & data, bool safetyfactor)
+bool LzCalculate_ExtractHeight::rectifyHeight(SectionData & data, bool safetyfactor)
 {
     if (!hasinit_syn_rectify_input_file || !userectifyfactor)
-        return;
+        return false;
 
     std::map<int,item>::iterator it = data.getMaps().begin();
     int tempkey;
@@ -239,6 +239,7 @@ void LzCalculate_ExtractHeight::rectifyHeight(SectionData & data, bool safetyfac
         
         it++;
     }
+    return true;
 }
 
 void LzCalculate_ExtractHeight::rectify_RT()                                                 //对三维点向量进行RT矫正

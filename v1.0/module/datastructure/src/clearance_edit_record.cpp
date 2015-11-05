@@ -147,3 +147,8 @@ bool EditRecordStack::cancelOneStep(SectionData &data)
     else
         return false;
 }
+
+LzLogger * EditRecordStack::getLogger()
+{
+    return logger;
+}

@@ -30,7 +30,7 @@
  * @version 1.0.0
  * @date 20140222
  */
-SelectAvaliableTunnelWidget::SelectAvaliableTunnelWidget(QWidget *parent) :
+SelectAvaliableTunnelWidget::SelectAvaliableTunnelWidget(bool initisconnectingdb, QWidget *parent) : isconnectingdb(initisconnectingdb),
     QWidget(parent),
     ui(new Ui::SelectAvaliableTunnelWidget)
 {
@@ -378,7 +378,8 @@ void SelectAvaliableTunnelWidget::on_nextWidgetButton_clicked()
     bool ret = ClientSetting::getSettingInstance()->setCorrectTunnelDataModel(tunnelid);
     if (ret == false)
     {
-        QMessageBox::warning(this, tr("提示"), QObject::tr("当前隧道ID: %1 的隧道%2没有在数据库中，不能找到隧道模型！").arg(tunnelid).arg(tunnelname1.c_str()));
+        if (isconnectingdb)
+            QMessageBox::warning(this, tr("提示"), QObject::tr("当前隧道ID: %1 的隧道%2没有在数据库中，不能找到隧道模型！").arg(tunnelid).arg(tunnelname1.c_str()));
     }
 
     QStringList strlist = projectname.split("_");

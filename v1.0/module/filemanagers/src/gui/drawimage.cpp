@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QPixmap>
 #include <QDebug>
+#include <QImageReader>
 #include <QMessageBox>
 
 double BaseImage::pixeltomm = 0.35;
@@ -17,6 +18,10 @@ BaseImage::BaseImage(QWidget *parent) :
     ui(new Ui::BaseImage)
 {
     ui->setupUi(this);
+
+    widthpixel = 1360;
+    heightpixel = 1580;
+    UpdateScaleRelativeParameter(40);
 
     // 默认底板
     floornumber = OutType_B_DianLi;
@@ -29,6 +34,9 @@ BaseImage::BaseImage(QWidget *parent) :
     isshowheightline = false;
     // 初始显示底板
     ifshowfloor = true;
+    
+    ifshowpointsarray = false;
+    ifshowfusepointarray = false;
 
     TopLeftPoint = QPointF(0,0);
     BottomRightPoint = QPointF(0,0);
@@ -59,7 +67,7 @@ void BaseImage::saveImage(QString outputimgfilename)
     bool tmpisDrawRect = isDrawRect;
     
     // 图片更新
-    scale = 34;
+    scale = 35.5;
     isDrawRect = false;
     isshowheightline = false;
     repaint();
@@ -80,7 +88,7 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
 {
     QBrush bruch(Qt::FDiagPattern);//画刷
     h=0;//暂时默认接触网高度为0
-    originy=((80+(6860+h)/scale))/pixeltomm;
+    originy=((160+(13720+h)/scale))/pixeltomm;
     // 画水平的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
@@ -101,7 +109,7 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
 
     // 画垂直的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
+    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(160/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
     if (!ifshowfloor)
@@ -109,35 +117,35 @@ void BaseImage::drawFloor_D_DianLi(QPainter & pp)
 
     // 标准限界实线部分
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4220/scale)/pixeltomm))};
+    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((3360/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2420/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((8440/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
-    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4220/scale)/pixeltomm))};
+    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((3360/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2420/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((8440/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree2,3);
     //绘制圆弧
-    // pp.drawEllipse((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm));
-    pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),((80/pixeltomm)+(200/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
+    // pp.drawEllipse((widthpixel/2)-((4880/scale)/pixeltomm),(160/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm));
+    pp.drawArc((widthpixel/2)-((4880/scale)/pixeltomm),((160/pixeltomm)+(400/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
     pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
-    QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
+    QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,8);
-    QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
+    QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree4,8);
-    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)-((1760/scale)/pixeltomm),originy-((4900/scale)/pixeltomm)),QPointF((widthpixel/2)-((1760/scale)/pixeltomm),originy-((6500/scale)/pixeltomm))};
+    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)-((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)-((3520/scale)/pixeltomm),originy-((9800/scale)/pixeltomm)),QPointF((widthpixel/2)-((3520/scale)/pixeltomm),originy-((13000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree5,4);
-    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)+((1760/scale)/pixeltomm),originy-((4900/scale)/pixeltomm)),QPointF((widthpixel/2)+((1760/scale)/pixeltomm),originy-((6500/scale)/pixeltomm))};
+    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)+((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)+((3520/scale)/pixeltomm),originy-((9800/scale)/pixeltomm)),QPointF((widthpixel/2)+((3520/scale)/pixeltomm),originy-((13000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree6,4);
-    QPointF pointsthree7[2]={QPointF((widthpixel/2)-((1760/scale)/pixeltomm),originy-((5300/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5300/scale)/pixeltomm))};
+    QPointF pointsthree7[2]={QPointF((widthpixel/2)-((3520/scale)/pixeltomm),originy-((10600/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((10600/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree7,2);
-    QPointF pointsthree8[2]={QPointF((widthpixel/2)+((1760/scale)/pixeltomm),originy-((5300/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5300/scale)/pixeltomm))};
+    QPointF pointsthree8[2]={QPointF((widthpixel/2)+((3520/scale)/pixeltomm),originy-((10600/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((10600/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree8,2);
     // 绘制圆弧
-    pp.drawArc((widthpixel/2)-((3200/scale)/pixeltomm),(80/pixeltomm),(((3200*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm),57*16,66*16);
+    pp.drawArc((widthpixel/2)-((6400/scale)/pixeltomm),(160/pixeltomm),(((6400*2)/scale)/pixeltomm),(((6400*2)/scale)/pixeltomm),57*16,66*16);
 }
 
 void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
 {
-    originy=((80+(6700)/scale))/pixeltomm;
+    originy=((160+(13400)/scale))/pixeltomm;
     // 画水平的基准线
            
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
@@ -160,7 +168,7 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
 
     // 画垂直的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
+    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(160/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
     if (!ifshowfloor)
@@ -168,29 +176,29 @@ void BaseImage::drawFloor_D_NeiRan(QPainter & pp)
 
     //标准限界实线部分
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4500/scale)/pixeltomm))};
+    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((3360/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2420/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((9000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
-    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((1680/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1210/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4500/scale)/pixeltomm))};
+    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((3360/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2420/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((9000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree2,3);
     //绘制圆弧
-    //pp.drawEllipse((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm));
-    pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
+    //pp.drawEllipse((widthpixel/2)-((4880/scale)/pixeltomm),(160/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm));
+    pp.drawArc((widthpixel/2)-((4880/scale)/pixeltomm),(160/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
     pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
-    QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
+    QPointF pointsthree3[8]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,8);
-    QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm))};
+    QPointF pointsthree4[8]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree4,8);
-    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)-((1650/scale)/pixeltomm),originy-((6050/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((6050/scale)/pixeltomm))};
+    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)-((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)-((3300/scale)/pixeltomm),originy-((12100/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((12100/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree5,4);
-    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)+((1650/scale)/pixeltomm),originy-((6050/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((6050/scale)/pixeltomm))};
+    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)+((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)+((3300/scale)/pixeltomm),originy-((12100/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((12100/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree6,4);
 }
 
 void BaseImage::drawFloor_B_DianLi(QPainter & pp)
 {
-    originy=((80+(6550)/scale))/pixeltomm;
+    originy=((160+(13100)/scale))/pixeltomm;
     // 画水平的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QBrush bruch(Qt::FDiagPattern);//画刷
@@ -212,7 +220,7 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
 
     // 画垂直的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
+    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(160/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
     if (!ifshowfloor)
@@ -220,30 +228,30 @@ void BaseImage::drawFloor_B_DianLi(QPainter & pp)
 
     //标准限界实线部分
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointsthree1[5]={QPointF((widthpixel/2)-((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((4000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2400/scale)/pixeltomm),originy-((4550/scale)/pixeltomm)),QPointF((widthpixel/2)-((1700/scale)/pixeltomm),originy-((5800/scale)/pixeltomm))};
+    QPointF pointsthree1[5]={QPointF((widthpixel/2)-((4500/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((8000/scale)/pixeltomm)),QPointF((widthpixel/2)-((4800/scale)/pixeltomm),originy-((9100/scale)/pixeltomm)),QPointF((widthpixel/2)-((3400/scale)/pixeltomm),originy-((11600/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,5);
-    QPointF pointsthree2[5]={QPointF((widthpixel/2)+((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((4000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2400/scale)/pixeltomm),originy-((4550/scale)/pixeltomm)),QPointF((widthpixel/2)+((1700/scale)/pixeltomm),originy-((5800/scale)/pixeltomm))};
+    QPointF pointsthree2[5]={QPointF((widthpixel/2)+((4500/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((8000/scale)/pixeltomm)),QPointF((widthpixel/2)+((4800/scale)/pixeltomm),originy-((9100/scale)/pixeltomm)),QPointF((widthpixel/2)+((3400/scale)/pixeltomm),originy-((11600/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree2,5);
     //绘制圆弧
-    //pp.drawEllipse((widthpixel/2)-((2300/scale)/pixeltomm),(80/pixeltomm),(((2300*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm));
-    pp.drawArc((widthpixel/2)-((2300/scale)/pixeltomm),(80/pixeltomm),(((2300*2)/scale)/pixeltomm),(((2300*2)/scale)/pixeltomm),42.3*16,95.2*16);
+
+    pp.drawArc((widthpixel/2)-((4600/scale)/pixeltomm),(160/pixeltomm),(((4600*2)/scale)/pixeltomm),(((4600*2)/scale)/pixeltomm),42.3*16,95.2*16);
 
 
     //标准限界虚线部分
     pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
-    QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
+    QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3500/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2500/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,9);
-    QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
+    QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3500/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2500/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree4,9);
-    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((5500/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5500/scale)/pixeltomm))};
+    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)-((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((11000/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((11000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree5,4);
-    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((5500/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5500/scale)/pixeltomm))};
+    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)+((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((11000/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((11000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree6,4);
 }
 
 void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
 {
-    originy=((80+(6000)/scale))/pixeltomm;
+    originy=((160+(12000)/scale))/pixeltomm;
     // 画水平的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
     QBrush bruch(Qt::FDiagPattern);//画刷
@@ -265,7 +273,7 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
        
     // 画垂直的基准线
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(80/pixeltomm))};
+    QPointF pointstwo[2]={QPointF(widthpixel/2,originy),QPointF(widthpixel/2,(160/pixeltomm))};
     pp.drawPolyline(pointstwo,2);
 
     if (!ifshowfloor)
@@ -273,23 +281,23 @@ void BaseImage::drawFloor_B_NeiRan(QPainter & pp)
 
     //标准限界实线部分
     pp.setPen(QPen(Qt::gray,1));//两个参数为画笔的颜色和粗细
-    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3900/scale)/pixeltomm))};
+    QPointF pointsthree1[3]={QPointF((widthpixel/2)-((4500/scale)/pixeltomm),originy),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((7800/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree1,3);
-    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((2250/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3900/scale)/pixeltomm))};
+    QPointF pointsthree2[3]={QPointF((widthpixel/2)+((4500/scale)/pixeltomm),originy),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((7800/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree2,3);
     //绘制圆弧
-    //pp.drawEllipse((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm));
-    pp.drawArc((widthpixel/2)-((2440/scale)/pixeltomm),(80/pixeltomm),(((2440*2)/scale)/pixeltomm),(((2440*2)/scale)/pixeltomm),0*16,180*16);
+    //pp.drawEllipse((widthpixel/2)-((4880/scale)/pixeltomm),(160/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm));
+    pp.drawArc((widthpixel/2)-((4880/scale)/pixeltomm),(160/pixeltomm),(((4880*2)/scale)/pixeltomm),(((4880*2)/scale)/pixeltomm),0*16,180*16);
 
     //标准限界虚线部分
     pp.setPen(QPen(Qt::gray,1,Qt::DashDotDotLine,Qt::RoundCap));
-    QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)-((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)-((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)-((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
+    QPointF pointsthree3[9]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)-((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)-((3500/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)-((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((2500/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree3,9);
-    QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((25/scale)/pixeltomm)),QPointF((widthpixel/2)+((1500/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1725/scale)/pixeltomm),originy-((200/scale)/pixeltomm)),QPointF((widthpixel/2)+((1750/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((350/scale)/pixeltomm)),QPointF((widthpixel/2)+((1875/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2370/scale)/pixeltomm),originy-((1100/scale)/pixeltomm)),QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((1250/scale)/pixeltomm))};
+    QPointF pointsthree4[9]={QPointF((widthpixel/2),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((50/scale)/pixeltomm)),QPointF((widthpixel/2)+((3000/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3450/scale)/pixeltomm),originy-((400/scale)/pixeltomm)),QPointF((widthpixel/2)+((3500/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((700/scale)/pixeltomm)),QPointF((widthpixel/2)+((3750/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4740/scale)/pixeltomm),originy-((2200/scale)/pixeltomm)),QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((2500/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree4,9);
-    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)-((1400/scale)/pixeltomm),originy-((5500/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5500/scale)/pixeltomm))};
+    QPointF pointsthree5[4]={QPointF((widthpixel/2)-((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)-((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)-((2800/scale)/pixeltomm),originy-((11000/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((11000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree5,4);
-    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((2440/scale)/pixeltomm),originy-((3000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2000/scale)/pixeltomm),originy-((4500/scale)/pixeltomm)),QPointF((widthpixel/2)+((1400/scale)/pixeltomm),originy-((5500/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((5500/scale)/pixeltomm))};
+    QPointF pointsthree6[4]={QPointF((widthpixel/2)+((4880/scale)/pixeltomm),originy-((6000/scale)/pixeltomm)),QPointF((widthpixel/2)+((4000/scale)/pixeltomm),originy-((9000/scale)/pixeltomm)),QPointF((widthpixel/2)+((2800/scale)/pixeltomm),originy-((11000/scale)/pixeltomm)),QPointF((widthpixel/2),originy-((11000/scale)/pixeltomm))};
     pp.drawPolyline(pointsthree6,4);
 }
 
@@ -338,12 +346,12 @@ void BaseImage::drawHeightsLine(QPainter & pp)
 	    for (list<int>::iterator it = interestHeights.begin(); it != interestHeights.end(); it++, line_i++)                      //对List进行遍历获取点
         {
             qreal ih = (*it);
-            QPointF pointsthreeheightline[3]={QPointF(0.0,(originy-((ih)/scale)/pixeltomm)),QPointF(widthpixel/2,(originy-((ih/scale)/pixeltomm))),QPointF((widthpixel),(originy-((ih/scale)/pixeltomm)))};
+            QPointF pointsthreeheightline[3]={QPointF(0.0,(originy-(2*(ih)/scale)/pixeltomm)),QPointF(widthpixel/2,(originy-(2*(ih/scale)/pixeltomm))),QPointF((widthpixel),(originy-(2*(ih/scale)/pixeltomm)))};
             pp.drawPolyline(pointsthreeheightline,3);
           
-            linefheight[line_i].setP1(QPointF((widthpixel/2),(originy-((ih/scale)/pixeltomm))));
-            linefheight[line_i].setP2(QPointF(((widthpixel/2)-5),(originy-((ih/scale)/pixeltomm))));
-            pp.drawText((widthpixel/2),(originy-(ih/scale)/pixeltomm),QString("%1").arg(ih));//标记时为了使数字在横线下方可以改为810
+            linefheight[line_i].setP1(QPointF((widthpixel/2),(originy-(2*(ih/scale)/pixeltomm))));
+            linefheight[line_i].setP2(QPointF(((widthpixel/2)-5),(originy-(2*(ih/scale)/pixeltomm))));
+            pp.drawText((widthpixel/2+3),(originy-2*(ih/scale)/pixeltomm),QString("%1").arg(ih));//标记时为了使数字在横线下方可以改为810
             // 如果图形面板太小，隔一个点画一个
             if (30 < scale)
             {
@@ -369,10 +377,10 @@ void BaseImage::Draw_SearchRect(QPainter & pp)
     pp.setPen(QPen(Qt::black,1.5));
 
     QPointF TopLeftPointImg, BottomRightPointImg;
-    TopLeftPointImg.setX((TopLeftPoint.x()/pixeltomm/scale) + widthpixel / 2); 
-    TopLeftPointImg.setY(originy - (TopLeftPoint.y()/pixeltomm/scale)); 
-    BottomRightPointImg.setX((BottomRightPoint.x()/pixeltomm/scale) + widthpixel / 2); 
-    BottomRightPointImg.setY(originy - (BottomRightPoint.y()/pixeltomm/scale)); 
+    TopLeftPointImg.setX(2*(TopLeftPoint.x()/pixeltomm/scale) + widthpixel / 2); 
+    TopLeftPointImg.setY(originy - 2*(TopLeftPoint.y()/pixeltomm/scale)); 
+    BottomRightPointImg.setX(2*(BottomRightPoint.x()/pixeltomm/scale) + widthpixel / 2); 
+    BottomRightPointImg.setY(originy - 2*(BottomRightPoint.y()/pixeltomm/scale)); 
 
     pp.drawRect(TopLeftPointImg.x(), TopLeftPointImg.y(), BottomRightPointImg.x() - TopLeftPointImg.x(), BottomRightPointImg.y() - TopLeftPointImg.y());
 }
@@ -413,10 +421,10 @@ void BaseImage::ConvertPixeltoMM()
     }
 
 
-    TopLeftPoint.setX((TopLeftPoint.x() - widthpixel / 2)*pixeltomm*scale); 
-    TopLeftPoint.setY((originy - TopLeftPoint.y())*pixeltomm*scale); 
-    BottomRightPoint.setX((BottomRightPoint.x() - widthpixel / 2)*pixeltomm*scale); 
-    BottomRightPoint.setY((originy - BottomRightPoint.y())*pixeltomm*scale); 
+    TopLeftPoint.setX((TopLeftPoint.x() - widthpixel / 2)/2*pixeltomm*scale); 
+    TopLeftPoint.setY((originy - TopLeftPoint.y())/2*pixeltomm*scale); 
+    BottomRightPoint.setX((BottomRightPoint.x() - widthpixel / 2)/2*pixeltomm*scale); 
+    BottomRightPoint.setY((originy - BottomRightPoint.y())/2*pixeltomm*scale); 
 
     //qDebug() << "TOPLEFTPOINT" << TopLeftPoint.x() << ", " << TopLeftPoint.y() << "BOTTOMRIGHT" << BottomRightPoint.x() << ", " << BottomRightPoint.y();
 }
@@ -426,6 +434,7 @@ void BaseImage::ConvertPixeltoMM()
  */
 void BaseImage::saveImage(QPixmap & pixmap)
 {
+    qDebug() << QImageReader::supportedImageFormats ();
 	qDebug() << saveimgpathfilename;
     bool ret = pixmap.save(saveimgpathfilename);
 }
@@ -463,19 +472,19 @@ void BaseImage::setFloorVisible(bool ifshow)
 
 void BaseImage::UpdateScaleRelativeParameter(int newscale)
 {
-    scale=newscale;
+    scale = newscale;
     if (scale < 40)
     {
-        widthpixel = ((double)40/(double)scale) * 680;
-        heightpixel = ((double)40/(double)scale) * 790;
+        widthpixel = ((double)40/(double)scale) * 1360;
+        heightpixel = ((double)40/(double)scale) * 1580;
     }
     else
     {
-        widthpixel = 680;
-        heightpixel = 790;
+        widthpixel = 1360;
+        heightpixel = 1580;
     }
-    setFixedSize(widthpixel,heightpixel);
-    isDrawRect=true;
+    setFixedSize(widthpixel, heightpixel);
+    isDrawRect = true;
     this->update();
 }
 
@@ -489,8 +498,7 @@ ClearanceImage::ClearanceImage(QWidget *parent):
 	BaseImage(parent)
 {
 	scale=40;
-    widthpixel=680;
-    heightpixel=790;
+
     setFixedSize(widthpixel,heightpixel);//即是宽297.5毫米，长280毫米
     rowcount=0;
     row1count=0;
@@ -834,10 +842,10 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
     for(int i=0;i<tmprowcount;i=i+3)
     {
         pp.setPen(QPen(Qt::black,1.5));
-        linef1[i].setP1(QPointF((widthpixel/2),(originy-((tmpArray1[i].rx()/scale)/pixeltomm))));
-        linef1[i].setP2(QPointF(((widthpixel/2)-5),(originy-((tmpArray1[i].rx()/scale)/pixeltomm))));
+        linef1[i].setP1(QPointF((widthpixel/2),(originy-(2*(tmpArray1[i].rx()/scale)/pixeltomm))));
+        linef1[i].setP2(QPointF(((widthpixel/2)-5),(originy-(2*(tmpArray1[i].rx()/scale)/pixeltomm))));
         pp.setPen(QPen(Qt::black,1.5));//两个参数为画笔的颜色和粗细
-        pp.drawText((widthpixel/2),(originy-(tmpArray1[i].rx()/scale)/pixeltomm),QString("%1").arg(tmpArray1[i].rx()));//标记时为了使数字在横线下方可以改为810
+        pp.drawText((widthpixel/2+3),(originy-(2*tmpArray1[i].rx()/scale)/pixeltomm),QString("%1").arg(tmpArray1[i].rx()));//标记时为了使数字在横线下方可以改为810
     }
     pp.drawLines(linef1,tmprowcount);
     delete [] linef1;
@@ -866,8 +874,8 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
         }
 
         // 测试校正图形而修改的代码，使用pointstwo_tmprowcount1变量
-        linef[j].setLine(((widthpixel/2)-((tmpArray1[j].ry()/scale)/pixeltomm)),(originy-((tmpArray1[j].rx()/scale)/pixeltomm)),
-                            ((widthpixel/2)-((tmpArray1[j+1].ry()/scale)/pixeltomm)),(originy-((tmpArray1[j+1].rx()/scale)/pixeltomm)));
+        linef[j].setLine(((widthpixel/2)-(2*(tmpArray1[j].ry()/scale)/pixeltomm)),(originy-(2*(tmpArray1[j].rx()/scale)/pixeltomm)),
+                            ((widthpixel/2)-(2*(tmpArray1[j+1].ry()/scale)/pixeltomm)),(originy-(2*(tmpArray1[j+1].rx()/scale)/pixeltomm)));
         // 或者下面这两行这种方式
         // linef[j].setP1(QPointF(400-(pointstwo_tmprowcount.at(j).y()/10),820-(pointstwo_tmprowcount.at(j).x()/10)));
         // linef[j].setP2(QPointF(400-(pointstwo_tmprowcount.at(j+1).y()/10),820-(pointstwo_tmprowcount.at(j+1).x()/10)));
@@ -891,8 +899,8 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
                 tmpArray2[j+1].ry()=0;
             }
         }
-        liner[j].setLine(((widthpixel/2)+((tmpArray2[j].ry()/scale)/pixeltomm)),(originy-((tmpArray2[j].rx()/scale)/pixeltomm)),
-                                ((widthpixel/2)+((tmpArray2[j+1].ry()/scale)/pixeltomm)),(originy-((tmpArray2[j+1].rx()/scale)/pixeltomm)));
+        liner[j].setLine(((widthpixel/2)+(2*(tmpArray2[j].ry()/scale)/pixeltomm)),(originy-(2*(tmpArray2[j].rx()/scale)/pixeltomm)),
+                                ((widthpixel/2)+(2*(tmpArray2[j+1].ry()/scale)/pixeltomm)),(originy-(2*(tmpArray2[j+1].rx()/scale)/pixeltomm)));
     }
     pp.drawLines(liner,tmprowcount);
     delete []liner;
@@ -902,15 +910,15 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
     {
         QPointF pointtop;
         pointtop.setX(widthpixel/2);
-        pointtop.setY(originy - tmpMinHeightVal/scale/pixeltomm);
+        pointtop.setY(originy - 2*tmpMinHeightVal/scale/pixeltomm);
         QPointF pointtmp1;
-        pointtmp1.setX((widthpixel/2) - ((tmpArray1[tmprowcount - 1].ry()/scale)/pixeltomm));
-        pointtmp1.setY(originy-((tmpArray1[tmprowcount - 1].rx()/scale)/pixeltomm));
+        pointtmp1.setX((widthpixel/2) - (2*(tmpArray1[tmprowcount - 1].ry()/scale)/pixeltomm));
+        pointtmp1.setY(originy-(2*(tmpArray1[tmprowcount - 1].rx()/scale)/pixeltomm));
         pp.drawLine(pointtop, pointtmp1);
 
         QPointF pointtmp2;
-        pointtmp2.setX((widthpixel/2) + ((tmpArray2[tmprowcount - 1].ry()/scale)/pixeltomm));
-        pointtmp2.setY(originy-((tmpArray2[tmprowcount - 1].rx()/scale)/pixeltomm));
+        pointtmp2.setX((widthpixel/2) + (2*(tmpArray2[tmprowcount - 1].ry()/scale)/pixeltomm));
+        pointtmp2.setY(originy-(2*(tmpArray2[tmprowcount - 1].rx()/scale)/pixeltomm));
         pp.drawLine(pointtop, pointtmp2);
     }
 
@@ -925,10 +933,10 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
         QPoint *pointr =new QPoint[tmprowcount];
         for(int i=0;i<tmprowcount;i++)
         {
-            point[i].setX(((widthpixel/2)-((tmpArray1[i].ry()/scale)/pixeltomm)));
-            point[i].setY((originy-((tmpArray1[i].rx()/scale)/pixeltomm)));
-            pointr[i].setX(((widthpixel/2)+((tmpArray2[i].ry()/scale)/pixeltomm)));
-            pointr[i].setY((originy-((tmpArray2[i].rx()/scale)/pixeltomm)));
+            point[i].setX(((widthpixel/2)-(2*(tmpArray1[i].ry()/scale)/pixeltomm)));
+            point[i].setY((originy-(2*(tmpArray1[i].rx()/scale)/pixeltomm)));
+            pointr[i].setX(((widthpixel/2)+(2*(tmpArray2[i].ry()/scale)/pixeltomm)));
+            pointr[i].setY((originy-(2*(tmpArray2[i].rx()/scale)/pixeltomm)));
         }
         pp.drawPoints(point,tmprowcount);
         pp.drawPoints(pointr,tmprowcount);
@@ -941,13 +949,13 @@ void ClearanceImage::Draw_PointsArray(QPainter & pp, CurveType type)
         pp.setPen(QPen(Qt::yellow, 3));
         QPointF pointtop;
         pointtop.setX(widthpixel/2);
-        pointtop.setY(originy - tmpMinHeightVal/scale/pixeltomm);
+        pointtop.setY(originy - 2*tmpMinHeightVal/scale/pixeltomm);
         pp.drawPoint(pointtop);
         // 显示文字
         QColor color(128, 64, 0);
         pp.setPen(QPen(color, 3));
         // -50表示让出距离
-        pp.drawText((widthpixel/2)-50,(originy-(tmpMinHeightVal/scale)/pixeltomm),QString("%1").arg((int)tmpMinHeightVal));//标记时为了使数字在横线下方可以改为810
+        pp.drawText((widthpixel/2)-50,(originy-2*(tmpMinHeightVal/scale)/pixeltomm),QString("%1").arg((int)tmpMinHeightVal));//标记时为了使数字在横线下方可以改为810
     }
 }
 
@@ -1038,7 +1046,7 @@ void ClearanceImage::mouseMoveEvent(QMouseEvent *event)
         gui_width=(int)(((newx)-(widthpixel/2))*pixeltomm*scale);
         gui_height=(int)((originy-(newy))*pixeltomm*scale);
     }
-    emit sendMousePos(gui_width, gui_height);
+    emit sendMousePos(gui_width/2, gui_height/2);
     setCursor(QCursor(Qt::ArrowCursor));//加上这一句才行
 	update();
 
@@ -1310,7 +1318,7 @@ void SectionImage::drawHeightsLine(QPainter & pp)
             QBrush bruch(Qt::FDiagPattern);//画刷
             bruch.setStyle(Qt::NoBrush);//将画刷设置成NULL
             pp.setBrush(bruch);
-            qreal minheightpix = originy - minHeight/scale/pixeltomm;
+            qreal minheightpix = originy - 2*minHeight/scale/pixeltomm;
             QPointF pointsthree[3]={QPointF(100.0,minheightpix),QPointF(widthpixel/2,minheightpix),QPointF((widthpixel-100),minheightpix)};
             pp.drawPolyline(pointsthree,1.5);
         }
@@ -1356,6 +1364,13 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
     }
     else
     {
+        QFont tmpfont = pp.font();
+        if (cansaveimg)
+        {
+            QFont newfont = tmpfont;
+            newfont.setPointSize(16);
+            pp.setFont(newfont);
+        }
         // 画数字的标记线
         QLineF *linef1 = new QLineF[rowcount];
         for(int i=0;i<rowcount;i=i+3)
@@ -1364,13 +1379,19 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
             //static const QPointF pointstwo_remark[2]={QPointF(400.0,820-(pointstwo_rowcount.at(i).x()/10)),QPointF(395.0,820-(pointstwo_rowcount.at(i).x()/10))};
             // pp.drawPolyline(pointstwo_remark,2);
             //画水平的标记线//只能画一个点，因为是静态的
-            linef1[i].setP1(QPointF((widthpixel/2),(originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm))));
-            linef1[i].setP2(QPointF(((widthpixel/2)-5),(originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm))));
+            linef1[i].setP1(QPointF((widthpixel/2),(originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm))));
+            linef1[i].setP2(QPointF(((widthpixel/2)-5),(originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm))));
             pp.setPen(QPen(Qt::black,1.5));//两个参数为画笔的颜色和粗细
-            pp.drawText((widthpixel/2),(originy-(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm),QString("%1").arg(pointstwo_rowcountStraight1[i].rx()));//标记时为了使数字在横线下方可以改为810
+            pp.drawText((widthpixel/2+3),(originy-2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm),QString("%1").arg(pointstwo_rowcountStraight1[i].rx()));//标记时为了使数字在横线下方可以改为810
+
         }
         pp.drawLines(linef1,rowcount);
         delete []linef1;
+
+        if (cansaveimg)
+        {
+            pp.setFont(tmpfont);
+        }
     }
 
     int drawrowcount = *rcount;
@@ -1420,8 +1441,8 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
         }
 
         // 测试校正图形而修改的代码，使用pointstwo_rowcount1变量
-        linef[j].setLine(((widthpixel/2)-((points_s1[j].ry()/scale)/pixeltomm)),(originy-((points_s1[j].rx()/scale)/pixeltomm)),
-                            ((widthpixel/2)-((points_s1[j+1].ry()/scale)/pixeltomm)),(originy-((points_s1[j+1].rx()/scale)/pixeltomm)));
+        linef[j].setLine(((widthpixel/2)-(2*(points_s1[j].ry()/scale)/pixeltomm)),(originy-(2*(points_s1[j].rx()/scale)/pixeltomm)),
+                            ((widthpixel/2)-(2*(points_s1[j+1].ry()/scale)/pixeltomm)),(originy-(2*(points_s1[j+1].rx()/scale)/pixeltomm)));
         // 或者下面这两行这种方式
         // linef[j].setP1(QPointF(400-(pointstwo_rowcount.at(j).y()/10),820-(pointstwo_rowcount.at(j).x()/10)));
         // linef[j].setP2(QPointF(400-(pointstwo_rowcount.at(j+1).y()/10),820-(pointstwo_rowcount.at(j+1).x()/10)));
@@ -1448,8 +1469,8 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
                 points_s2[j+1].ry()=0;
             }
         }
-        liner[j].setLine(((widthpixel/2)+((points_s2[j].ry()/scale)/pixeltomm)),(originy-((points_s2[j].rx()/scale)/pixeltomm)),
-                                ((widthpixel/2)+((points_s2[j+1].ry()/scale)/pixeltomm)),(originy-((points_s2[j+1].rx()/scale)/pixeltomm)));
+        liner[j].setLine(((widthpixel/2)+(2*(points_s2[j].ry()/scale)/pixeltomm)),(originy-(2*(points_s2[j].rx()/scale)/pixeltomm)),
+                                ((widthpixel/2)+(2*(points_s2[j+1].ry()/scale)/pixeltomm)),(originy-(2*(points_s2[j+1].rx()/scale)/pixeltomm)));
     }
     pp.drawLines(liner,drawrowcount);
     delete []liner;
@@ -1459,15 +1480,15 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
     {
         QPointF pointtop;
         pointtop.setX(widthpixel/2);
-        pointtop.setY(originy - (*minh)/scale/pixeltomm);
+        pointtop.setY(originy - 2*(*minh)/scale/pixeltomm);
         QPointF pointtmp1;
-        pointtmp1.setX((widthpixel/2) - ((points_s1[drawrowcount - 1].ry()/scale)/pixeltomm));
-        pointtmp1.setY(originy-((points_s1[drawrowcount - 1].rx()/scale)/pixeltomm));
+        pointtmp1.setX((widthpixel/2) - (2*(points_s1[drawrowcount - 1].ry()/scale)/pixeltomm));
+        pointtmp1.setY(originy-(2*(points_s1[drawrowcount - 1].rx()/scale)/pixeltomm));
         pp.drawLine(pointtop, pointtmp1);
 
         QPointF pointtmp2;
-        pointtmp2.setX((widthpixel/2) + ((points_s2[drawrowcount - 1].ry()/scale)/pixeltomm));
-        pointtmp2.setY(originy-((points_s2[drawrowcount - 1].rx()/scale)/pixeltomm));
+        pointtmp2.setX((widthpixel/2) + (2*(points_s2[drawrowcount - 1].ry()/scale)/pixeltomm));
+        pointtmp2.setY(originy-(2*(points_s2[drawrowcount - 1].rx()/scale)/pixeltomm));
         pp.drawLine(pointtop, pointtmp2);
     }
 
@@ -1481,10 +1502,10 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
         QPointF *pointr = new QPointF[drawrowcount];
         for(int i=0;i<drawrowcount;i++)
         {
-            point[i].setX(((widthpixel/2)-((pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm)));
-            point[i].setY((originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm)));
-            pointr[i].setX(((widthpixel/2)+((pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm)));
-            pointr[i].setY((originy-((pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm)));
+            point[i].setX(((widthpixel/2)-(2*(pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm)));
+            point[i].setY((originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm)));
+            pointr[i].setX(((widthpixel/2)+(2*(pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm)));
+            pointr[i].setY((originy-(2*(pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm)));
         }
         pp.drawPoints(point,drawrowcount);
         pp.drawPoints(pointr,drawrowcount);
@@ -1496,13 +1517,24 @@ void SectionImage::Draw_Straight(QPainter & pp, bool iscompared)
         pp.setPen(QPen(Qt::yellow, 3));
         QPointF pointtop;
         pointtop.setX(widthpixel/2);
-        pointtop.setY(originy - (*minh)/scale/pixeltomm);
+        pointtop.setY(originy - 2*(*minh)/scale/pixeltomm);
         pp.drawPoint(pointtop);
         // 显示文字
         QColor color(128, 64, 0);
         pp.setPen(QPen(color, 3));
         // -50表示让出距离
-        pp.drawText((widthpixel/2) - 50,(originy-((*minh)/scale)/pixeltomm),QString("%1").arg((int)(*minh)));//标记时为了使数字在横线下方可以改为810
+        QFont tmpfont = pp.font();
+        if (cansaveimg)
+        {
+            QFont newfont = tmpfont;
+            newfont.setPointSize(16);
+            pp.setFont(newfont);
+        }
+        pp.drawText((widthpixel/2) - 50,(originy-(2*(*minh)/scale)/pixeltomm),QString("%1").arg((int)(*minh)));//标记时为了使数字在横线下方可以改为810
+        if (cansaveimg)
+        {
+            pp.setFont(tmpfont);
+        }
     }
 }
 
@@ -1538,7 +1570,7 @@ void SectionImage::Draw_Fuse(QPainter &pp)
             for(int j = 0; j < fuse_count.at(i); j++)
             {
                 // 因为有负值，不分左右
-                tmppoints[j] = QPointF((widthpixel/2)+((tmppoints2[j].ry()/scale)/pixeltomm), originy-((tmppoints2[j].rx()/scale)/pixeltomm));
+                tmppoints[j] = QPointF((widthpixel/2)+(2*(tmppoints2[j].ry()/scale)/pixeltomm), originy-(2*(tmppoints2[j].rx()/scale)/pixeltomm));
             }
             pp.drawPoints(tmppoints, fuse_count.at(i));
             delete[] tmppoints;
@@ -1554,9 +1586,9 @@ void SectionImage::drawMovingInterestPointsLine(QPainter & pp)
     pp.setBrush(bruch);
 
     QPointF pointsthree[3]={
-                                QPointF(((widthpixel/2)+((correctPoint_1_FZ.rx()/scale)/pixeltomm)), (originy-((correctPoint_1_FZ.ry()/scale)/pixeltomm))),
-                                QPointF(((widthpixel/2)+((correctPoint_FZ.rx()/scale)/pixeltomm)),(originy-((correctPoint_FZ.ry()/scale)/pixeltomm))),
-                                QPointF(((widthpixel/2)+((correctPoint_2_FZ.rx()/scale)/pixeltomm)),(originy-((correctPoint_2_FZ.ry()/scale)/pixeltomm)))
+                                QPointF(((widthpixel/2)+(2*(correctPoint_1_FZ.rx()/scale)/pixeltomm)), (originy-(2*(correctPoint_1_FZ.ry()/scale)/pixeltomm))),
+                                QPointF(((widthpixel/2)+(2*(correctPoint_FZ.rx()/scale)/pixeltomm)),(originy-(2*(correctPoint_FZ.ry()/scale)/pixeltomm))),
+                                QPointF(((widthpixel/2)+(2*(correctPoint_2_FZ.rx()/scale)/pixeltomm)),(originy-(2*(correctPoint_2_FZ.ry()/scale)/pixeltomm)))
                             };
     pp.drawPolyline(pointsthree,3);
 }
@@ -1591,8 +1623,7 @@ void SectionImage::paintEvent(QPaintEvent *)
             {
                 if (compared_hasinit)
                     Draw_Straight(pp, true);
-
-                Draw_Straight(pp);
+                Draw_Straight(pp, false);
 
                 // 是否保存图片
                 if (cansaveimg)
@@ -1676,7 +1707,7 @@ void SectionImage::mouseMoveEvent(QMouseEvent *event)
             gui_width=(int)(((newx)-(widthpixel/2))*pixeltomm*scale);
             gui_height=(int)((originy-(newy))*pixeltomm*scale);
         }
-        emit sendMousePos(gui_width, gui_height);
+        emit sendMousePos(gui_width/2, gui_height/2);
         setCursor(QCursor(Qt::ArrowCursor));//加上这一句才行
         
         // 找兴趣点，修正点
@@ -1684,8 +1715,8 @@ void SectionImage::mouseMoveEvent(QMouseEvent *event)
         {
             if(newx<=(widthpixel/2))//左侧距离
             {
-                int x=(int)((widthpixel/2)-((pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
-                int y=(int)(originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
+                int x=(int)((widthpixel/2)-(2*(pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
+                int y=(int)(originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
                 // 找到临近位置
                 if(qAbs((x-newx))<=5&&qAbs((y-newy))<=5) 
                 {
@@ -1694,8 +1725,8 @@ void SectionImage::mouseMoveEvent(QMouseEvent *event)
             }
             else//右侧距离
             {
-                int x=(int)((widthpixel/2)+((pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
-                int y=(int)(originy-((pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
+                int x=(int)((widthpixel/2)+(2*(pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
+                int y=(int)(originy-(2*(pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
                 // 找到临近位置
                 if(qAbs((x-newx))<=5&&qAbs((y-newy))<=5)
                 {
@@ -1748,8 +1779,8 @@ void SectionImage::findCorrectPoint()
         int gui_width;
         if (lastPoint.x() <= (widthpixel/2))//左侧距离
         {
-            int x = (int)((widthpixel/2)-((pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
-            int y = (int)(originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
+            int x = (int)((widthpixel/2)-(2*(pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
+            int y = (int)(originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
             // 找到临近位置
             if (qAbs((x-lastPoint.x()))<=5&&qAbs((y-lastPoint.y()))<=5)
             {
@@ -1783,8 +1814,8 @@ void SectionImage::findCorrectPoint()
         }
         else//右侧距离
         {
-            int x=(int)((widthpixel/2)+(( pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
-            int y=(int)(originy-(( pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
+            int x=(int)((widthpixel/2)+(2*( pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
+            int y=(int)(originy-(2*( pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
             // 找到临近位置
             if(qAbs((x-lastPoint.x()))<=5&&qAbs((y-lastPoint.y()))<=5)
             {
@@ -1829,8 +1860,8 @@ void SectionImage::updateCorrectPoint(bool ismouserelease)
             int gui_width;
             if (lastPoint.x() <= (widthpixel/2))//左侧距离
             {
-                int x = (int)((widthpixel/2)-((pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
-                int y = (int)(originy-((pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
+                int x = (int)((widthpixel/2)-(2*(pointstwo_rowcountStraight1[i].ry()/scale)/pixeltomm));
+                int y = (int)(originy-(2*(pointstwo_rowcountStraight1[i].rx()/scale)/pixeltomm));
                 // 找到临近位置
                 if (qAbs((x-lastPoint.x()))<=5&&qAbs((y-lastPoint.y()))<=5)
                 {
@@ -1838,15 +1869,15 @@ void SectionImage::updateCorrectPoint(bool ismouserelease)
                     {
                         endPoint=QPointF(widthpixel/2,endPoint.y());
                     }
-                    int endy = (int)(((widthpixel/2)-endPoint.x())*pixeltomm*scale);
+                    int endy = (int)(((widthpixel/2)-endPoint.x())*pixeltomm*scale)/2;
                     pointstwo_rowcountStraight1[i].ry()=endy;
                     emit sendUpdateSectionDataVal(pointstwo_rowcountStraight1[i].ry(), pointstwo_rowcountStraight1[i].rx(), true, true);
                 }
             }
             else//右侧距离
             {
-                int x=(int)((widthpixel/2)+(( pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
-                int y=(int)(originy-(( pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
+                int x=(int)((widthpixel/2)+(2*( pointstwo_rowcountStraight2[i].ry()/scale)/pixeltomm));
+                int y=(int)(originy-(2*( pointstwo_rowcountStraight2[i].rx()/scale)/pixeltomm));
                 // 找到临近位置
                 if(qAbs((x-lastPoint.x()))<=5&&qAbs((y-lastPoint.y()))<=5)
                 {
@@ -1854,7 +1885,7 @@ void SectionImage::updateCorrectPoint(bool ismouserelease)
                     {
                         endPoint=QPointF(widthpixel/2,endPoint.y());
                     }
-                    int endy=(int)((endPoint.x()-(widthpixel/2))*pixeltomm*scale);
+                    int endy=(int)((endPoint.x()-(widthpixel/2))*pixeltomm*scale)/2;
                     pointstwo_rowcountStraight2[i].ry()=endy;
                     emit sendUpdateSectionDataVal(pointstwo_rowcountStraight2[i].ry(),pointstwo_rowcountStraight2[i].rx(), false, true);
                 }
@@ -1870,7 +1901,7 @@ void SectionImage::updateCorrectPoint(bool ismouserelease)
             {
                 endPoint=QPointF(widthpixel/2,endPoint.y());
             }
-            int endy = (int)(((widthpixel/2)-endPoint.x())*pixeltomm*scale);
+            int endy = (int)(((widthpixel/2)-endPoint.x())*pixeltomm*scale)/2;
             correctPoint_FZ.setX((-1)*endy);
             emit sendUpdateSectionDataVal((-1)*correctPoint_FZ.rx(), correctPoint_FZ.ry(), true, false);
         }
@@ -1880,7 +1911,7 @@ void SectionImage::updateCorrectPoint(bool ismouserelease)
             {
                 endPoint=QPointF(widthpixel/2,endPoint.y());
             }
-            int endy=(int)((endPoint.x()-(widthpixel/2))*pixeltomm*scale);
+            int endy=(int)((endPoint.x()-(widthpixel/2))*pixeltomm*scale)/2;
             correctPoint_FZ.setX(endy);
             emit sendUpdateSectionDataVal(correctPoint_FZ.rx(), correctPoint_FZ.ry(), false, false);
         }

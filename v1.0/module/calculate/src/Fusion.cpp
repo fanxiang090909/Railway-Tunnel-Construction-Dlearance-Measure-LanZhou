@@ -69,6 +69,8 @@ Fusion::Fusion(QObject* obj) : QObject(obj)
     extra_high = new LzSerialStorageSynthesis(); 
     extra_high->setting(250, 1024*1024*50, true);
     ifsuspend = false;
+
+    logger = NULL;
 }
 
 Fusion::~Fusion()
@@ -617,10 +619,12 @@ void Fusion::Comput_RT(double Q_a, double Q_b, double R_a, double R_b)
     cur_angle = atan2((Q_a-R_a),rail_dist)*180/3.14159265;
     std_angle = atan2((std_Q.x-std_R.x),rail_dist)*180/3.14159265;
     theta = cur_angle - std_angle; 
-    *RT_point.ptr<float>(0,0) = std_R.y - R_b;         //以左轨R作为旋转平移标准
-    *RT_point.ptr<float>(0,1) = (R_b/rail_dist)*(Q_a-R_a) - (std_Q.x - std_R.x)/2;
-    *RT_point.ptr<float>(0,2) = theta;
+    *RT_point.ptr<float>(0,0) = -1*(std_R.y - R_b);         //以左轨R作为旋转平移标准
+    *RT_point.ptr<float>(0,1) = -1*((R_b/rail_dist)*(Q_a-R_a) - (std_Q.x - std_R.x)/2);
+    *RT_point.ptr<float>(0,2) = -1*theta;
     std::cout<<theta<<endl;
+    log(QString("Comput_RT: std_Q.x=%1, std_Q.y=%2, std_R.x=%3, std_R.y=%4, Q_x=%5, Q_y=%6, R_x=%7, R_y=%8, theta=%9")
+                         .arg(std_Q.x).arg(std_Q.y).arg(std_R.x).arg(std_R.y).arg(Q_a).arg(Q_b).arg(R_a).arg(R_b).arg(theta));
 }
 
 void Fusion::init_test()
@@ -643,6 +647,11 @@ void Fusion::init_test()
 
 int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool isinterruptfile, __int64 start_num, __int64 frame_cunt, string QRrailcalibfile, string rectifyfile, bool userectifyfactor, bool usesaftyfactor)
 {
+
+    initLogger(out_file + ".log", "NPU LanZhou LzFusionThread");
+    log("outputfile:" + QString::fromLocal8Bit(out_file.c_str()) + ", " + out_extra_high.c_str());
+    log("QRrailcalibfile:" + QString::fromLocal8Bit(QRrailcalibfile.c_str()));
+    log("rectifyfile:" + QString::fromLocal8Bit(rectifyfile.c_str()) + ", " + QString("userectifyfactor=%1, usesaftyfactor=%2").arg(userectifyfactor).arg(usesaftyfactor));
 
     LzCalculate_ExtractHeight * extract = new LzCalculate_ExtractHeight();
     extract->init(Item, "", "", "", rectifyfile, out_extra_high, userectifyfactor, usesaftyfactor);
@@ -675,7 +684,10 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
     for(int i=1;i<=18;i++)
     {
         if (i <= 18)
-            get_valid(i) = get_mat(i)->openFile(open_file(i).c_str());    
+        {
+            get_valid(i) = get_mat(i)->openFile(open_file(i).c_str()); 
+            log("openfile:" + QString::fromLocal8Bit(open_file(i).c_str()) + ":" + QString("%1").arg(get_valid(i)));
+        }
         /*else if (i == 17)
             get_valid(i) = ((LzSerialStorageRT*)get_mat(i))->openFile(open_file(i).c_str());    
         else if (i == 18)
@@ -801,11 +813,23 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             }
         }
 //		get_vector();                                                  //将17组从机vector放入一个vector中
-        if(lzMat_Q->getCurrentBlockInfo().isvalid&&lzMat_R->getCurrentBlockInfo().isvalid)              //当前帧左右轨点有效
+        if(get_valid(17) && get_valid(18))
         {
-            Comput_RT(Q_a, Q_b, R_a, R_b);
-		    rectify_RT();                                                  //对vector进行rt矫正
+			if(lzMat_Q->getCurrentBlockInfo().isvalid&&lzMat_R->getCurrentBlockInfo().isvalid)              //当前帧左右轨点有效
+            {
+
+                if(1420<abs(R_b-Q_b)&&abs(R_b-Q_b)<1440)                  //用轨距进行判断是否存在误检测点
+                    Comput_RT(Q_a, Q_b, R_a, R_b);
+                rectify_RT();                                                  //对vector进行rt矫正
+            }
+            log(QString("FrameNo=%1, get_valid(17)=%2 && get_valid(18)=%3, Q_a=%4, Q_b=%5, R_a=%6, R_b=%7, CONDITION(1420<abs(R_b-Q_b)&&abs(R_b-Q_b)<1440)=%8")
+                            .arg(Info.key).arg(get_valid(17)).arg(get_valid(18)).arg(Q_a).arg(Q_b).arg(R_a).arg(R_b).arg(1420<abs(R_b-Q_b)&&abs(R_b-Q_b)<1440));
         }
+        else
+        {
+            log(QString("FrameNo=%1, get_valid(17)=%2 && get_valid(18)=%3").arg(Info.key).arg(get_valid(17)).arg(get_valid(18)));
+        }
+
         out_pnts = Mat(3,fus_vector.size(),CV_64FC4);                     //需改正
         for(int i=0;i<fus_vector.size();i++)
         {
@@ -839,8 +863,12 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
         
         // 【Step4】系数校正
         if (userectifyfactor)
-            extract->rectifyHeight(Data, usesaftyfactor);  
-                
+        {
+            bool retrectify = extract->rectifyHeight(Data, usesaftyfactor);  
+            if (!retrectify)
+                log(QString("FrameNo=%1, rectifyHeight false").arg(Info.key));
+        }
+
 		extra_high->writeMap(frame_num, mile_count, center_height, Data.getMaps(), tmpblockinfo, true);    //参数需要加！！！！
         fus_vector.clear();
         ret = 0;
@@ -850,6 +878,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             lzMat_Out->closeFile();
             extra_high->closeFile();
             delete extract;
+            log(QString("FrameNo=%1, extract_height false returnVal=%2").arg(Info.key).arg(ret));
             return ret;
         }
         qDebug() << "fuse " << Info.key;
@@ -861,7 +890,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
         {
             emit statusShow(Info.key, true);
             // 关闭文件
-            for(int i=1;i<=17;i++)
+            for(int i=1;i<=18;i++)
             {
                 if(get_valid(i))
                 {
@@ -871,6 +900,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
             lzMat_Out->closeFile();
             extra_high->closeFile();
             delete extract;
+            log(QString("suspend FrameNo=%1").arg(Info.key));
             return -1; // 暂停计算返回
         }
 
@@ -878,7 +908,7 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
         fus_vector.clear();
 	}
 
-    for(int i=1;i<=17;i++)
+    for(int i=1;i<=18;i++)
     {
         if(get_valid(i))
         {
@@ -889,5 +919,44 @@ int Fusion::fuse(list<int> Item, string out_file, string out_extra_high, bool is
     extra_high->closeFile();
 	//system("pause");
     delete extract;
+    log(QString("finish all"));
     return ret;
+}
+
+/** 
+ * 日志类初始化
+ */
+bool Fusion::initLogger(string filename, string username)
+{
+    if (logger != NULL)
+    {
+        if (logger->isLogging())
+        {
+            logger->log("***************************************************************************");
+            logger->log(string("【关闭融合计算日志类】") + filename + string("用户【") + username + string("】"));
+            logger->close();
+        }
+        delete logger;
+    }
+
+    logger = new LzLogger(LzLogger::MasterOpt);
+    logger->setFilename(filename);
+    if (logger->open() == 0)
+    {
+        hasinitlog = true;
+        logger->log("***************************************************************************");
+        logger->log(string("【开启融合计算日志类") + filename + string("用户【") + username + string("】"));
+        return true;
+    }
+    else
+    {
+        hasinitlog = false;
+        return false;
+    }
+}
+
+void Fusion::log(QString msg)
+{
+    if (hasinitlog)
+        logger->log(msg.toLocal8Bit().constData());
 }

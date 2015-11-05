@@ -104,8 +104,9 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
     // 获得画图界面修改断面数据的高度和限界半宽
     connect(imagesection, SIGNAL(sendUpdateSectionDataVal(int, int, bool, bool)), this, SLOT(updateSectionData(int, int, bool, bool)));
     
-    ui->horizontalSlider->setRange(10, 150);
-    ui->spinBox->setRange(10, 150);
+    ui->horizontalSlider->setRange(5, 150);
+    ui->spinBox->setRange(5, 150);
+    ui->spinBox->setVisible(false);
    
     connect(ui->spinBox, SIGNAL(valueChanged(int)), ui->horizontalSlider, SLOT(setValue(int)));
     connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), ui->spinBox, SLOT(setValue(int)));
@@ -114,6 +115,10 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
     connect(this,SIGNAL(sendspinBoxvalue(int)),imagesection,SLOT(UpdateScaleRelativeParameter(int)));
     // 当widget大小改变时，告知外层界面容器，更新scrollbar信号槽
     connect(imagesection, SIGNAL(resizeWidget()), this, SLOT(resizeGraphWidget()));
+
+    imagesection->UpdateScaleRelativeParameter(80);
+
+
     // 播放按钮信号槽
     connect(ui->beginFrameLabel, SIGNAL(clicked()), this, SLOT(viewFirstFrame()));
     connect(ui->endFrameLabel, SIGNAL(clicked()), this, SLOT(viewEndFrame()));
@@ -875,7 +880,7 @@ void CorrectClearanceWidget::moreImage()
 
 void CorrectClearanceWidget::moreImage3D()
 {
-    image3d = new ImageViewer3DTwoViewWidget();
+    image3d = new ImageViewer3DTwoViewWidget("", false, true);
 
     QString projectpath = LzProjectAccess::getLzProjectAccessInstance()->getProjectPath(LzProjectClass::Main);
 	QString projectname = LzProjectAccess::getLzProjectAccessInstance()->getProjectFilename(LzProjectClass::Main);
@@ -884,7 +889,7 @@ void CorrectClearanceWidget::moreImage3D()
 	bool isTwoNasMode = image3d->getNasMode();
 
 	qDebug() << projectpath << tmpimg_projectpath << projectname.left(projectname.size() - 5);
-    image3d->setInfo(isTwoNasMode, projectpath, projectname.left(projectname.size() - 5), tmpimg_projectpath, currenttunnelid, currenttunnelname);
+    image3d->setInfo(projectpath, projectname.left(projectname.size() - 5), tmpimg_projectpath, currenttunnelid, currenttunnelname);
     image3d->setCurrentFCs(framecounter);
     image3d->show();
 }
@@ -1408,7 +1413,7 @@ void CorrectClearanceWidget::htmlPreview()
     makedir(outputfilename);
 
     // 保存图片
-    QString tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.jpg").arg(mile);
+    QString tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.png").arg(mile);
     imagesection->saveImage(tmpinsertimgfile);
 
     bool ret1;
@@ -1448,7 +1453,7 @@ void CorrectClearanceWidget::excelPreview()
     outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"),openFileDir, tr("EXCEL (*.xls)"));
     
     // 保存图片
-    QString tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.jpg").arg(mile);
+    QString tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.png").arg(mile);
     imagesection->saveImage(tmpinsertimgfile);
     
     bool ret1;
@@ -1531,7 +1536,7 @@ void CorrectClearanceWidget::slotExportAll(int param)
                     outputfilename = openFileDir + "/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.xls").arg(mile);
 
                     // 保存图片
-                    tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.jpg").arg(mile);
+                    tmpinsertimgfile = ClientSetting::getSettingInstance()->getParentPath() + "/output/" + currenttunnelname + "_" + currenttunneldate + QObject::tr("_里程%1.png").arg(mile);
                     imagesection->saveImage(tmpinsertimgfile);
 
                     bool ret1;

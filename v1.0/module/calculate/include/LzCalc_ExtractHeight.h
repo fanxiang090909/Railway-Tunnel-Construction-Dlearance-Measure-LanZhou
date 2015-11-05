@@ -50,7 +50,7 @@ public:
     /**
      * 加校正系数校正提高度结果
      */
-    void rectifyHeight(SectionData & data, bool safetyfactor);
+    bool rectifyHeight(SectionData & data, bool safetyfactor);
 
     /**
      * 对三维点向量进行RT矫正

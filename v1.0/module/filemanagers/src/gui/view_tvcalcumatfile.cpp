@@ -52,6 +52,7 @@ ViewTVCalcuMatDataWidget::ViewTVCalcuMatDataWidget(QWidget *parent) :
 
     ui->horizontalSlider->setRange(5, 150);
     ui->spinBox->setRange(5, 150);
+    ui->spinBox->setVisible(false);
    
     connect(ui->spinBox, SIGNAL(valueChanged(int)), ui->horizontalSlider, SLOT(setValue(int)));
     connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), ui->spinBox, SLOT(setValue(int)));
@@ -59,7 +60,10 @@ ViewTVCalcuMatDataWidget::ViewTVCalcuMatDataWidget(QWidget *parent) :
     // 根据scale改变图形界面的大小
     connect(this,SIGNAL(sendspinBoxvalue(int)),imagesection,SLOT(UpdateScaleRelativeParameter(int)));
     // 当widget大小改变时，告知外层界面容器，更新scrollbar信号槽
-    connect(imagesection, SIGNAL(resizeWidget()), this, SLOT(resizeGraphWidget()));
+    //connect(imagesection, SIGNAL(resizeWidget()), this, SLOT(resizeGraphWidget()));
+
+    imagesection->UpdateScaleRelativeParameter(80);
+
     // 播放按钮信号槽
     connect(ui->beginFrameLabel_2, SIGNAL(clicked()), this, SLOT(viewFirstFrame()));
     connect(ui->endFrameLabel_2, SIGNAL(clicked()), this, SLOT(viewEndFrame()));
@@ -134,6 +138,13 @@ ViewTVCalcuMatDataWidget::ViewTVCalcuMatDataWidget(QWidget *parent) :
     ifcompareToComareData = false;
     ui->loadCompareDataButton->setVisible(false);
     connect(ui->loadCompareDataButton, SIGNAL(clicked()), this, SLOT(loadCompareDataWidget()));
+
+    // 换底板
+    connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(floorIndexChanged(int)));
+    ui->comboBox->setCurrentIndex(1);
+
+    // 截图
+    connect(ui->saveImageButton, SIGNAL(clicked()), this, SLOT(saveImage()));
 }
 
 ViewTVCalcuMatDataWidget::~ViewTVCalcuMatDataWidget()
@@ -667,11 +678,11 @@ void ViewTVCalcuMatDataWidget::loadGaugeImage()
             qDebug()<<endl;
         }*/
         //////////
-
-        imagesection->setFusePointArrayVisible(true);
-
         if (isfileopen_syn)
             imagesection->SectionDataToPointsArray(sectiondata);
+        imagesection->setPointsArrayVisible(true);
+        if (ret)
+            imagesection->setFusePointArrayVisible(true);
     }
     else
         imagesection->setFusePointArrayVisible(false);
@@ -723,4 +734,30 @@ void ViewTVCalcuMatDataWidget::loadCompareDataWidget()
 
     ifcompareToComareData = true;
     loadWidget->setParentPath(tmpopendir);
+}
+
+// 切换底板
+void ViewTVCalcuMatDataWidget::floorIndexChanged(int index)
+{
+    OutputClearanceImageType type = OutType_B_DianLi;
+    switch (index)
+    {
+        case 0: type = OutType_B_NeiRan; break;
+        case 1: type = OutType_B_DianLi; break;
+        case 2: type = OutType_D_NeiRan; break;
+        case 3: type = OutType_D_DianLi; break;
+        default: type = OutType_B_DianLi;
+    }
+    imagesection->setfloornumber(type);
+}
+
+// 截图
+void ViewTVCalcuMatDataWidget::saveImage()
+{
+    // 获得输出文件名
+    QString outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"), QString("%1_%2.png").arg(file_full).arg(current_fc), tr("PNG (*.png)"));
+    // 保存图片
+	qDebug() << outputfilename;
+	imagesection->saveImage(outputfilename);
+    appendMsg(QObject::tr("截图保存到文件%1成功").arg(outputfilename));
 }

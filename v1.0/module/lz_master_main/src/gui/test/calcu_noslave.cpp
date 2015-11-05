@@ -672,7 +672,7 @@ void CalcuNoSlaveWidget::calculate_Fuse_beginAll(bool useerrorrectifyfactor, boo
 
             QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
 
-            QString QRrailcalifile = "QRrial.xml";
+            QString QRrailcalifile = "QRrail.xml";
             QString rectifyheightfile = "rectify.heights";
 
             if (tmpsl.size() >= 2)

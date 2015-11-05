@@ -160,9 +160,10 @@ bool XMLTaskFileLoader::loadFile(PlanTaskList & list)
             isdownlink = true;
         TiXmlAttribute *pulsePerMeter =downstream->Next();//每米脉冲数
         temp =pulsePerMeter->Value();
-        int pulsenumber = atoi(temp);
+        float pulsenumber = atof(temp);
         TiXmlAttribute *zhengchangnot =pulsePerMeter->Next();//是否正常
         temp =zhengchangnot->Value();
+        tmpint = atoi(temp);
         bool isnormal;
         if (tmpint == 0)
             isnormal = false;

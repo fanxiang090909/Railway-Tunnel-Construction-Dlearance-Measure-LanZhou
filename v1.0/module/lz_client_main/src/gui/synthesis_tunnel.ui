@@ -660,13 +660,16 @@
                </size>
               </property>
               <property name="minimum">
-               <number>10</number>
+               <number>5</number>
               </property>
               <property name="maximum">
-               <number>60</number>
+               <number>150</number>
               </property>
               <property name="value">
-               <number>40</number>
+               <number>80</number>
+              </property>
+              <property name="sliderPosition">
+               <number>80</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -676,13 +679,13 @@
             <item>
              <widget class="QSpinBox" name="spinBox">
               <property name="minimum">
-               <number>10</number>
+               <number>5</number>
               </property>
               <property name="maximum">
-               <number>60</number>
+               <number>150</number>
               </property>
               <property name="value">
-               <number>40</number>
+               <number>80</number>
               </property>
              </widget>
             </item>

@@ -20,6 +20,8 @@
 #include "LzSerialStorageRT.h"
 #include "LzSerialStorageSynthesis.h"
 
+#include "lz_logger.h"
+
 #include <QObject>
 #include <QDebug>
 
@@ -79,6 +81,14 @@ public:
     void get_vector(Mat&, int cameragroupid, bool carriagedirection);
     bool & get_point_valid(int);
 
+    /** 
+     * 日志类初始化
+     */
+    bool initLogger(string filename, string username);
+    /**
+     * 日志记录
+     */
+    void log(QString msg);
 
 private:
     // @author 范翔，是否终止计算
@@ -117,6 +127,10 @@ private:
     double rail_dist;                                    //定义钢轨间距
 	int start_num,cunt_num;                              //用于定义融合的起始帧号及总共融合的帧数
     FileStorage fs;                                      //用于加载标定文件（车底QR标定点）
+
+    // 日志相关 @author 范翔
+    LzLogger * logger;
+    bool hasinitlog;
 };
 
 #endif // FUSECALCULTAION_H

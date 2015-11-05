@@ -63,7 +63,8 @@ bool LzCalculateThread::initLogger(string filename, string username)
     {
         if (logger->isLogging())
         {
-            logger->log(string("关闭工程-文件校正,") + string("用户") + username);
+            logger->log("***************************************************************************");
+            logger->log(string("【关闭计算日志类】") + filename + string("用户【") + username + string("】"));
             logger->close();
         }
         delete logger;
@@ -74,7 +75,8 @@ bool LzCalculateThread::initLogger(string filename, string username)
     if (logger->open() == 0)
     {
         hasinitlog = true;
-        logger->log(string("开启工程-文件校正") + string("用户") + username);
+        logger->log("***************************************************************************");
+        logger->log(string("【开启计算日志类") + filename + string("用户【") + username + string("】"));
         return true;
     }
     else
@@ -128,7 +130,7 @@ void LzCalculateTVThread::init(string projectpath, int newtunnelid, std::list<Ch
     this->outputfile = outputfile;
     this->datahead = outputdatahead;
 
-    initLogger(outputfile + ".log", "tangshuhang");
+    initLogger(projectpath + "/mid_calcu/" + outputfile + ".log", "NPU LanZhou LzCalculateTVThreadThread");
 
     this->isfrominterruptfile = isinterrupt;
     this->interruptedfc = newinterruptfc;
@@ -153,6 +155,9 @@ void LzCalculateTVThread::run()
         cam = slavemodel.box1.camera;
         calibfile = projectpath + "/calcu_calibration/" + slavemodel.box1.box_camera_calib_file;
         calibfile = LocalFileOperation::toBackSlashStr(QString::fromLocal8Bit(calibfile.c_str())).toLocal8Bit().constData();
+
+        log("calibfile:" + QString::fromLocal8Bit(calibfile.c_str()));
+
         ret = true;
     }
     a[0] = slavemodel.box2.boxindex;
@@ -162,6 +167,9 @@ void LzCalculateTVThread::run()
         cam = slavemodel.box2.camera;
         calibfile = projectpath + "/calcu_calibration/" + slavemodel.box2.box_camera_calib_file;
         calibfile = LocalFileOperation::toBackSlashStr(QString::fromLocal8Bit(calibfile.c_str())).toLocal8Bit().constData();
+        
+        log("calibfile:" + QString::fromLocal8Bit(calibfile.c_str()));
+
         ret = true;
     }
     if (ret == false)
@@ -170,6 +178,9 @@ void LzCalculateTVThread::run()
         return;
     }
     string output_file = projectpath + "/mid_calcu/" + outputfile;
+
+    log("outputfile:" + QString::fromLocal8Bit(output_file.c_str()));
+
     qDebug() << "****calcu output file" << output_file.c_str() << "start****";
 
     LzSerialStorageAcqui * lzacqui_L = new LzSerialStorageAcqui();                               //左相机流式存储类
@@ -312,7 +323,7 @@ void LzCalculateTVThread::run()
                 lzstore_mat->writeMat(Lz_c._rect_Pnts3d, Info, true);                                 //写入Mat还有问题，须改！
 
                 // log
-                log(QString("FrameNo %1 readframe1 & readframe2 %2 %3, LzCaculator %4").arg(Info.key).arg(ifread1).arg(ifread2).arg(Lz_c._rect_Pnts3d.cols));
+                log(QString("FrameNo=%1, readframe1=%2 & readframe2=%3, isvalid=%4, LzCaculator._rect_Pnts3d.cols=%5").arg(Info.key).arg(ifread1).arg(ifread2).arg(Info.isvalid).arg(Lz_c._rect_Pnts3d.cols));
 
                 Lz_c.is_valid = false;
                 Lz_c._rect_Pnts3d = Mat::zeros(0,0,0);
@@ -333,6 +344,7 @@ void LzCalculateTVThread::run()
                     delete lzacqui_R;
                     delete lzstore_mat;
                     emit finish(threadid, -1, tunnelid, QObject::tr(outputfile.c_str()), Info.key);
+                    log(QString("suspend FrameNo=%1").arg(Info.key));
                     return;
                 }
 
@@ -348,6 +360,8 @@ void LzCalculateTVThread::run()
             delete lzacqui_R;
             delete lzstore_mat;
             emit finish(threadid, 6, tunnelid, QString("双目计算文件%1时异常%2").arg(QObject::tr(outputfile.c_str())).arg(ex.getErrDescribe().c_str()), 0);
+            log(QString("LzException %1").arg(ex.getErrDescribe().c_str()));
+
             return;
         }
 
@@ -358,6 +372,7 @@ void LzCalculateTVThread::run()
     delete lzacqui_R;
     delete lzstore_mat;
     qDebug() << "****calcu output file" << output_file.c_str() << "end****";
+    log(QString("finish all"));
 
     emit finish(threadid, 0, tunnelid, QString(this->outputfile.c_str()), currentcalcfc);
 }
@@ -399,7 +414,7 @@ void LzCalculateTVRTThread_V2::init(string projectpath, int newtunnelid, std::li
     this->datahead = outputdatahead;
     this->outputfile = outputfile;
     
-    initLogger(outputfile + ".log", "tangshuhang");
+    initLogger(projectpath + "/mid_calcu/" + outputfile + ".log", "NPU LanZhou LzCalculateTVThreadThread");
 
     this->isfrominterruptfile = isinterrupt;
     this->interruptedfc = newinterruptfc;
@@ -424,6 +439,9 @@ void LzCalculateTVRTThread_V2::run()
         cam = slavemodel.box1.camera;
         calibfile = projectpath + "/calcu_calibration/" + slavemodel.box1.box_camera_calib_file;
         calibfile = LocalFileOperation::toBackSlashStr(QString::fromLocal8Bit(calibfile.c_str())).toLocal8Bit().constData();
+
+        log("calibfile:" + QString::fromLocal8Bit(calibfile.c_str()));
+
         ret = true;
     }
     a[0] = slavemodel.box2.boxindex;
@@ -433,6 +451,9 @@ void LzCalculateTVRTThread_V2::run()
         cam = slavemodel.box2.camera;
         calibfile = projectpath + "/calcu_calibration/" + slavemodel.box2.box_camera_calib_file;
         calibfile = LocalFileOperation::toBackSlashStr(QString::fromLocal8Bit(calibfile.c_str())).toLocal8Bit().constData();
+
+        log("calibfile:" + QString::fromLocal8Bit(calibfile.c_str()));
+
         ret = true;
     }
     if (ret == false)
@@ -443,6 +464,7 @@ void LzCalculateTVRTThread_V2::run()
 
     string Pnts_out_file = projectpath + "/mid_calcu/" + outputfile;
     qDebug() << "****calcu output file" << Pnts_out_file.c_str() << "start****";
+    log("outputfile:" + QString::fromLocal8Bit(Pnts_out_file.c_str()));
 
     LzSerialStorageAcqui * lzacqui_L = new LzSerialStorageAcqui();                        //组1左相机流式存储类
     lzacqui_L->setting(250, 1024*1024*200, true);
@@ -604,7 +626,7 @@ void LzCalculateTVRTThread_V2::run()
 				//lzstore_Pnts_mat->writeMat(Cam_Img._rect_Pnts3d,Info,true);
 
                 // log
-                log(QString("FrameNo %1 readframe1 & readframe2 %2 %3, LzCaculator %4").arg(Info.key).arg(ifread1).arg(ifread2).arg(Cam_Img._rect_Pnts3d.cols));
+                log(QString("FrameNo=%1, readframe1=%2 & readframe2=%3, isvalid=%4, LzCaculator.Cam_Img._rect_Pnts3d.cols=%5, Cam_Img.rail_P.x=%6, Cam_Img.rail_P.y=%7").arg(Info.key).arg(ifread1).arg(ifread2).arg(Info.isvalid).arg(Cam_Img._rect_Pnts3d.cols).arg(Cam_Img.rail_P.x).arg(Cam_Img.rail_P.y));
 
                 currentcalcfc = Info.key;
                 emit statusShow(threadid, Info.key, tunnelid, QObject::tr(outputfile.c_str()));
@@ -621,6 +643,7 @@ void LzCalculateTVRTThread_V2::run()
                     delete lzacqui_R;
                     delete lzstore_Pnts_mat;
                     emit finish(threadid, -1, tunnelid, QObject::tr(outputfile.c_str()), Info.key);
+                    log(QString("suspend FrameNo=%1").arg(Info.key));
 
                     return;
                 }
@@ -637,6 +660,8 @@ void LzCalculateTVRTThread_V2::run()
             delete lzacqui_R;
             delete lzstore_Pnts_mat;
             emit finish(threadid, 6, tunnelid, QString("双目计算文件%1时异常%2").arg(QObject::tr(outputfile.c_str())).arg(ex.getErrDescribe().c_str()), 0);
+            log(QString("LzException %1").arg(ex.getErrDescribe().c_str()));
+
             return;
         }
 
@@ -646,6 +671,7 @@ void LzCalculateTVRTThread_V2::run()
     delete lzacqui_L;
     delete lzacqui_R;
     delete lzstore_Pnts_mat;
+    log(QString("finish all"));
 
     emit finish(threadid, 0, tunnelid, QString(this->outputfile.c_str()), currentcalcfc);
 }

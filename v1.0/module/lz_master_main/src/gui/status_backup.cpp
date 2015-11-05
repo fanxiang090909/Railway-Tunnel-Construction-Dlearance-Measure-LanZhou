@@ -42,6 +42,10 @@ BackupWidget::BackupWidget(QWidget *parent) :
     ui->stopMasterBackupButton->setVisible(false);
 
     connect(ui->resetButton, SIGNAL(clicked()), this, SLOT(resetBackupConfigFile()));
+
+    // @author 范翔 20151027，暂停备份的逻辑去掉，每次重新备份即可，只保留暂停计算，Prof Wang的意思
+    ui->stopMasterBackupButton->setVisible(false);
+    ui->stopBackupButton->setVisible(false);
 }
 
 BackupWidget::~BackupWidget()

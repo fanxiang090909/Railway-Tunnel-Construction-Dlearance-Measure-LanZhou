@@ -369,6 +369,12 @@ void OutputClearanceWidget::clearanceImagePreview()
         syntunnelcorrect->initPointsArray(datar.getMaps().size(), Curve_Right);
         ret = syntunnelcorrect->ClearanceDataToPointsArray(datar, Curve_Right);
     }
+
+    if (hass || hasl || hasr)
+        syntunnelcorrect->setPointsArrayVisible(true);
+    else
+        syntunnelcorrect->setPointsArrayVisible(false);
+
     // 即更新绘图
     syntunnelcorrect->update();
 
@@ -578,7 +584,7 @@ void OutputClearanceWidget::pdfPreview()
         makedir(outputfilename);
 
         // 保存图片
-        insertimgfile = insertimgfile + singleTunnelModel.getTaskTunnelInfoFormat() + ".jpg";
+        insertimgfile = insertimgfile + singleTunnelModel.getTaskTunnelInfoFormat() + ".png";
         syntunnelcorrect->saveImage(insertimgfile);
 
         bool ret1;
@@ -598,7 +604,7 @@ void OutputClearanceWidget::pdfPreview()
         makedir(outputfilename);
 
         // 保存图片
-        insertimgfile = insertimgfile + QObject::tr("区段综合") + "_" + datetimestr+ ".jpg";
+        insertimgfile = insertimgfile + QObject::tr("区段综合") + "_" + datetimestr+ ".png";
         syntunnelcorrect->saveImage(insertimgfile);
 
         // 输出到excel
@@ -660,7 +666,7 @@ void OutputClearanceWidget::excelPreview()
         outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"), openFileDir, tr("EXCEL (*.xls)"));
 
         // 保存图片
-        insertimgfile = QString(openFileDir.constData()) + ".jpg";
+        insertimgfile = QString(openFileDir.constData()) + ".png";
 		qDebug() << insertimgfile;
 		syntunnelcorrect->saveImage(insertimgfile);
 
@@ -681,7 +687,7 @@ void OutputClearanceWidget::excelPreview()
         outputfilename = QFileDialog::getSaveFileName(this, tr("导出到文件"),openFileDir, tr("EXCEL (*.xls)"));
         
         // 保存图片
-        insertimgfile = QString(openFileDir.constData()) + ".jpg";
+        insertimgfile = QString(openFileDir.constData()) + ".png";
         syntunnelcorrect->saveImage(insertimgfile);
 
         // 输出到excel
@@ -753,7 +759,7 @@ void OutputClearanceWidget::exportAllToExcels()
                     outputfilename = openFileDir + "/" + singleTunnelModel.getTaskTunnelInfoFormat() + ".xls";
 
                     // 保存图片
-                    tmpinsertimgfile = insertimgfilepath + singleTunnelModel.getTaskTunnelInfoFormat() + ".jpg";
+                    tmpinsertimgfile = insertimgfilepath + singleTunnelModel.getTaskTunnelInfoFormat() + ".png";
                     syntunnelcorrect->saveImage(tmpinsertimgfile);
 
                     bool ret1;

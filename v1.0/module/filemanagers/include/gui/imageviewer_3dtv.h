@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPixmap>
+#include <QButtonGroup>
 #include <QImage>
 #include "checkedtask_list.h"
 #include "show_3dpoints.h"
@@ -25,13 +26,14 @@ class ImageViewer3DTwoViewWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ImageViewer3DTwoViewWidget(QWidget *parent = 0);
+    explicit ImageViewer3DTwoViewWidget(QString singlenasip, bool isLocalHost = true, bool isTwoNasMode = false, QWidget *parent = 0);
     ~ImageViewer3DTwoViewWidget();
 
     /**
 	 * 图形修正时候原图浏览设置信息函数，无seqnostart版本
 	 */
-    void setInfo(bool isTwoNasMode, QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname);
+    void setInfo(QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname);
+    void setInfo(bool initIsDataOnLocal, bool isTwoNasMode, QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname);
 
 public:
 
@@ -101,6 +103,14 @@ private slots:
 
     void exitOuter();
 
+    /**
+     * 切换数据存储位置模式
+     */
+    void editingNASMode();
+    void changeDataNASMode(bool);
+    void changeNASMode(bool);
+
+
     // 转到帧的相关槽函数
     void frameSearch();
     void frameSearchEditToggled();
@@ -164,6 +174,15 @@ private:
 	//@zengwang 2015年10月13日
 	//设定当前是一个Nas模式还是两个Nas模式
 	bool isTwoNasMode;
+
+    // @author 范翔 是不是数据在本机
+    bool isLocalHost;
+    // 单台NASIP地址
+    QString singlenasip;
+    bool isEditingNASMode;
+
+    // 选择数据存储位置
+    QButtonGroup * group;
 
     // 转到帧的相关
     bool firsttime;

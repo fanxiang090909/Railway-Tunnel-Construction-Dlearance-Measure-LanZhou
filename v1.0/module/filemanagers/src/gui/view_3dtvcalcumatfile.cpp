@@ -39,8 +39,9 @@ View3DTVCalcuMatDataWidget::View3DTVCalcuMatDataWidget(QWidget *parent) :
     ui->gridLayout->addWidget(ui->page4, 0, 1, 1, 1);
     ui->gridLayout->addWidget(ui->page5, 0, 1, 1, 1);
 
-    widget4 = new SelectAvaliableTunnelWidget(ui->page4);
-    widget56 = new ImageViewer3DTwoViewWidget(ui->page5);
+    // false参数表示不连接数据库
+    widget4 = new SelectAvaliableTunnelWidget(false, ui->page4);
+    widget56 = new ImageViewer3DTwoViewWidget("", false, true, ui->page5);
 
     QGridLayout *layout2 = new QGridLayout();
     layout2->addWidget(widget4);
@@ -92,7 +93,7 @@ void View3DTVCalcuMatDataWidget::slotSelectedTunnelToSynthesis(int tunnelid, QSt
     QString tmpimg_projectpath = ClientSetting::getSettingInstance()->getClientTmpLocalParentPath();
 
     qDebug() << projectpath << tmpimg_projectpath << projectname.left(projectname.size() - 5) <<  "       " << tunnelid << selectfile << startframeno << endframeno;
-    widget56->setInfo(false, projectpath, projectname.left(projectname.size() - 5), tmpimg_projectpath, tunnelid, tunnelname);
+    widget56->setInfo(projectpath, projectname.left(projectname.size() - 5), tmpimg_projectpath, tunnelid, tunnelname);
     widget56->setCurrentFCs(startframeno);
 
 }

@@ -238,7 +238,7 @@ void CreateProjectWidget::createProj()
         }
 
         qDebug() << "from: " << MasterSetting::getSettingInstance()->getParentPath() + "/calcu_calibration" << ", to: " << newdir + "/calcu_calibration"; 
-        // 拷贝双目标定参数配置文件
+        // 拷贝双目标定参数配置文件，QRrail.xml文件，rectify.heights文件
         ret2 = LocalFileOperation::copyDirectoryFiles(MasterSetting::getSettingInstance()->getParentPath() + "/calcu_calibration",
                                             newdir + "/calcu_calibration", true);
         if (ret2 == false)

@@ -82,6 +82,8 @@ public:
      */
     bool cancelOneStep(SectionData &data);
 	
+    LzLogger * getLogger();
+
 private:
 
     stack<EditRecord> editingStack;

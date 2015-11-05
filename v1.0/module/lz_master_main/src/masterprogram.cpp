@@ -1109,7 +1109,7 @@ void MasterProgram::parseMsg(QString msg)
 
                 backup_FeedbackPerTunnel_CameraGroup_R(filename, slaveid, 0, seqno, index, false, 0);
                 
-                saveCalcuBackupInfo(LzProjectClass::Backup);
+                //saveCalcuBackupInfo(LzProjectClass::Backup);
                 
                 // 每个从机单线程备份，所以threadid号为1
                 emit signalToCameraTask(WorkingStatus::Backuping, QString("%1").arg(slaveid), 1, filename, "ok");
@@ -1170,14 +1170,15 @@ void MasterProgram::parseMsg(QString msg)
                 {
                     emit signalMsgToGUI(WorkingStatus::Backuping, QObject::tr("[从控%1] 暂停备份失败，文件正在备份，请稍后"));
                 }
-                else if (retstr.compare("true") == 0)
+                // @author 范翔 20151027，暂停备份的逻辑去掉，每次重新备份即可，只保留暂停计算，Prof Wang的意思
+                /*else if (retstr.compare("true") == 0)
                 {
                     // 记录中断帧号处理函数
                     if (hasChangeBackupCalcuStatus)
                         saveCalcuBackupInfo(LzProjectClass::Backup);
 
                     emit signalMsgToGUI(WorkingStatus::Backuping, QObject::tr("[从控%1] 暂停备份文件%2成功，暂停帧号为%3").arg(slaveid).arg(filename).arg(interruptfc));
-                }
+                }*/
                 break;
             }
             default:;
@@ -1998,7 +1999,7 @@ void MasterProgram::calculate_Fuse_beginStartAll(bool useerrorrectifyfactor, boo
 
                 QStringList tmpsl = QString::fromLocal8Bit(NetworkConfigList::getNetworkConfigListInstance()->getCalibrationFile().c_str()).split(",", QString::SkipEmptyParts);
 
-                QString QRrailcalifile = "QRrial.xml";
+                QString QRrailcalifile = "QRrail.xml";
                 QString rectifyheightfile = "rectify.heights";
 
                 if (tmpsl.size() >= 2)
@@ -2248,8 +2249,9 @@ void MasterProgram::backup_beginStartAll()
 
                             if (tmphasbackup < 5) // 还未做备份
                                 backup_StartOneFile(i, tmpfilename, tmptunnelid, false, 0, beginfc, endfc);
-                            else if (tmphasbackup == 5)
-                                backup_StartOneFile(i, tmpfilename, tmptunnelid, true, backupinterruptpos, beginfc, endfc);
+                            // @author 范翔 20151027，暂停备份的逻辑去掉，每次重新备份即可，只保留暂停计算，Prof Wang的意思
+                            //else if (tmphasbackup == 5)
+                            //    backup_StartOneFile(i, tmpfilename, tmptunnelid, true, backupinterruptpos, beginfc, endfc);
                             else
                                 emit signalMsgToGUI(WorkingStatus::Backuping, QObject::tr("[主控]  已经备份完%1").arg(tmpfilename));;//tmphasbackupnum++;
                                 ;//tmphasbackupnum++;
@@ -2334,8 +2336,9 @@ void MasterProgram::backup_beginStartOneTunnel(int tobackuptunnelid /*,QString t
                             tmpfilename = tmpnameprefix +  QString("_%1").arg(tmpcamindex) + ".dat";
                             if (tmphasbackup < 5) // 还未做备份
                                 backup_StartOneFile(i, tmpfilename, tmptunnelid, false, 0, beginfc, endfc);
-                            else if (tmphasbackup == 5)
-                                backup_StartOneFile(i, tmpfilename, tmptunnelid, true, backupinterruptpos, beginfc, endfc);
+                            // @author 范翔 20151027，暂停备份的逻辑去掉，每次重新备份即可，只保留暂停计算，Prof Wang的意思
+                            //else if (tmphasbackup == 5)
+                            //    backup_StartOneFile(i, tmpfilename, tmptunnelid, true, backupinterruptpos, beginfc, endfc);
                             else
                                 emit signalMsgToGUI(WorkingStatus::Backuping, QObject::tr("[主控]  已经备份完%1").arg(tmpfilename));;//tmphasbackupnum++;
                                 ;//tmphasbackupnum++;

@@ -25,7 +25,7 @@ namespace Pylon{
 				//当未进入预进洞无效状态或采集状态时，休眠
 				while ( !discarding && !acquisiting )
 				{
-					boost::this_thread::sleep_for( boost::chrono::milliseconds(10) );
+					boost::this_thread::sleep_for( boost::chrono::milliseconds(200) );
 				}
 
 

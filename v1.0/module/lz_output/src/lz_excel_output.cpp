@@ -46,11 +46,11 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
     excel.SetCellData(52,1,QObject::tr("%1隧道断面示意图").arg(QObject::tr(inputbasicdata->getName().c_str())));
 
     // 线路名称
-    excel.SetCellData(3,3,QObject::tr(inputbasicdata->getLinename().c_str()));
+    excel.SetCellData(3,2,QObject::tr(inputbasicdata->getLinename().c_str()));
     excel.SetCellData(54,2,QObject::tr(inputbasicdata->getLinename().c_str()));
 
     // 区段///TODO
-    excel.SetCellData(3,9,QObject::tr(inputbasicdata->getLinename().c_str()));
+    excel.SetCellData(3,7,QObject::tr(inputbasicdata->getLinename().c_str()));
     // 面向站名
     excel.SetCellData(3,10,QObject::tr(inputbasicdata->getLineEndStation().c_str()));
     excel.SetCellData(54,8,QObject::tr(inputbasicdata->getLineEndStation().c_str()));
@@ -61,17 +61,18 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
 
     // 时间
     QByteArray ba = collectdate.toLocal8Bit();
+    excel.SetCellData(48,10,ba.constData());
     excel.SetCellData(54,10,ba.constData());
 
     // 计算隧道长度
     _int64 tunnellength = inputbasicdata->getEndPoint() - inputbasicdata->getStartPoint();
     if (tunnellength < 0)
         tunnellength = 0 - tunnellength;
-    excel.SetCellData(102,3,tunnellength); 
+    //excel.SetCellData(102,3,tunnellength); 
 
     // 计算中心里程 隧道中心点的里程数
     float centerlength = 1.0 * (inputbasicdata->getEndPoint() + inputbasicdata->getStartPoint()) / 2; 
-    excel.SetCellData(4,10,centerlength);
+    excel.SetCellData(4,7,centerlength);
     excel.SetCellData(101,3,centerlength); 
 
     SectionData & data = inputdata;
@@ -144,9 +145,16 @@ int LzExcelOutput::outputSingleSection(TunnelDataModel * inputbasicdata, QString
     // <150高度手动输入？ ///TODO
 
     // 线路中心线上方最低净高mm///TODO
-    int newdata = 0;
-    excel.SetCellData(rowcount+startrownum+1,10,newdata);
+    excel.SetCellData(rowcount+startrownum+1,6,(int)inputdata.getCenterHeight());
     
+    // 半径
+    int radius = inputdata.getRadius();
+    if (radius <= 0)
+        radius = 0;
+    excel.SetCellData(4,10,radius); 
+    excel.SetCellData(54,6,radius); 
+    excel.SetCellData(102,3,radius); 
+
     excel.setProperty("DisplayAlerts", 0);
     
     // 保存
@@ -234,6 +242,7 @@ int LzExcelOutput::outputSingleTunnel(TunnelDataModel * inputbasicdata, Clearanc
     QByteArray ba = strList.at(1).toLocal8Bit();
     QDateTime tmpdate = QDateTime::fromString(ba.constData(), "yyyyMMdd");
     QString date = tmpdate.toString("yyyy-MM-dd");
+    excel.SetCellData(49,15, date.toLocal8Bit().constData());
     excel.SetCellData(54,16, date.toLocal8Bit().constData());
     // TODO表上再插入一个时间
 
@@ -460,6 +469,7 @@ int LzExcelOutput::outputMultiTunnels(ClearanceMultiTunnels * inputdata, QString
     if (strlist.length() < 3)
         return -1;
     QString collectdate = strlist.at(2);
+    excel.SetCellData(49,15,collectdate);
     excel.SetCellData(54,16,collectdate);
 
     // 最小曲线半径

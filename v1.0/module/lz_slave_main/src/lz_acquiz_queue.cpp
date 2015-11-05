@@ -1020,6 +1020,6 @@ void LzAcquizQueue::onTimeOut()
 
 void LzAcquizQueue::collect_feedbackFCToMaster(QString cameraid, long long currentfc)
 {
-    if (hasCamerainit && hasInitSlaveModel())
-        emit signalMsgToMaster(QString("1108,cameraindex=%1,currentframe=%2").arg(cameraid).arg(currentfc));
+    //if (hasCamerainit && hasInitSlaveModel())
+    //    emit signalMsgToMaster(QString("1108,cameraindex=%1,currentframe=%2").arg(cameraid).arg(currentfc));
 }

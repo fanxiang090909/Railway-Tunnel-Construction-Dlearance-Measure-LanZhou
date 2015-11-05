@@ -61,6 +61,12 @@ private slots:
     // 显示对比数据界面
     void loadCompareDataWidget();
 
+    // 切换底板
+    void floorIndexChanged(int);
+
+    // 截图
+    void saveImage();
+
 public slots:
     
     void loadGaugeImage();

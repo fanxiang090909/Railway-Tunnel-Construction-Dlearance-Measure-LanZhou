@@ -2,12 +2,15 @@
 
 #include "ui_imageviewer_3dtv.h"
 
+#include <QDebug>
+#include <QObject>
+#include <QButtonGroup>
+
 #include "setting_client.h"
 #include "lz_project_access.h"
 #include "LzSerialStorageAcqui.h"
 #include "LzSerialStorageMat.h"
 #include "checkedtask_list.h"
-#include <QDebug>
 #include "LzCalculator.h"
 #include "MatToQImage.h"
 
@@ -24,7 +27,7 @@ const int TN_HEIGHT = 480;//图像显示的尺寸
  * @version 1.0.0
  * @date 2015-03-24
  */
-ImageViewer3DTwoViewWidget::ImageViewer3DTwoViewWidget(QWidget *parent) : 
+ImageViewer3DTwoViewWidget::ImageViewer3DTwoViewWidget(QString initsinglenasip, bool initisLocalHost, bool initIsTwoNasMode, QWidget *parent) : singlenasip(initsinglenasip), isLocalHost(initisLocalHost), isTwoNasMode(initIsTwoNasMode),
     QWidget(parent), ui(new Ui::ImageViewer3DTwoViewWidget)
 {
     ui->setupUi(this);
@@ -89,6 +92,25 @@ ImageViewer3DTwoViewWidget::ImageViewer3DTwoViewWidget(QWidget *parent) :
 	//@zengwang 2015年10月13日
 	isTwoNasMode = true;
 
+    // 数据地址选择
+    isEditingNASMode = false;
+    ui->twoNASRadioButton->setChecked(true);
+    ui->editingNASModeWidget->setEnabled(false);
+    ui->editNASModeButton->setText(QObject::tr("修改"));
+
+    connect(ui->editNASModeButton, SIGNAL(clicked()), this, SLOT(editingNASMode()));
+    connect(ui->dataOnNASCheckBox, SIGNAL(toggled(bool)), this, SLOT(changeDataNASMode(bool)));
+    connect(ui->oneNASRadioButton, SIGNAL(toggled(bool)), this, SLOT(changeNASMode(bool)));
+    connect(ui->twoNASRadioButton, SIGNAL(toggled(bool)), this, SLOT(changeNASMode(bool)));
+
+    group = new QButtonGroup(this);
+    group->addButton(ui->oneNASRadioButton);
+    group->addButton(ui->twoNASRadioButton);
+
+    group->setId(ui->oneNASRadioButton, 0);
+    group->setId(ui->twoNASRadioButton, 1);
+    ui->dataOnNASCheckBox->setChecked(true);
+
     connect(ui->exit_Button, SIGNAL(clicked()), this, SLOT(exitOuter()));
 
     // 查找帧号
@@ -132,20 +154,14 @@ void ImageViewer3DTwoViewWidget::updateCameraandImages()
     updateImages();
 }
 
-/**
- * 图形修正时候原图浏览设置信息函数，无seqnostart版本
- */
-void ImageViewer3DTwoViewWidget::setInfo(bool isTwoNasMode, QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname)
+void ImageViewer3DTwoViewWidget::setInfo(QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname)
 {
-	this->currentprojpath = projectpath;
+    this->currentprojpath = projectpath;
 	this->projectname = projectname;
     this->currenttmpimgpath = tmpimg_projectpath;
     this->currenttunnelid = tunnelid;
     datetime = projectpath.right(8);
     this->currenttunnelname = tunnelname;
-
-	//
-	this->isTwoNasMode = isTwoNasMode;
 
     // 默认向后申请
     viewdirection = false;
@@ -172,11 +188,16 @@ void ImageViewer3DTwoViewWidget::setInfo(bool isTwoNasMode, QString projectpath,
             // 还没有找到起始时找起始帧所在文件
             currentseqno = (*it).seqno;
             current_fc_master = (*it).start_frame_master;
-            currenttmpimgpath = projectpath + "/mid_calcu/" + QString::fromLocal8Bit(currentCheckedModel.calcuItem.cal_filename_prefix.c_str());
-            currenttmpimgpath_l = projectpath + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
-            currenttmpimgpath_r = projectpath + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
 
-			//nasip+"/"+projectname+"/"
+            if (isLocalHost)
+            {
+                currenttmpimgpath = projectpath + "/mid_calcu/" + QString::fromLocal8Bit(currentCheckedModel.calcuItem.cal_filename_prefix.c_str());
+                currenttmpimgpath_l = projectpath + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+                currenttmpimgpath_r = projectpath + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+
+			    //nasip+"/"+projectname+"/"
+                qDebug() << currenttmpimgpath << currenttmpimgpath_l << currenttmpimgpath_r;
+            }
 
             setCamerasCurrentFCs(current_fc_master);
         }
@@ -186,6 +207,16 @@ void ImageViewer3DTwoViewWidget::setInfo(bool isTwoNasMode, QString projectpath,
         // 更新显示原图
         updateImages();
     }
+}
+
+/**
+ * 图形修正时候原图浏览设置信息函数，无seqnostart版本
+ */
+void ImageViewer3DTwoViewWidget::setInfo(bool initIsDataOnLocal, bool initisTwoNasMode, QString projectpath, QString projectname, QString tmpimg_projectpath, int tunnelid, QString tunnelname)
+{
+	this->isTwoNasMode = initisTwoNasMode;
+    this->isLocalHost = initIsDataOnLocal;
+    setInfo(projectpath, projectname, tmpimg_projectpath, tunnelid, tunnelname);
 }
 
 /**
@@ -384,32 +415,56 @@ bool ImageViewer3DTwoViewWidget::setCamerasCurrentFCs(__int64 master_fc)
                 currentimgfiler->setting(250, 1024*1024*100, true);
             }
 
+            if (!isLocalHost)
+            {
+    		    if(getNasMode() == true)
+			    {
+				    QString nasip = NetworkConfigList::getNetworkConfigListInstance()->findNASIPByCamID(tmpcamid);
+				    QString masternasip = NetworkConfigList::getNetworkConfigListInstance()->getMasterBackupNasIP();
+				    singlenasip = masternasip;
+                    currenttmpimgpath = "//" + masternasip + "/LanZhou/" + projectname + "/mid_calcu/" + QString::fromLocal8Bit(currentCheckedModel.calcuItem.cal_filename_prefix.c_str());
+				    currenttmpimgpath_l = "//" + nasip + "/LanZhou/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+				    currenttmpimgpath_r = "//" + nasip  + "/LanZhou/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+			    
+                    qDebug() << currenttmpimgpath << currenttmpimgpath_l << currenttmpimgpath_r;
+                }
+                else
+                {
+				    currenttmpimgpath = "//" + singlenasip + "/LanZhou/" + projectname + "/mid_calcu/" + QString::fromLocal8Bit(currentCheckedModel.calcuItem.cal_filename_prefix.c_str());
+				    currenttmpimgpath_l = "//" + singlenasip + "/LanZhou/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+				    currenttmpimgpath_r = "//" + singlenasip  + "/LanZhou/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
+                    qDebug() << currenttmpimgpath << currenttmpimgpath_l << currenttmpimgpath_r;
+                }
+            }
+            qDebug() << currenttmpimgpath << currenttmpimgpath_l << currenttmpimgpath_r;
+
             if (find == 1)
             {
-				if(getNasMode() == true)
-				{
-					QString nasip = NetworkConfigList::getNetworkConfigListInstance()->findNASIPByCamID(tmpcamid);
-					QString masternasip = NetworkConfigList::getNetworkConfigListInstance()->getMasterBackupNasIP();
-					currenttmpimgpath = "//" + masternasip + "/" + projectname + "/mid_calcu/" + QString::fromLocal8Bit(currentCheckedModel.calcuItem.cal_filename_prefix.c_str());
-					currenttmpimgpath_l = "//" + nasip + "/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
-					currenttmpimgpath_r = "//" + nasip  + "/" + projectname + "/collect/" + QString("%1_%2_%3").arg(currentseqno).arg(QObject::tr((*it).tunnel_name.c_str())).arg(datetime);
-				}
                 QByteArray tmpba = (currenttmpimgpath + "_" + QString(tmpmodel.box1.boxindex)).toLocal8Bit() + ".mdat";
                 fileopen = currentpointsfile->openFile(tmpba.constData());
                 if (!fileopen)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
+
                 camidl = tmpmodel.box1.camera_ref.c_str();
                 tmpba = (currenttmpimgpath_l + "_" + camidl.c_str() + ".dat").toLocal8Bit();
                 fileopenl = currentimgfilel->openFile(tmpba.constData());
                 if (!fileopenl)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
+
                 camidr = tmpmodel.box1.camera.c_str();
                 tmpba = (currenttmpimgpath_r + "_" + camidr.c_str() + ".dat").toLocal8Bit();
                 fileopenr = currentimgfiler->openFile(tmpba.constData());
                 if (!fileopenr)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
-                updateStatus(QObject::tr("network_config.xml已找到左侧相机%1，右侧相机%2").arg(camidl.c_str()).arg(camidr.c_str()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
 
+                updateStatus(QObject::tr("network_config.xml已找到左侧相机%1，右侧相机%2").arg(camidl.c_str()).arg(camidr.c_str()));
+                return true;
             }
             else if (find == 2)
             {
@@ -417,18 +472,27 @@ bool ImageViewer3DTwoViewWidget::setCamerasCurrentFCs(__int64 master_fc)
                 fileopen = currentpointsfile->openFile(tmpba.constData());
                 if (!fileopen)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
+
                 camidl = tmpmodel.box2.camera_ref.c_str();
                 tmpba = (currenttmpimgpath_l + "_" + camidl.c_str() + ".dat").toLocal8Bit();
                 fileopenl = currentimgfilel->openFile(tmpba.constData());
                 if (!fileopenl)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
+
                 camidr = tmpmodel.box2.camera.c_str();
                 tmpba = (currenttmpimgpath_r + "_" + camidr.c_str() + ".dat").toLocal8Bit();
                 fileopenr = currentimgfiler->openFile(tmpba.constData());
                 if (!fileopenr)
                     updateStatus(QObject::tr("文件%1打不开").arg(tmpba.constData()));
-                updateStatus(QObject::tr("network_config.xml已找到左侧相机%1，右侧相机%2").arg(camidl.c_str()).arg(camidr.c_str()));
+                else
+                    updateStatus(QObject::tr("文件%1已打开").arg(tmpba.constData()));
 
+                updateStatus(QObject::tr("network_config.xml已找到左侧相机%1，右侧相机%2").arg(camidl.c_str()).arg(camidr.c_str()));
+                return true;
             }
             else
             {
@@ -505,20 +569,29 @@ bool ImageViewer3DTwoViewWidget::updateImages()
 
     if (fileopen)
     {
-        if (!currentpointsfile->retrieveMat(tmpcurrentfc))
-            return false;
-
-        // 当前点
-        cv::Mat currentpoints;
-        BlockInfo currentblockinfo;
-
-        ret = currentpointsfile->readMat(currentpoints, currentblockinfo);
-        if (!ret)
-            return false;
-        else if (widget != NULL)
+        if (currentpointsfile->retrieveMat(tmpcurrentfc))
         {
-            widget->setCurrentMat(currentpoints, true);
-            widget->updateGL();
+            // 当前点
+            cv::Mat currentpoints;
+            BlockInfo currentblockinfo;
+
+            ret = currentpointsfile->readMat(currentpoints, currentblockinfo);
+            if (!ret)
+                return false;
+            else if (widget != NULL)
+            {
+                widget->setCurrentMat(currentpoints, true);
+                widget->updateGL();
+            }
+        }
+        else
+        {
+            cv::Mat currentpoints;
+            if (widget != NULL)
+            {
+                widget->setCurrentMat(currentpoints, true);
+                widget->updateGL();
+            }
         }
     }
 
@@ -544,20 +617,32 @@ bool ImageViewer3DTwoViewWidget::updateImages()
                     if (fileopenl)
                     {
                         if ( !currentimgfilel->retrieveFrame(tmpcurrentfc) ) // TODO
-			                return false;
+                        {
+                            tmpcamimg->clear();
+                            continue;
+                        }
                     }
                     else
+                    {
+                        tmpcamimg->clear();
                         continue;
+                    }
                     tmpfileimg = currentimgfilel;
                     break;
             case 1: tmpcamimg = tmpcamimg2; 
                     if (fileopenr)
                     {
                         if ( !currentimgfiler->retrieveFrame(tmpcurrentfc) ) // TODO
-			                return false;
+                        {
+                            tmpcamimg->clear();
+                            continue;
+                        }
                     }
                     else
+                    {
+                        tmpcamimg->clear();
                         continue;
+                    }
                     tmpfileimg = currentimgfiler;
                     break;    
             default:break;
@@ -777,6 +862,57 @@ void ImageViewer3DTwoViewWidget::exitOuter()
     }
     currentimgfiler = NULL;
     emit finish();
+}
+
+void ImageViewer3DTwoViewWidget::editingNASMode()
+{
+    isEditingNASMode = !isEditingNASMode;
+    if (isEditingNASMode)
+    {
+        ui->editingNASModeWidget->setEnabled(true);
+        ui->oneNASIPLineEdit->setText(singlenasip);
+        ui->editNASModeButton->setText(QObject::tr("应用"));
+    }
+    else
+    {
+        ui->editingNASModeWidget->setEnabled(false);
+        ui->editNASModeButton->setText(QObject::tr("修改"));
+        singlenasip = ui->oneNASIPLineEdit->text().trimmed();
+        setInfo(isLocalHost, isTwoNasMode, currentprojpath, projectname, currenttmpimgpath, currenttunnelid, currenttunnelname);
+    }
+}
+
+/**
+ * 切换数据存储位置模式
+ */
+void ImageViewer3DTwoViewWidget::changeDataNASMode(bool ischecked)
+{
+    isLocalHost = !ischecked;
+    if (isLocalHost)
+    {
+        ui->oneNASIPLineEdit->setEnabled(false);
+        ui->oneNASRadioButton->setEnabled(false);
+        ui->twoNASRadioButton->setEnabled(false);
+    }
+    else
+    {
+        ui->oneNASRadioButton->setEnabled(true); 
+        ui->twoNASRadioButton->setEnabled(true);
+        switch(group->checkedId())
+        {
+            case 0: ui->oneNASIPLineEdit->setEnabled(true); break; 
+            case 1: ui->oneNASIPLineEdit->setEnabled(false); break; 
+        }    
+    }
+}
+
+void ImageViewer3DTwoViewWidget::changeNASMode(bool ischecked)
+{
+    switch(group->checkedId())
+    {
+        case 0: ui->oneNASIPLineEdit->setEnabled(true); isTwoNasMode = false; break; 
+        case 1: ui->oneNASIPLineEdit->setEnabled(false); isTwoNasMode = true; break; 
+    }    
 }
 
 // 转到帧的相关槽函数
