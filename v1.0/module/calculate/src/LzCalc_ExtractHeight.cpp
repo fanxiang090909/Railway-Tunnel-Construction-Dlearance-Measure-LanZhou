@@ -26,6 +26,8 @@ LzCalculate_ExtractHeight::LzCalculate_ExtractHeight()
     // @author 范翔，火车行驶时（计划配置时）车厢正反
     carriagedirect = true;
     isinterruptfile = false;
+
+    logger = NULL;
 }
 
 LzCalculate_ExtractHeight::~LzCalculate_ExtractHeight()
@@ -309,10 +311,32 @@ void LzCalculate_ExtractHeight::Mat2Vector(Mat & input, Vector<Point3d> & output
 
 int LzCalculate_ExtractHeight::extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height)
 {
-	int blank_step = 75;
+    int blank_step = 75;                    //上下平均值的步长
+    center_height = -1;                     //整个隧道最高点
+    float center_height_HI = -1;            //隧道中心定高
+    float ratio_k = 0.45;
+	float ratio_b = 925;                    //起拱位置为 = raito_k * 中心顶高 + ratio_b
+	float start_height = 3000;              //定义起拱高度                   
+	float minx = 10000;
+    for(Vector<Point3d>::iterator point = fus_vector.begin(); point != fus_vector.end(); point++)
+   {
+	  
+        // 中心顶部净高
+        if ((*point).x > center_height)
+            center_height = (*point).x;
+        if ((*point).z >= 7.5 && (*point).z <= 9.5 && (*point).y<20 && -20<(*point).y)
+        {
+            if ((*point).x > center_height_HI)
+               center_height_HI = (*point).x;
+        }
+	}
+	if(center_height_HI == -1)
+		center_height_HI  = center_height;
 
-    center_height = -1;
-    float center_height_HI = -1, minx = 10000;
+	start_height = center_height_HI  * ratio_k + ratio_b;
+	float height_dist = center_height_HI - start_height;
+	float height_k    = (-45) / height_dist;
+	float height_b    = 50 - start_height*height_k;                                         //blank_step的函数为 blank_step = height_k * 当前item点高 +  height_b
 	for(list<int>::iterator it = Item.begin(); it != Item.end() ;it++)                      //对List进行遍历获取点
 	{
 		bool flag = false;
@@ -323,19 +347,10 @@ int LzCalculate_ExtractHeight::extract_height(Vector<Point3d> & fus_vector, Sect
 	    bool postive = false;                                                               //用于指明有无指定高度数据
 	    bool mean_2_init = false;
 	    bool mean_1_init = false;
-		for(Vector<Point3d>::iterator point = fus_vector.begin(); point != fus_vector.end(); point++)
+		if (start_height < *it && *it < center_height_HI)                                   //假如提取点在拱的范围内
+			blank_step = *it * height_k + height_b;
+	    for(Vector<Point3d>::iterator point = fus_vector.begin(); point != fus_vector.end(); point++)
 	    {
-            // 中心顶部净高
-            if ((*point).x > center_height)
-                center_height = (*point).x;
-            /*if ((*point).x < minx)
-                minx = (*point).x;*/
-            if ((*point).z >= 7.5 && (*point).z <= 9.5)
-            {
-                if ((*point).x > center_height_HI)
-                    center_height_HI = (*point).x;
-            }
-
 		    if((*point).x==*it)
 		    {
 			    Pts.x = (*point).x;
@@ -467,6 +482,11 @@ int LzCalculate_ExtractHeight::run()
         return 5;
     }
 
+    initLogger(fusefile_no_RT + ".log", "NPU LanZhou LzExtractHeightThread");
+    log("outputfile:" + QString::fromLocal8Bit(syn_output_file.c_str()));
+    log("rectifyfile:" + QString::fromLocal8Bit(syn_rectify_input_file.c_str()) + ", " + QString("userectifyfactor=%1, usesaftyfactor=%2").arg(userectifyfactor).arg(usesafetyfactor));
+    log(QString("hasinit_syn_rectify_input_file:%1").arg(hasinit_syn_rectify_input_file));
+
     std::vector<BLOCK_KEY> inputkeys = lzMatFuse->readKeys();
 
     BLOCK_KEY startfr = inputkeys.at(0);
@@ -509,10 +529,10 @@ int LzCalculate_ExtractHeight::run()
 
         // 【Step2】对vector进行rt矫正
         // 将17组从机vector放入一个vector中
-        if (hasinit_has_RTfile)
+        /*if (hasinit_has_RTfile)
         {
 		    rectify_RT();                                                  
-        }
+        }*/
 
       	BlockInfo tmpblockinfo;
         tmpblockinfo.isvalid = true;
@@ -573,4 +593,42 @@ int LzCalculate_ExtractHeight::run()
 
 	//system("pause");
     return ret;
+}
+
+/** 
+ * 日志类初始化
+ */
+bool LzCalculate_ExtractHeight::initLogger(string filename, string username)
+{
+    if (logger != NULL)
+    {
+        if (logger->isLogging())
+        {
+            logger->log("***************************************************************************");
+            logger->log(string("【关闭提高度计算日志类】") + filename + string("用户【") + username + string("】"));
+            logger->close();
+        }
+        delete logger;
+    }
+
+    logger = new LzLogger(LzLogger::MasterOpt);
+    logger->setFilename(filename);
+    if (logger->open() == 0)
+    {
+        hasinitlog = true;
+        logger->log("***************************************************************************");
+        logger->log(string("【开启提高度计算日志类") + filename + string("用户【") + username + string("】"));
+        return true;
+    }
+    else
+    {
+        hasinitlog = false;
+        return false;
+    }
+}
+
+void LzCalculate_ExtractHeight::log(QString msg)
+{
+    if (hasinitlog)
+        logger->log(msg.toLocal8Bit().constData());
 }

@@ -183,6 +183,9 @@ private:
 	float newCenterHeight;
 	//9月2号添加
 
+	//@zengwang 2015年11月5号添加
+	bool isCurrentCarriageDirectionChanged;
+
 private slots:
   
     /**

@@ -3,6 +3,7 @@
 
 #include <datastructure.h>
 #include <filemanagers.h>
+#include "lz_logger.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -61,6 +62,15 @@ public:
      * 提取高度
      */
     int extract_height(Vector<Point3d> & fus_vector, SectionData & Data, float & center_height);
+
+    /** 
+     * 日志类初始化
+     */
+    bool initLogger(string filename, string username);
+    /**
+     * 日志记录
+     */
+    void log(QString msg);
 
 signals:
     // @author 范翔改 继承自QObject 可以通过消息槽反馈计算进度
@@ -138,6 +148,10 @@ private:
      *          面向终点的左边数据点和右边数据点
      */
     std::map<int, RectifyFactor> vals;
+
+    // 日志相关 @author 范翔
+    LzLogger * logger;
+    bool hasinitlog;
 };
 
 #endif // LZCALCULATE_EXTRACTHEIGHT_H

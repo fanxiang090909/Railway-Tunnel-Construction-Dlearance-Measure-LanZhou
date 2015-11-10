@@ -122,6 +122,10 @@ SynthesisTunnelWidget::SynthesisTunnelWidget(QWidget *parent) :
 
 	isNormalTravel = true;
 
+	//@zengwang 2015年11月5号添加
+	isCurrentCarriageDirectionChanged = false;
+
+
 }
 
 SynthesisTunnelWidget::~SynthesisTunnelWidget()
@@ -239,6 +243,12 @@ void SynthesisTunnelWidget::endProgressBar()
  */
 void SynthesisTunnelWidget::carriageDirectionChanged(int index)
 {
+
+
+	//@zengwang 2015年11月5日添加
+	isCurrentCarriageDirectionChanged = true;
+
+
     if (carriagedirectionlock)
         return;
 
@@ -561,6 +571,7 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 				
 			// 左右侧有效
 
+			/*
 			if(isNormalTravel)         //判断是否正常行驶   正常行驶
 			{
 				if(isDoubleLine)      //判断是否为双线    双线
@@ -576,9 +587,9 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 					else      //采集方向与出表方向不一致
 					{
 						//如果采集方向与出表方向不一致时，先将左右数据进行对调，再显示左边数据（右边数据不显示）
-						straightdata.swapLeftAndRight();
-						leftdata.swapLeftAndRight();
-						rightdata.swapLeftAndRight();
+						//straightdata.swapLeftAndRight();
+						//leftdata.swapLeftAndRight();
+						//rightdata.swapLeftAndRight();
 						//straightdata.resetLeftOrRight(!currentcarriagedirection);
 						//leftdata.resetLeftOrRight(!currentcarriagedirection);
 						//rightdata.resetLeftOrRight(!currentcarriagedirection);
@@ -592,9 +603,9 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 						ui->leftRightValidComboBox->setCurrentIndex(0);
 					else                            //采集与出表方向不一致时，将左右数据对调后进行显示
 					{
-						straightdata.swapLeftAndRight();
-						leftdata.swapLeftAndRight();
-						rightdata.swapLeftAndRight();
+						//straightdata.swapLeftAndRight();
+						//leftdata.swapLeftAndRight();
+						//rightdata.swapLeftAndRight();
 
 						ui->leftRightValidComboBox->setCurrentIndex(0);
 					}
@@ -615,9 +626,9 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 					}
 					else              //采集与出表数据不一致时，左右数据对调，出左边数据
 					{
-						straightdata.swapLeftAndRight();
-						leftdata.swapLeftAndRight();
-						rightdata.swapLeftAndRight();
+						//straightdata.swapLeftAndRight();
+						//leftdata.swapLeftAndRight();
+						//rightdata.swapLeftAndRight();
 						//straightdata.resetLeftOrRight(!currentcarriagedirection);
 						//leftdata.resetLeftOrRight(!currentcarriagedirection);
 						//rightdata.resetLeftOrRight(!currentcarriagedirection);
@@ -628,17 +639,32 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 				else           //单线不存在非正常行驶这种情况,不做任何处理
 					ui->leftRightValidComboBox->setCurrentIndex(0);
 			}
-
+			*/
 
 
 			int leftrightvalid = ui->leftRightValidComboBox->currentIndex();
             // @TODO 系数0.5103应改为外部配置文件输入
 			//lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, currentcarriagedirection, this->current_startframeno, this->current_endframeno, leftrightvalid);
-            lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, true, this->current_startframeno, this->current_endframeno, leftrightvalid);
+           
+
+			
+			lzsyn.initSynthesis(tunnelheightssynname, m, &tmp, interframe_mile, true, this->current_startframeno, this->current_endframeno, leftrightvalid);
 			bool hasstraight = false, hasleft = false, hasright = false;
 			lzsyn.synthesis(straightdata, leftdata, rightdata, hasstraight, hasleft, hasright);
 
-            int ret1 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(straightdata, tasktunnelid, ClearanceType::Straight_Smallest);
+
+			//@zengwang 2015年11月5号添加
+			//如果认为修改车厢方向（），则将左右数据对调
+			if(isCurrentCarriageDirectionChanged == true)
+			{
+				straightdata.swapLeftAndRight();
+				leftdata.swapLeftAndRight();
+				rightdata.swapLeftAndRight();
+			}
+
+			isCurrentCarriageDirectionChanged = false;
+						
+			int ret1 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(straightdata, tasktunnelid, ClearanceType::Straight_Smallest);
             int ret2 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(leftdata, tasktunnelid, ClearanceType::LeftCurve_Smallest);
             int ret3 = ClearanceOutputDAO::getClearanceOutputDAOInstance()->clearanceDataToDBData(rightdata, tasktunnelid, ClearanceType::RightCurve_Smallest);
 
@@ -659,6 +685,8 @@ void SynthesisTunnelWidget::calculateSynthesisData()
 
         // 重新显示
         loadSynthesisData();
+
+		
     }
     else
         ;
