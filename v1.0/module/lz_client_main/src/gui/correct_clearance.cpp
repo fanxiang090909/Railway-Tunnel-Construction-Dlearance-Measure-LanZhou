@@ -192,7 +192,9 @@ CorrectClearanceWidget::CorrectClearanceWidget(QWidget *parent) :
 
     // 显示融合结果
     connect(ui->showFuseButton,SIGNAL(toggled(bool)),this,SLOT(showFuse(bool)));
-    ui->showFuseButton->setChecked(true);
+    // 默认不显示融合结果
+    ui->showFuseButton->setChecked(false);
+    
     // 显示底板
     connect(ui->showFloorButton,SIGNAL(toggled(bool)),this,SLOT(showFloor(bool)));
     ui->showFloorButton->setChecked(true);

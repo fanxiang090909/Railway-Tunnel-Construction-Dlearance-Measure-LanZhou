@@ -14,7 +14,7 @@
 #include "LzCalculator.h"
 #include "icpPointToPoint.h"
 #include "Fusion.h"
-#include "R_T_Calc.h"   // 旧版本RT计算
+//#include "R_T_Calc.h"   // 旧版本RT计算
 #include "Lz_RT_Calc.h" // 新版本RT计算
 #include "xmlsynthesisheightsfileloader.h"
 #include "output_heights_list.h"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="gb2312" standalone="yes" ?>
-<network_config calibration_file="QRrail.xml,heights.rectify," master_ip="192.168.200.1" master_backup_nasip="192.168.200.102" db_server_ip="localhost">
+<network_config calibration_file="QRrail_20151021.xml,heights_20151106.rectify" master_ip="192.168.200.1" master_backup_nasip="192.168.200.102" db_server_ip="localhost">
     <slave slaveid="1" ip="192.168.200.12" port="1111" is_rt_slave="0" backup_nasip="192.168.200.101">
         <camera_pair index="A" camera_calib_file="Lz_Cali_A_20151027.xml" fenzhong_calib_file="FZCalibration_A_20141030.xml">
             <camera_ref cameraid="A2" sn="21395107" paramfile="A2.xml" />

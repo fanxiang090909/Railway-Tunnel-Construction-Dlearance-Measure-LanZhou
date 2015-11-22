@@ -24,6 +24,64 @@
 
 #include "setting_master.h"
 
+#include "Windows.h" 
+#include <sstream> 
+#include <Tlhelp32.h>  
+
+using namespace std;
+
+int CheckIfRunningProcessByName(const wchar_t * name)  
+{  
+    DWORD pid = 0;  
+      
+    // Create toolhelp snapshot.  
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);  
+    PROCESSENTRY32W process;  
+    ZeroMemory(&process, sizeof(process));  
+    process.dwSize = sizeof(process);  
+  
+    std::vector<DWORD> pids;  
+    // Walkthrough all processes.  
+    if (Process32FirstW(snapshot, &process))  
+    {  
+        do  
+        {  
+            // Compare process.szExeFile based on format of name, i.e., trim file path  
+            // trim .exe if necessary, etc.  
+            if (!wcscmp(process.szExeFile, name))  
+            {  
+               pid = process.th32ProcessID;   
+               pids.push_back(pid);  
+            }  
+        } while (Process32NextW(snapshot, &process));  
+    }  
+  
+    size_t size = pids.size();  
+    if (size > 1)
+        return 2;
+    else if (size == 1)
+        return 1;
+    else
+        return 0;
+}  
+
+bool CheckIfRunning(QString programename, bool iscurrent)
+{
+    QByteArray ba = programename.toLocal8Bit();
+    wstringstream wss;
+    wss << ba.constData();
+    qDebug() << wss.str().c_str();
+    int isrunning = CheckIfRunningProcessByName(wss.str().c_str());
+    if ((iscurrent && isrunning == 2) || (!iscurrent && isrunning > 0))
+    {
+        QMessageBox::critical(0, QObject::tr("启动错误"),
+                                QObject::tr("%1程序正在运行中，请先关闭正在运行的程序！").arg(programename),
+                                QMessageBox::Ok);
+        return true;
+    }
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -44,6 +102,17 @@ int main(int argc, char *argv[])
         return 1;
     }
     QApplication::setQuitOnLastWindowClosed(false);
+
+    bool isrunning = CheckIfRunning("lz_master_gui.exe", true);
+    if (isrunning)
+    {
+        return 1;
+    }
+    isrunning = CheckIfRunning("lz_master_monitor.exe", false);
+    if (isrunning)
+    {
+        return 1;
+    }
 
     QSplashScreen *splash = new QSplashScreen();
     splash->setPixmap(QPixmap(":/image/start.png"));

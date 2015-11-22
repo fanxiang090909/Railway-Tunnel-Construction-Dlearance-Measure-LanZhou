@@ -191,6 +191,9 @@
     <CustomBuild Include="..\..\..\..\..\calculate\include\LzCalc_ExtractHeight.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\lz_db\include\daoadmin.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_about.cpp">
@@ -496,9 +499,6 @@
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\calculate\src\LZ_Calculation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\calculate\src\icp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -589,9 +589,6 @@
     <ClCompile Include="..\..\..\..\..\lz_logger\src\lz_logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\calculate\src\R_T_Calc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_status_calcu_master.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -653,6 +650,18 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalc_ExtractHeight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_daoadmin.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_daoadmin.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\lz_db\src\daoadmin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\lz_db\src\settingdb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -729,9 +738,6 @@
     <ClInclude Include="..\..\..\..\..\datastructure\include\lz_working_enum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\calculate\include\LZ_Calculation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\filemanagers\include\LzSerialStorageBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -786,9 +792,6 @@
     <ClInclude Include="..\..\..\..\..\lz_logger\include\lz_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\calculate\include\R_T_Calc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\calculate\include\calibparameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -811,6 +814,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\pulsehandle\include\WriteHardware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\lz_db\include\connectdb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

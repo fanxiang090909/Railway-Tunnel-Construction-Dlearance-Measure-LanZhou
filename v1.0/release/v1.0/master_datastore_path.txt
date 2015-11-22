@@ -1,1 +1,2 @@
 D:/datastore
+DistanceMode:0.5103

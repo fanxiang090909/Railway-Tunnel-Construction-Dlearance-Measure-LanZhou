@@ -205,9 +205,6 @@
     <ClCompile Include="..\..\..\..\..\calculate\src\kdtree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\calculate\src\LZ_Calculation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\calculate\src\matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -337,9 +334,6 @@
     <ClCompile Include="GeneratedFiles\qrc_icons.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\calculate\src\R_T_Calc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\calculate\src\LzCalculator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -453,9 +447,6 @@
     <ClInclude Include="..\..\..\..\..\calculate\include\icp\matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\calculate\include\LZ_Calculation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\compress\include\lzoconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -490,9 +481,6 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\datastructure\include\clearance_item.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\calculate\include\R_T_Calc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\calculate\include\calibparameters.h">
